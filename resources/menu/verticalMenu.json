@@ -225,7 +225,7 @@
         {
           "url": "auth/login-basic",
           "name": "Login",
-          "slug": "auth-login-basic",
+          "slug": "login",
           "target": "_blank"
         },
         {
