@@ -43,9 +43,18 @@ use App\Http\Controllers\form_elements\InputGroups;
 use App\Http\Controllers\form_layouts\VerticalForm;
 use App\Http\Controllers\form_layouts\HorizontalForm;
 use App\Http\Controllers\tables\Basic as TablesBasic;
+use App\Http\Controllers\tables\DataTableController;
+use Illuminate\Support\Facades\Auth;
 
 // Main Page Route
-Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
+// Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
+Route::get('/', function () {
+  if (Auth::check()) {
+    return redirect()->route('dashboard-analytics');
+  } else {
+    return redirect()->route('login');
+  }
+});
 
 // layout
 Route::get('/layouts/without-menu', [WithoutMenu::class, 'index'])->name('layouts-without-menu');
@@ -55,6 +64,9 @@ Route::get('/layouts/container', [Container::class, 'index'])->name('layouts-con
 Route::get('/layouts/blank', [Blank::class, 'index'])->name('layouts-blank');
 
 // pages
+Route::get('/dashboard', [Analytics::class, 'index'])
+  ->middleware('auth')
+  ->name('dashboard-analytics');
 Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name('pages-account-settings-account');
 Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');
 Route::get('/pages/account-settings-connections', [AccountSettingsConnections::class, 'index'])->name('pages-account-settings-connections');
@@ -62,7 +74,9 @@ Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('pages-misc-e
 Route::get('/pages/misc-under-maintenance', [MiscUnderMaintenance::class, 'index'])->name('pages-misc-under-maintenance');
 
 // authentication
-Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
+Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('login');
+Route::post('/auth/login-basic', [LoginBasic::class, 'login'])->name('auth-login');
+Route::post('/logout', [LoginBasic::class, 'logout'])->name('logout');
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 Route::get('/auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('auth-reset-password-basic');
 
@@ -107,3 +121,6 @@ Route::get('/form/layouts-horizontal', [HorizontalForm::class, 'index'])->name('
 
 // tables
 Route::get('/tables/basic', [TablesBasic::class, 'index'])->name('tables-basic');
+
+// DataTables AJAX route for users
+Route::get('/users', [DataTableController::class, 'index'])->name('users.index');
