@@ -20,14 +20,23 @@
         <div class="col-12 col-xxl-8 order-2 order-md-3 order-xxl-2 mb-6">
             <div class="card">
                 <div class="row row-bordered g-0">
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="card-title mb-0">
                                 <h5 class="m-0 me-2"><i class="bx bx-lg bx-history"></i> History</h5>
                             </div>
                         </div>
                         {{-- Table history absensi --}}
-                        <div></div>
+                          <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4" style="width:100%">
+                              <thead>
+                                  <tr>
+                                      <th>ID</th>
+                                      <th>Name</th>
+                                      <th>Email</th>
+                                      <th>Action</th>
+                                  </tr>
+                              </thead>
+                          </table>
                     </div>
                 </div>
             </div>
@@ -71,3 +80,70 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        window.addEventListener('load', function() {
+            $('#usersTable').on('init.dt', function() {
+                $('#usersTable_wrapper').addClass('px-5');
+                $('.dt-layout-table').addClass('table-responsive');
+            });
+
+            $('#usersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route('users.index') }}',
+                    type: 'GET'
+                },
+                columns: [{
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ]
+            });
+        });
+    </script>
+
+    <style>
+    /* 🔹 Batasi area yang bisa di-scroll */
+    .table-container {
+        overflow-x: auto;      /* scroll horizontal */
+        overflow-y: hidden;      /* scroll vertikal (kalau datanya panjang) */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 🔹 Agar header tetap di tempat */
+    .table-container thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 10;
+    }
+
+    /* 🔹 Hilangkan padding bawah agar tabel pas */
+    .dataTables_wrapper .row {
+        margin-bottom: 0;
+    }
+    </style>
+@endpush

@@ -1,0 +1,2 @@
+@import 'bootstrap/dist/css/bootstrap.min.css'; /* Bootstrap 5 CSS dari node_modules */
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css'; /* DataTables + Bootstrap 5 integration */
