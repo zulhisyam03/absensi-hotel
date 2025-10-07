@@ -20,3 +20,23 @@
 <!-- BEGIN: Page JS-->
 @yield('page-script')
 <!-- END: Page JS-->
+
+<script>
+function logoutUser() {
+  fetch("{{ route('logout') }}", {
+    method: "POST",
+    headers: {
+      "X-CSRF-TOKEN": "{{ csrf_token() }}",
+      "Accept": "application/json",
+    },
+  })
+  .then(response => {
+    if (response.redirected) {
+      window.location.href = response.url; // follow redirect
+    } else {
+      window.location.href = "/auth/login-basic";
+    }
+  })
+  .catch(() => alert("Logout gagal, coba lagi."));
+}
+</script>
