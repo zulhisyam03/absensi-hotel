@@ -1,9 +1,9 @@
 <?php
 // Variables
 return [
-  "creatorName" => "ThemeSelection",
-  "creatorUrl" => "https://themeselection.com",
-  "templateName" => "Swissbell Hotel",
+  "creatorName" => "Zul Hisyam",
+  "creatorUrl" => "https://www.linkedin.com/in/zul-hisyam-2783b4222/",
+  "templateName" => "Swiss-Belexpress",
   "templateSuffix" => "Bootstrap Dashboard FREE",
   "templateVersion" => "2.0.0",
   "templateFree" => true,
