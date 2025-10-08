@@ -4,11 +4,7 @@
       "url": "/",
       "name": "Dashboards",
       "icon": "menu-icon tf-icons bx bx-home-smile",
-      "slug": "dashboard",
-      "badge": [
-        "danger",
-        "5"
-      ]
+      "slug": "dashboard"
     },
     {
       "menuHeader": "Apps & Pages"
@@ -28,6 +24,7 @@
       "name": "Training",
       "icon": "menu-icon tf-icons bx bx-list-ul",
       "slug": "training-pegawai",
+      "hidden": true,
       "visibleTo": [
         "hr",
         "admin"
@@ -194,29 +191,6 @@
           "slug": "forms-input-groups"
         }
       ]
-    },
-    {
-      "name": "Form Layouts",
-      "icon": "menu-icon tf-icons bx bx-detail",
-      "slug": "form-layouts",
-      "submenu": [
-        {
-          "url": "form/layouts-vertical",
-          "name": "Vertical Form",
-          "slug": "form-layouts-vertical"
-        },
-        {
-          "url": "form/layouts-horizontal",
-          "name": "Horizontal Form",
-          "slug": "form-layouts-horizontal"
-        }
-      ]
-    },
-    {
-      "url": "tables/basic",
-      "icon": "menu-icon tf-icons bx bx-table",
-      "name": "Tables",
-      "slug": "tables-basic"
     }
   ]
 }

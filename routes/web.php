@@ -10,6 +10,7 @@ use App\Http\Controllers\layouts\Blank;
 use App\Http\Controllers\pages\AccountSettingsAccount;
 use App\Http\Controllers\AbsenController;
 use App\Http\Controllers\pages\PegawaiController;
+use App\Http\Controllers\pages\PayrollController;
 use App\Http\Controllers\pages\AccountSettingsNotifications;
 use App\Http\Controllers\pages\AccountSettingsConnections;
 use App\Http\Controllers\pages\MiscError;
@@ -74,6 +75,9 @@ Route::middleware(['auth'])->group(function () {
 
   // Shift Kerja
   Route::get('/pages/shift-kerja', [AbsenController::class, 'viewShift'])->name('pages-shift-kerja');
+
+  // Payroll
+  Route::get('/pages/payroll', [PayrollController::class, 'index'])->name('pages-payroll');
 
   Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name('pages-account-settings-account');
   Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');

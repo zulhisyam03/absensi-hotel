@@ -133,6 +133,12 @@
                     //     searchable: false
                     // }
                 ],
+                language: {
+                    // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
+                    lengthMenu: "_MENU_",
+                    searchPlaceholder: "Cari...",
+                    search: ""
+                },
                 responsive: true,
                 pageLength: 10,
                 lengthMenu: [
