@@ -27,7 +27,7 @@
                             </div>
                         </div>
                         {{-- Table history absensi --}}
-                        <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4"
+                        <table id="pegawaiTable" class="table table-responsive table-striped text-nowrap px-4"
                             style="width:100%">
                             <thead>
                                 <tr>
@@ -49,16 +49,16 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
-            $('#usersTable').on('init.dt', function() {
-                $('#usersTable_wrapper').addClass('px-5');
+            $('#pegawaiTable').on('init.dt', function() {
+                $('#pegawaiTable_wrapper').addClass('px-5');
                 $('.dt-layout-table').addClass('table-responsive');
             });
 
-            $('#usersTable').DataTable({
+            $('#pegawaiTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('history-absen.index') }}',
+                    url: '{{ route('shift-kerja.index') }}',
                     type: 'GET'
                 },
                 columns: [{
@@ -108,7 +108,7 @@
     </script>
 
     <style>
-        #usersTable tbody td {
+        #pegawaiTable tbody td {
             text-transform: capitalize;
         }
     </style>

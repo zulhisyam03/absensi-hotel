@@ -67,7 +67,10 @@ Route::get('/layouts/blank', [Blank::class, 'index'])->name('layouts-blank');
 // pages on middleware
 Route::middleware(['auth'])->group(function () {
   Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
+
+  // Shift Kerja
   Route::get('/pages/shift-kerja', [AbsenController::class, 'viewShift'])->name('pages-shift-kerja');
+
   Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name('pages-account-settings-account');
   Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');
   Route::get('/pages/account-settings-connections', [AccountSettingsConnections::class, 'index'])->name('pages-account-settings-connections');
@@ -124,5 +127,6 @@ Route::get('/form/layouts-horizontal', [HorizontalForm::class, 'index'])->name('
 // tables
 Route::get('/tables/basic', [TablesBasic::class, 'index'])->name('tables-basic');
 
-// DataTables AJAX route for users
+// DataTables AJAX route
 Route::get('/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
+Route::get('/shift-kerja', [DataTableController::class, 'viewShift'])->name('shift-kerja.index');

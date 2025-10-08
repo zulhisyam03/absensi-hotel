@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\tables;
 
 use App\Http\Controllers\Controller;
+use App\Models\ShiftKerja;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Absen;
+use App\Models\Pegawai;
 use Carbon\Carbon;
 
 class DataTableController extends Controller
@@ -93,26 +95,33 @@ class DataTableController extends Controller
   {
     //
     if ($request->ajax()) {
-      // return DataTables::of(User::query())
-      //   ->addColumn('action', function ($row) {
-      //     $editBtn = '<a href="/users/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
-      //     $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
-      //     return $editBtn . ' ' . $deleteBtn;
-      //   })
-      //   ->rawColumns(['action'])
-      //   ->make(true);
+      // ⭐️ 1. Lakukan JOIN ke tabel 'pegawais' dan pilih kolom yang diperlukan.
+      $shiftKerja = ShiftKerja::query()
+        ->select('shift_kerjas.*') // Pilih semua kolom dari shift_kerjas
+        ->leftJoin('pegawais', 'shift_kerjas.no_karyawan', '=', 'pegawais.no_karyawan')
 
-      $absensi = Absen::query()->orderBy('created_at', 'DESC');
-      return DataTables::of($absensi)
-        // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
+        // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
+        ->orderBy('pegawais.nama_pegawai', 'ASC') // Urutkan berdasarkan nama_pegawai A-Z
+        // Jika Anda ingin pengurutan created_at sebagai urutan sekunder:
+        // ->orderBy('shift_kerjas.created_at', 'DESC');
+        ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
+
+      return DataTables::of($shiftKerja)
         ->addIndexColumn()
-
-        ->editColumn('created_at', function ($row) {
+        ->editColumn('waktu_masuk', function ($row) {
           // Menggunakan Carbon untuk memformat created_at
-          return Carbon::parse($row->created_at)->format('Y-m-d H:i:s');
+          return Carbon::parse($row->waktu_masuk)->format('H:i');
         })
+        ->editColumn('waktu_pulang', function ($row) {
+          // Menggunakan Carbon untuk memformat created_at
+          return Carbon::parse($row->waktu_pulang)->format('H:i');
+        })
+        ->addColumn('nama_pegawai', function ($row) {
+          return $row->pegawai ? $row->pegawai->nama_pegawai : 'N/A';
+        })
+        // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addColumn('action', function ($row) {
-          $editBtn = '<a href="/users/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
+          $editBtn = '<a href="/shift-kerja/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
           return $editBtn . ' ' . $deleteBtn;
         })
