@@ -20,20 +20,22 @@ class DataTableController extends Controller
   {
     //
     if ($request->ajax()) {
-      // return DataTables::of(User::query())
-      //   ->addColumn('action', function ($row) {
-      //     $editBtn = '<a href="/users/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
-      //     $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
-      //     return $editBtn . ' ' . $deleteBtn;
-      //   })
-      //   ->rawColumns(['action'])
-      //   ->make(true);
+      $absensi = Absen::query()
+        ->select('absens.*') // Pilih semua kolom dari absens
+        ->leftJoin('pegawais', 'absens.no_karyawan', '=', 'pegawais.no_karyawan')
 
-      $absensi = Absen::query()->orderBy('created_at', 'DESC');
+        // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
+        ->orderBy('absens.created_at', 'DESC') // Urutkan berdasarkan nama_pegawai A-Z
+        // Jika Anda ingin pengurutan created_at sebagai urutan sekunder:
+        // ->orderBy('shift_kerjas.created_at', 'DESC');
+        ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
+
       return DataTables::of($absensi)
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addIndexColumn()
-
+        ->addColumn('nama_pegawai', function ($row) {
+          return $row->pegawai ? $row->pegawai->nama_pegawai : 'N/A';
+        })
         ->editColumn('created_at', function ($row) {
           // Menggunakan Carbon untuk memformat created_at
           return Carbon::parse($row->created_at)->format('Y-m-d H:i:s');

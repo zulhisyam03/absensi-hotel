@@ -76,6 +76,11 @@ Route::middleware(['auth'])->group(function () {
   Route::get('/pages/account-settings-connections', [AccountSettingsConnections::class, 'index'])->name('pages-account-settings-connections');
   Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
   Route::get('/pages/misc-under-maintenance', [MiscUnderMaintenance::class, 'index'])->name('pages-misc-under-maintenance');
+
+  // DataTables AJAX route
+  Route::get('/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
+  Route::get('/shift-kerja', [DataTableController::class, 'viewShift'])->name('shift-kerja.index');
+
 });
 
 // authentication
@@ -126,7 +131,3 @@ Route::get('/form/layouts-horizontal', [HorizontalForm::class, 'index'])->name('
 
 // tables
 Route::get('/tables/basic', [TablesBasic::class, 'index'])->name('tables-basic');
-
-// DataTables AJAX route
-Route::get('/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
-Route::get('/shift-kerja', [DataTableController::class, 'viewShift'])->name('shift-kerja.index');

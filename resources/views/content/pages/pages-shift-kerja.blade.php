@@ -36,6 +36,7 @@
                                     <th>Shift</th>
                                     <th>Waktu Masuk</th>
                                     <th>Waktu Pulang</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                         </table>
