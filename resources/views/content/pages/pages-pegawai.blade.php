@@ -23,28 +23,28 @@
                     <div class="col-lg-12">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="card-title mb-0">
-                                <h5 class="m-0 me-2"><i class="bx bx-lg bx-timer"></i> Shift Kerja</h5>
+                                <h5 class="m-0 me-2"><i class="bx bx-lg bx-user"></i> Daftar Pegawai</h5>
                             </div>
                         </div>
 
                         {{-- Button tambah Data Pegwai --}}
                         <div class="d-flex justify-content-end">
-                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"><i
+                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahPegawai"><i
                                     class="bx bx-lg bx-plus"></i>
-                                Tambah Shift</button>
+                                Tambah Pegawai</button>
                         </div>
                         {{-- END Button tambah Data Pegwai --}}
 
                         {{-- Table history absensi --}}
-                        <table id="shiftTable" class="table table-responsive table-striped text-nowrap px-4"
+                        <table id="pegawaiTable" class="table table-responsive table-striped text-nowrap px-4"
                             style="width:100%">
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Nomor Pegawai</th>
                                     <th>Nama Pegawai</th>
-                                    <th>Shift</th>
-                                    <th>Waktu Masuk</th>
-                                    <th>Waktu Pulang</th>
+                                    <th>No. Handphone</th>
+                                    <th>Tanggal Join</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -59,16 +59,16 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
-            $('#shiftTable').on('init.dt', function() {
-                $('#shiftTable_wrapper').addClass('px-5');
+            $('#pegawaiTable').on('init.dt', function() {
+                $('#pegawaiTable_wrapper').addClass('px-5');
                 $('.dt-layout-table').addClass('table-responsive');
             });
 
-            $('#shiftTable').DataTable({
+            $('#pegawaiTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('shift-kerja.index') }}',
+                    url: '{{ route('pegawai.index') }}',
                     type: 'GET'
                 },
                 columns: [{
@@ -79,20 +79,20 @@
                         searchable: false // Nomor urut tidak perlu dicari
                     },
                     {
+                        data: 'no_karyawan',
+                        name: 'no_karyawan'
+                    },
+                    {
                         data: 'nama_pegawai',
                         name: 'nama_pegawai'
                     },
                     {
-                        data: 'shift',
-                        name: 'shift'
+                        data: 'no_hp',
+                        name: 'no_hp'
                     },
                     {
-                        data: 'waktu_masuk',
-                        name: 'waktu_masuk'
-                    },
-                    {
-                        data: 'waktu_pulang',
-                        name: 'waktu_pulang'
+                        data: 'tgl_join',
+                        name: 'tgl_join'
                     },
                     {
                         data: 'action',
@@ -118,7 +118,7 @@
     </script>
 
     <style>
-        #shiftTable tbody td {
+        #pegawaiTable tbody td {
             text-transform: capitalize;
         }
     </style>

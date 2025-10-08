@@ -16,7 +16,7 @@
     {
       "url": "pages/daftar-pegawai",
       "name": "Daftar Pegawai",
-      "icon": "menu-icon tf-icons bx bx-list-ul",
+      "icon": "menu-icon tf-icons bx bx-user",
       "slug": "daftar-pegawai",
       "visibleTo": [
         "hr",

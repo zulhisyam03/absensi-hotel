@@ -45,54 +45,6 @@ class DataTableController extends Controller
     return view('history-absen.index');
   }
 
-  /**
-   * Show the form for creating a new resource.
-   */
-  public function create()
-  {
-    //
-  }
-
-  /**
-   * Store a newly created resource in storage.
-   */
-  public function store(Request $request)
-  {
-    //
-  }
-
-  /**
-   * Display the specified resource.
-   */
-  public function show(string $id)
-  {
-    //
-  }
-
-  /**
-   * Show the form for editing the specified resource.
-   */
-  public function edit(string $id)
-  {
-    //
-  }
-
-  /**
-   * Update the specified resource in storage.
-   */
-  public function update(Request $request, string $id)
-  {
-    //
-  }
-
-  /**
-   * Remove the specified resource from storage.
-   */
-  public function destroy(string $id)
-  {
-    //
-  }
-
   public function viewShift(Request $request)
   {
     //
@@ -131,5 +83,27 @@ class DataTableController extends Controller
         ->make(true);
     }
     return view('shift-kerja.index');
+  }
+
+  public function viewPegawai(Request $request)
+  {
+    //
+    if ($request->ajax()) {
+      $pegawai = Pegawai::query()
+        ->orderBy('nama_pegawai', 'ASC');
+
+      return DataTables::of($pegawai)
+        // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
+        ->addIndexColumn()
+        // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
+        ->addColumn('action', function ($row) {
+          $editBtn = '<a href="/pegawai/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
+          $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
+          return $editBtn . ' ' . $deleteBtn;
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    }
+    return view('pegawai.index');
   }
 }

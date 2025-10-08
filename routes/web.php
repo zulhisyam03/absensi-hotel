@@ -9,6 +9,7 @@ use App\Http\Controllers\layouts\Container;
 use App\Http\Controllers\layouts\Blank;
 use App\Http\Controllers\pages\AccountSettingsAccount;
 use App\Http\Controllers\AbsenController;
+use App\Http\Controllers\pages\PegawaiController;
 use App\Http\Controllers\pages\AccountSettingsNotifications;
 use App\Http\Controllers\pages\AccountSettingsConnections;
 use App\Http\Controllers\pages\MiscError;
@@ -68,6 +69,9 @@ Route::get('/layouts/blank', [Blank::class, 'index'])->name('layouts-blank');
 Route::middleware(['auth'])->group(function () {
   Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
 
+  // Pegawai
+  Route::get('/pages/daftar-pegawai', [PegawaiController::class, 'index'])->name('pages-pegawai');
+
   // Shift Kerja
   Route::get('/pages/shift-kerja', [AbsenController::class, 'viewShift'])->name('pages-shift-kerja');
 
@@ -80,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
   // DataTables AJAX route
   Route::get('/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
   Route::get('/shift-kerja', [DataTableController::class, 'viewShift'])->name('shift-kerja.index');
+  Route::get('/pegawai', [DataTableController::class, 'viewPegawai'])->name('pegawai.index');
 
 });
 
