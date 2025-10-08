@@ -66,6 +66,6 @@ class AbsenController extends Controller
   // Method to view the shift schedule page
   public function viewShift()
   {
-    return view('content.pages.pages-jadwal-shift');
+    return view('content.pages.pages-shift-kerja');
   }
 }

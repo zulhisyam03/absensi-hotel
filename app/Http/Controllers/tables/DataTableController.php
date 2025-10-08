@@ -111,8 +111,14 @@ class DataTableController extends Controller
           // Menggunakan Carbon untuk memformat created_at
           return Carbon::parse($row->created_at)->format('Y-m-d H:i:s');
         })
+        ->addColumn('action', function ($row) {
+          $editBtn = '<a href="/users/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
+          $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
+          return $editBtn . ' ' . $deleteBtn;
+        })
+        ->rawColumns(['action'])
         ->make(true);
     }
-    return view('history-absen.index');
+    return view('shift-kerja.index');
   }
 }

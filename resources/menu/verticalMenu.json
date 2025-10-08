@@ -34,7 +34,7 @@
       ]
     },
     {
-      "url": "pages/jadwal-shift",
+      "url": "pages/shift-kerja",
       "name": "Shift Kerja",
       "icon": "menu-icon tf-icons bx bx-timer",
       "slug": "shift-kerja",
