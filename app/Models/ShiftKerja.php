@@ -5,21 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Absen extends Model
+class ShiftKerja extends Model
 {
   use HasFactory;
-
-  protected $fillable = [
-    'no_karyawan',
-    'shift',
-    'pict',
-    'status',
-    'keterangan',
-  ];
 
   public function pegawai()
   {
     return $this->belongsTo(Pegawai::class, 'no_karyawan', 'no_karyawan');
-    // Syntaks: belongsTo(Model, foreign_key_di_Absen, owner_key_di_Pegawai)
+    // Syntaks: belongsTo(Model, foreign_key_di_ShiftKerja, owner_key_di_Pegawai)
   }
 }

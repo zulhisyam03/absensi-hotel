@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Absen;
+use App\Models\Pegawai;
+use App\Models\ShiftKerja;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -22,19 +24,19 @@ class DatabaseSeeder extends Seeder
     ]);
 
     Absen::factory()->create([
-      'user_id' => 'sb001',
-      'nama_pegawai' => 'Hendi',
+      'no_karyawan' => 'sb001',
       'shift' => 'pagi',
     ]);
     Absen::factory()->create([
-      'user_id' => 'sb002',
-      'nama_pegawai' => 'Hendi',
+      'no_karyawan' => 'sb002',
       'shift' => 'pagi',
     ]);
     Absen::factory()->create([
-      'user_id' => 'sb001',
-      'nama_pegawai' => 'Hendi',
+      'no_karyawan' => 'sb001',
       'shift' => 'pagi',
     ]);
+
+    Pegawai::factory()->create([]);
+    ShiftKerja::factory()->create([]);
   }
 }

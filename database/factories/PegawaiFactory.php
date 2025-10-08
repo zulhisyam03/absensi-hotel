@@ -1,0 +1,31 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Pegawai>
+ */
+class PegawaiFactory extends Factory
+{
+  /**
+   * Define the model's default state.
+   *
+   * @return array<string, mixed>
+   */
+  public function definition(): array
+  {
+    return [
+      //
+      'no_karyawan' => 'SB001',
+      'nama_pegawai' => fake()->name(),
+      'no_hp' => '082234567890',
+      'email' => fake()->unique()->safeEmail(),
+      'tempat_lahir' => 'Palu',
+      'tgl_lahir' => fake()->date(),
+      'tgl_join' => fake()->date(),
+      'status' => 'aktif',
+    ];
+  }
+}

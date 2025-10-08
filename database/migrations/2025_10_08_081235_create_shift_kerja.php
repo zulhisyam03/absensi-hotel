@@ -10,20 +10,20 @@ return new class extends Migration {
    */
   public function up(): void
   {
-    Schema::create('absens', function (Blueprint $table) {
+    Schema::create('shift_kerjas', function (Blueprint $table) {
       $table->id();
-      $table->string('no_karyawan')->nullable();
-      $table->string('shift')->nullable();
-      $table->string('pict')->nullable();
-      $table->string('status')->nullable();
-      $table->string('keterangan')->nullable();
+      $table->string('no_karyawan');
+      $table->string('shift');
+      $table->time('waktu_masuk');
+      $table->time('waktu_pulang');
+      $table->char('flag');
       $table->timestamps();
 
       // ⭐️ 2. Definisikan Foreign Key Constraint
-      $table->foreign('no_karyawan') // Kolom di tabel absens
+      $table->foreign('no_karyawan') // Kolom di tabel shift_kerjas
         ->references('no_karyawan') // Merujuk ke kolom di tabel pegawais
         ->on('pegawais') // Di tabel pegawais
-        ->onDelete('cascade'); // Opsi: Hapus absen jika pegawai dihapus
+        ->onDelete('cascade'); // Opsi: Hapus shift jika pegawai dihapus
     });
   }
 
@@ -32,6 +32,6 @@ return new class extends Migration {
    */
   public function down(): void
   {
-    Schema::dropIfExists('absens');
+    Schema::dropIfExists('shift_kerjas');
   }
 };
