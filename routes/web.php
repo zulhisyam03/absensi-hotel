@@ -123,4 +123,4 @@ Route::get('/form/layouts-horizontal', [HorizontalForm::class, 'index'])->name('
 Route::get('/tables/basic', [TablesBasic::class, 'index'])->name('tables-basic');
 
 // DataTables AJAX route for users
-Route::get('/users', [DataTableController::class, 'index'])->name('users.index');
+Route::get('/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');

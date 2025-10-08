@@ -27,16 +27,19 @@
                             </div>
                         </div>
                         {{-- Table history absensi --}}
-                          <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4" style="width:100%">
-                              <thead>
-                                  <tr>
-                                      <th>ID</th>
-                                      <th>Name</th>
-                                      <th>Email</th>
-                                      <th>Action</th>
-                                  </tr>
-                              </thead>
-                          </table>
+                        <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4"
+                            style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama Pegawai</th>
+                                    <th>Shift</th>
+                                    <th>Waktu</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -93,27 +96,42 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('users.index') }}',
+                    url: '{{ route('history-absen.index') }}',
                     type: 'GET'
                 },
                 columns: [{
-                        data: 'id',
-                        name: 'id'
+                        data: 'DT_RowIndex', // Kunci dari addIndexColumn()
+                        name: 'DT_RowIndex',
+                        title: 'No.', // Ubah header ID menjadi NO.
+                        orderable: false, // Nomor urut tidak perlu diurutkan
+                        searchable: false // Nomor urut tidak perlu dicari
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'nama_pegawai',
+                        name: 'nama_pegawai'
                     },
                     {
-                        data: 'email',
-                        name: 'email'
+                        data: 'shift',
+                        name: 'shift'
                     },
                     {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
+                        data: 'created_at',
+                        name: 'created_at'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
+                    {
+                        data: 'keterangan',
+                        name: 'keterangan'
                     }
+                    // {
+                    //     data: 'action',
+                    //     name: 'action',
+                    //     orderable: false,
+                    //     searchable: false
+                    // }
                 ],
                 responsive: true,
                 pageLength: 10,
@@ -126,24 +144,8 @@
     </script>
 
     <style>
-    /* 🔹 Batasi area yang bisa di-scroll */
-    .table-container {
-        overflow-x: auto;      /* scroll horizontal */
-        overflow-y: hidden;      /* scroll vertikal (kalau datanya panjang) */
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* 🔹 Agar header tetap di tempat */
-    .table-container thead th {
-        position: sticky;
-        top: 0;
-        background: #fff;
-        z-index: 10;
-    }
-
-    /* 🔹 Hilangkan padding bawah agar tabel pas */
-    .dataTables_wrapper .row {
-        margin-bottom: 0;
-    }
+        #usersTable tbody td {
+            text-transform: capitalize;
+        }
     </style>
 @endpush

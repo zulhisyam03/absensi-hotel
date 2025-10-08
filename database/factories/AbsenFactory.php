@@ -1,0 +1,30 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Absen>
+ */
+class AbsenFactory extends Factory
+{
+  /**
+   * Define the model's default state.
+   *
+   * @return array<string, mixed>
+   */
+  public function definition(): array
+  {
+    $shiftoptions = ['pagi', 'siang', 'malam'];
+    return [
+      //
+      'user_id' => fake()->unique(),
+      'nama_pegawai' => fake()->name(),
+      'shift' => $this->faker->randomElement($shiftoptions),
+      'pict' => $this->faker->imageUrl(640, 480, 'people', true),
+      'status' => 'masuk',
+      'keterangan' => '',
+    ];
+  }
+}
