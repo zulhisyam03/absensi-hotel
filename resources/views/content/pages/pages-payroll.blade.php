@@ -48,11 +48,11 @@
                         <input class="form-control" list="datalistOptions" id="exampleDataList"
                             placeholder="Type to search..." name="nama_pegawai" />
                         <datalist id="datalistOptions">
-                            <option value="San Francisco"></option>
-                            <option value="New York"></option>
-                            <option value="Seattle"></option>
-                            <option value="Los Angeles"></option>
-                            <option value="Chicago"></option>
+                            <option value="Rendy"></option>
+                            <option value="Ana"></option>
+                            <option value="Seli"></option>
+                            <option value="Andi"></option>
+                            <option value="Rizz"></option>
                         </datalist>
                         {{-- <div id="defaultFormControlHelp" class="form-text">We'll never share your details with anyone else.
                         </div> --}}

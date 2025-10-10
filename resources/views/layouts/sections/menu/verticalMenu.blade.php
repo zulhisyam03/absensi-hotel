@@ -28,26 +28,30 @@
                 </li>
             @else
                 {{-- active menu method --}}
+                {{-- active menu method --}}
                 @php
                     $activeClass = null;
                     $currentRouteName = Route::currentRouteName();
-
+                    // Exact match untuk slug string tunggal (selalu)
                     if ($currentRouteName === $menu->slug) {
                         $activeClass = 'active';
-                    } elseif (isset($menu->submenu)) {
-                        if (gettype($menu->slug) === 'array') {
-                            foreach ($menu->slug as $slug) {
-                                if (str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
-                                    $activeClass = 'active open';
-                                }
+                    }
+                    // Handle array slug (untuk multiple route, dengan prefix match) - DIPINDAH KE SINI AGAR BEKERJA TANPA SUBMENU
+                    if (gettype($menu->slug) === 'array') {
+                        foreach ($menu->slug as $slug) {
+                            if (str_contains($currentRouteName, $slug) && strpos($currentRouteName, $slug) === 0) {
+                                $activeClass = 'active'; // Gunakan 'active' saja (tanpa 'open' karena no submenu)
+                                break; // Stop loop jika sudah match
                             }
-                        } else {
-                            if (
-                                str_contains($currentRouteName, $menu->slug) and
-                                strpos($currentRouteName, $menu->slug) === 0
-                            ) {
-                                $activeClass = 'active open';
-                            }
+                        }
+                    }
+                    // Prefix match untuk slug string tunggal JIKA ADA SUBMENU (logika asli dipertahankan)
+                    elseif (isset($menu->submenu)) {
+                        if (
+                            str_contains($currentRouteName, $menu->slug) &&
+                            strpos($currentRouteName, $menu->slug) === 0
+                        ) {
+                            $activeClass = 'active open';
                         }
                     }
                 @endphp

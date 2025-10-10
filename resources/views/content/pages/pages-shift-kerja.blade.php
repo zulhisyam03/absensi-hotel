@@ -28,7 +28,7 @@
                         </div>
 
                         {{-- Button tambah Data Pegwai --}}
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-end mb-5">
                             <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"><i
                                     class="bx bx-lg bx-plus"></i>
                                 Tambah Shift</button>
