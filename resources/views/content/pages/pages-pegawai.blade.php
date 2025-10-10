@@ -29,8 +29,8 @@
 
                         {{-- Button tambah Data Pegwai --}}
                         <div class="d-flex justify-content-end">
-                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahPegawai"><i
-                                    class="bx bx-lg bx-plus"></i>
+                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahPegawai"
+                                onclick="navigateToForm()"><i class="bx bx-lg bx-plus"></i>
                                 Tambah Pegawai</button>
                         </div>
                         {{-- END Button tambah Data Pegwai --}}
@@ -115,6 +115,10 @@
                 ]
             });
         });
+
+        function navigateToForm() {
+            window.location.href = window.location.origin + '/pages/pegawai/create';
+        }
     </script>
 
     <style>

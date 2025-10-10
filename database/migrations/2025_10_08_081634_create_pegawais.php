@@ -19,6 +19,7 @@ return new class extends Migration {
       $table->string('tempat_lahir');
       $table->date('tgl_lahir');
       $table->date('tgl_join');
+      $table->string('jabatan', '15');
       $table->string('status');
       $table->timestamps();
     });

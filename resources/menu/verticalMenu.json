@@ -76,7 +76,26 @@
       "icon": "menu-icon tf-icons bx bx-cog",
       "slug": "ui",
       "hidden": false,
+      "visibleTo": [
+        "hr",
+        "admin"
+      ],
       "submenu": [
+        {
+          "url": "config/lokasi",
+          "name": "Lokasi",
+          "slug": "config-lokasi"
+        },
+        {
+          "url": "config/shift",
+          "name": "Shift",
+          "slug": "config-shift"
+        },
+        {
+          "url": "config/user",
+          "name": "User",
+          "slug": "config-user"
+        },
         {
           "url": "ui/accordion",
           "name": "Accordion",

@@ -17,7 +17,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-2">
                                 <select id="defaultSelect" class="form-select" name="periode_bulan">
-                                    <option hidden>Bulan</option>
+                                    <option hidden>-- Bulan --</option>
                                     <option value="01">Januari</option>
                                     <option value="02">Februari</option>
                                     <option value="03">Maret</option>
@@ -34,7 +34,7 @@
                             </div>
                             <div class="col-md-6">
                                 <select id="defaultSelect" class="form-select" name="periode_tahun">
-                                    <option hidden>Tahun</option>
+                                    <option hidden>-- Tahun --</option>
                                     <option value="2025">2025</option>
                                     <option value="2024">2024</option>
                                     <option value="2023">2023</option>

@@ -25,6 +25,7 @@ class PegawaiFactory extends Factory
       'tempat_lahir' => 'Palu',
       'tgl_lahir' => fake()->date(),
       'tgl_join' => fake()->date(),
+      'jabatan' => random_int(1, 2) == 1 ? 'HR' : 'Staff',
       'status' => 'aktif',
     ];
   }
