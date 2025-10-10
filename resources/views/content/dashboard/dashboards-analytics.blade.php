@@ -96,7 +96,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('history-absen.index') }}',
+                    url: window.location.origin + '/history-absen',
                     type: 'GET'
                 },
                 columns: [{

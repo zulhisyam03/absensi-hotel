@@ -13,21 +13,6 @@
                 <h5 class="card-header"><i class="bx bx-lg bx-dollar-circle"></i> Payroll</h5>
                 <div class="card-body col-12 mx-auto">
                     <div class="mb-4">
-                        <label for="defaultFormControlInput" class="form-label fs-5">Nama Pegawai</label>
-                        <input class="form-control" list="datalistOptions" id="exampleDataList"
-                            placeholder="Type to search...">
-                        <datalist id="datalistOptions">
-                            <option value="San Francisco"></option>
-                            <option value="New York"></option>
-                            <option value="Seattle"></option>
-                            <option value="Los Angeles"></option>
-                            <option value="Chicago"></option>
-                        </datalist>
-                        {{-- <div id="defaultFormControlHelp" class="form-text">We'll never share your details with anyone else.
-                        </div> --}}
-                    </div>
-
-                    <div class="mb-4">
                         <label for="defaultFormControlInput" class="form-label fs-5">Periode</label>
                         <div class="row">
                             <div class="col-md-6 mb-2">
@@ -57,15 +42,31 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="mb-4">
+                        <label for="defaultFormControlInput" class="form-label fs-5">Nama Pegawai</label>
+                        <input class="form-control" list="datalistOptions" id="exampleDataList"
+                            placeholder="Type to search..." name="nama_pegawai" />
+                        <datalist id="datalistOptions">
+                            <option value="San Francisco"></option>
+                            <option value="New York"></option>
+                            <option value="Seattle"></option>
+                            <option value="Los Angeles"></option>
+                            <option value="Chicago"></option>
+                        </datalist>
+                        {{-- <div id="defaultFormControlHelp" class="form-text">We'll never share your details with anyone else.
+                        </div> --}}
+                    </div>
+
                     <div class="mb-4">
                         <label for="defaultFormControlInput" class="form-label fs-5">Total Hari Kerja</label>
                         <input type="number" class="form-control" id="exampleFormControlInput1"
-                            placeholder="Total Hari Kerja" readonly />
+                            placeholder="Total Hari Kerja" name="total_hari_kerja" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="defaultFormControlInput" class="form-label fs-5">Total Gaji</label>
-                        <input type="text" class="form-control" id="exampleFormControlInput1"
-                            placeholder="Rp. 1.000.000" />
+                        <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Rp. 1.000.000"
+                            name="total_gaji" />
                     </div>
 
                     <button class="btn btn-warning btn-lg"><i class="bx bx-printer"></i> Cetak</button>

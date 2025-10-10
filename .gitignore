@@ -26,3 +26,8 @@ yarn-error.log
 !/public/assets/*
 /public/css
 /public/js
+
+.env
+ngrok.exe
+serve-ngrok.ps1
+vite.config.js

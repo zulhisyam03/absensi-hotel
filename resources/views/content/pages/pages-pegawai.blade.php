@@ -68,7 +68,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('pegawai.index') }}',
+                    url: window.location.origin + '/pegawai',
                     type: 'GET'
                 },
                 columns: [{

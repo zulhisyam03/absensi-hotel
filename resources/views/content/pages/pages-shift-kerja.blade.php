@@ -68,7 +68,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('shift-kerja.index') }}',
+                    url: window.location.origin + '/shift-kerja',
                     type: 'GET'
                 },
                 columns: [{
