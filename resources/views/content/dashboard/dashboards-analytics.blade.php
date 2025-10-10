@@ -12,6 +12,7 @@
 
 @section('page-script')
     @vite('resources/assets/js/dashboards-analytics.js')
+    @vite(['resources/assets/js/ui-modals.js'])
 @endsection
 
 @section('content')
@@ -73,8 +74,8 @@
                                         <span class="badge bg-label-secondary fs-5">Shift Pagi</span>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary rounded-circle fs-2"
-                                    style="width:175px;height:175px;">Masuk</button>
+                                <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"
+                                    data-bs-toggle="modal" data-bs-target="#backDropModal">Masuk</button>
                             </div>
                         </div>
                     </div>
@@ -82,11 +83,178 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-lg"> <!-- Tambah modal-lg untuk ukuran lebih besar -->
+            <form class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="backDropModalTitle">Absensi Wajah</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-3"> <!-- Perbaiki dari col mb-12 -->
+                            <!-- Elemen video untuk menampilkan feed kamera -->
+                            <video id="videoKamera" autoplay playsinline muted width="100%" height="auto"
+                                style="border: 1px solid #ddd; border-radius: 5px;"></video>
+                            <p class="text-muted small mt-2">Arahkan kamera ke wajah Anda untuk absensi.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    &nbsp;
+                    <button type="button" id="btnSaveAbsensi" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+
+            // KAMERA
+            // Definisikan elemen-elemen yang diperlukan (INI YANG KURANG DI SCRIPT ANDA)
+            const video = document.getElementById('videoKamera');
+            const modal = document.getElementById('backDropModal');
+            let mediaStream = null; // Untuk menyimpan stream kamera
+
+            // Cek apakah elemen ada (debugging)
+            if (!modal) {
+                console.error('Elemen modal #backDropModal tidak ditemukan. Pastikan HTML modal ada di halaman.');
+                return;
+            }
+            if (!video) {
+                console.error('Elemen video #videoKamera tidak ditemukan. Pastikan HTML video ada di modal.');
+                return;
+            }
+            console.log('Elemen modal dan video ditemukan. Siap inisialisasi kamera.'); // Debugging
+
+            // Fungsi untuk memulai kamera (INI YANG KURANG - HARUS DIPANGGIL SAAT MODAL DIBUKA)
+            function startCamera() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert('Browser Anda tidak mendukung akses kamera. Gunakan Chrome/Firefox terbaru.');
+                    return;
+                }
+
+                console.log('Memulai akses kamera...'); // Debugging
+
+                navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: {
+                                ideal: 640
+                            },
+                            height: {
+                                ideal: 480
+                            },
+                            facingMode: 'user' // Kamera depan untuk absensi wajah (selfie)
+                        }
+                    })
+                    .then(function(stream) {
+                        mediaStream = stream;
+                        video.srcObject = stream;
+                        video.play(); // Pastikan video mulai play
+                        console.log(
+                            'Kamera berhasil diakses! Feed harus muncul sekarang.'); // Debugging: Cek console
+                    })
+                    .catch(function(err) {
+                        console.error('Error mengakses kamera:', err);
+                        let errorMsg = 'Gagal mengakses kamera. Alasan: ';
+                        if (err.name === 'NotAllowedError') {
+                            errorMsg +=
+                                'Izin kamera ditolak. Izinkan di pengaturan browser (klik ikon gembok/kamera di address bar).';
+                        } else if (err.name === 'NotFoundError') {
+                            errorMsg += 'Tidak ada kamera ditemukan di perangkat Anda.';
+                        } else if (err.name === 'NotReadableError') {
+                            errorMsg += 'Kamera sedang digunakan aplikasi lain. Tutup aplikasi tersebut.';
+                        } else if (err.name === 'OverconstrainedError') {
+                            errorMsg += 'Spesifikasi kamera tidak sesuai (coba tanpa facingMode).';
+                        } else {
+                            errorMsg += err.message + '. Pastikan halaman di HTTPS/localhost.';
+                        }
+                        alert(errorMsg);
+                        // Opsional: Tutup modal jika gagal
+                        const modalInstance = bootstrap.Modal.getInstance(modal);
+                        if (modalInstance) modalInstance.hide();
+                    });
+            }
+
+            // Fungsi untuk menghentikan kamera (untuk hemat baterai dan privasi)
+            function stopCamera() {
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                    video.srcObject = null;
+                    console.log('Kamera dihentikan.'); // Debugging
+                }
+            }
+
+            // Event listener: Mulai kamera saat modal dibuka (INI YANG HARUS DIUNCOMMENT DAN DITAMBAHKAN)
+            modal.addEventListener('shown.bs.modal', function() {
+                console.log('Modal dibuka - mulai kamera...'); // Debugging
+                startCamera();
+            });
+
+            // Event listener: Hentikan kamera saat modal ditutup (UNCOMMENT DAN AKTIFKAN)
+            modal.addEventListener('hidden.bs.modal', function() {
+                console.log('Modal ditutup - hentikan kamera...'); // Debugging
+                stopCamera();
+            });
+
+            // Event untuk tombol Save (capture gambar) - SEKARANG VARIABEL VIDEO DAN MODAL SUDAH ADA
+            const btnSaveAbsensi = document.getElementById('btnSaveAbsensi');
+            if (btnSaveAbsensi) {
+                btnSaveAbsensi.addEventListener('click', function() {
+                    if (!video || !video.videoWidth || !video.videoHeight) {
+                        alert(
+                            'Kamera belum siap. Pastikan feed kamera muncul dulu (lihat console untuk error).'
+                            );
+                        return;
+                    }
+
+                    console.log('Mencoba capture gambar...'); // Debugging
+
+                    // Ambil snapshot dari video (menggunakan canvas)
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+
+                    // Konversi ke base64 atau kirim ke server untuk proses absensi
+                    const imageData = canvas.toDataURL('image/png');
+                    console.log('Gambar absensi berhasil dicapture:', imageData.substring(0, 50) +
+                        '... (lihat console lengkap)'); // Debugging: Tampilkan sebagian data
+
+                    // Tutup modal setelah save
+                    const modalInstance = bootstrap.Modal.getInstance(modal);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    // Opsional: Tampilkan pesan sukses
+                    alert('Absensi berhasil disimpan! (Gambar ada di console untuk testing)');
+
+                    // Opsional: Download gambar untuk testing (hapus jika tidak perlu)
+                    const link = document.createElement('a');
+                    link.href = imageData;
+                    link.download = 'absensi-' + new Date().toISOString().slice(0, 19).replace(/:/g, '-') +
+                        '.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            } else {
+                console.error('Tombol #btnSaveAbsensi tidak ditemukan di modal.');
+            }
+
+            console.log('Script kamera selesai diinisialisasi.'); // Debugging akhir
+            // END KAMERA
+
+
             $('#usersTable').on('init.dt', function() {
                 $('#usersTable_wrapper').addClass('px-5');
                 $('.dt-layout-table').addClass('table-responsive');
@@ -146,6 +314,7 @@
                     [10, 25, 50, 100]
                 ]
             });
+
         });
     </script>
 
