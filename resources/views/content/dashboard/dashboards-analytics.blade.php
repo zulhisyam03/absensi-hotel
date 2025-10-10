@@ -46,24 +46,8 @@
             </div>
         </div>
         <!--/ Attendance -->
-        <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-3 order-md-2">
+        <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-1 order-md-2">
             <div class="row">
-                <div class="col-6 mb-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <p class="badge bg-label-warning fs-5 mb-1">Training</p>
-                            <h4 class="card-title fs-1 text-center">2</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 mb-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <p class="badge bg-label-primary fs-5 mb-1">Cuti</p>
-                            <h4 class="card-title fs-1 text-center">12</h4>
-                        </div>
-                    </div>
-                </div>
                 <div class="col-12 mb-6">
                     <div class="card">
                         <div class="card-body">
@@ -80,32 +64,52 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-6 mb-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <p class="badge bg-label-warning fs-5 mb-1">Training</p>
+                            <h4 class="card-title fs-1 text-center">2</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 mb-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <p class="badge bg-label-primary fs-5 mb-1">Cuti</p>
+                            <h4 class="card-title fs-1 text-center">12</h4>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Modal -->
     <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1">
-        <div class="modal-dialog modal-lg"> <!-- Tambah modal-lg untuk ukuran lebih besar -->
+        <div class="modal-dialog modal-fullscreen">
             <form class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="backDropModalTitle">Absensi Wajah</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="backDropModalTitle" class="text-light">Absensi Wajah</h5>
+                    {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 mb-3"> <!-- Perbaiki dari col mb-12 -->
+                <div class="modal-body p-0">
+                    <div class="row m-0 h-100">
+                        <div class="col-12 p-0 mb-0 h-100">
                             <!-- Elemen video untuk menampilkan feed kamera -->
-                            <video id="videoKamera" autoplay playsinline muted width="100%" height="auto"
-                                style="border: 1px solid #ddd; border-radius: 5px;"></video>
-                            <p class="text-muted small mt-2">Arahkan kamera ke wajah Anda untuk absensi.</p>
+                            <video id="videoKamera" autoplay playsinline muted width="100%" height="100%"
+                                class="d-block w-100 h-100"
+                                style="border: 1px solid #ddd; border-radius: 5px; object-fit: cover;">
+                            </video>
+                            <p class="text-muted small mt-2 d-none d-md-block">
+                                Arahkan kamera ke wajah Anda untuk absensi.
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer pt-0 pb-2 px-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                     &nbsp;
-                    <button type="button" id="btnSaveAbsensi" class="btn btn-primary">Simpan</button>
+                    <button type="button" id="btnSaveAbsensi" class="btn btn-primary btn-sm">Simpan</button>
                 </div>
             </form>
         </div>
@@ -115,6 +119,36 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+
+            // Event saat modal dibuka: Scroll ke atas + akses kamera
+            document.getElementById('backDropModal').addEventListener('shown.bs.modal', function() {
+                // Scroll halaman utama ke atas secara otomatis
+                window.scrollTo(0, 0);
+
+                // Akses kamera (kamera depan untuk selfie/absensi)
+                navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'user', // Kamera depan
+                            width: {
+                                ideal: 1280
+                            },
+                            height: {
+                                ideal: 720
+                            }
+                        }
+                    })
+                    .then(function(stream) {
+                        var video = document.getElementById('videoKamera');
+                        video.srcObject = stream;
+                        video.play(); // Pastikan play di mobile
+                    })
+                    .catch(function(err) {
+                        console.error('Error accessing camera: ', err);
+                        alert('Gagal mengakses kamera. Izinkan permission di browser dan coba lagi.');
+                        // Optional: Tutup modal jika gagal
+                        // bootstrap.Modal.getInstance(document.getElementById('backDropModal')).hide();
+                    });
+            });
 
             // KAMERA
             // Definisikan elemen-elemen yang diperlukan (INI YANG KURANG DI SCRIPT ANDA)
@@ -211,7 +245,7 @@
                     if (!video || !video.videoWidth || !video.videoHeight) {
                         alert(
                             'Kamera belum siap. Pastikan feed kamera muncul dulu (lihat console untuk error).'
-                            );
+                        );
                         return;
                     }
 
@@ -321,6 +355,105 @@
     <style>
         #usersTable tbody td {
             text-transform: capitalize;
+        }
+
+        /* Fullscreen modal di mobile - Hilangkan scrollbar dan scroll ke atas */
+        @media (max-width: 575.98px) {
+            .modal-fullscreen .modal-content {
+                height: 100vh;
+                border-radius: 0;
+                overflow: hidden !important;
+                /* Hilangkan overflow di seluruh modal */
+            }
+
+            .modal-fullscreen .modal-header {
+                padding: 0.5rem 1rem;
+                background: rgb(255, 255, 255);
+                color: rgb(255, 255, 255);
+            }
+
+            .modal-fullscreen .modal-body {
+                padding: 0 !important;
+                height: calc(100vh - 120px);
+                overflow: hidden !important;
+                /* Pastikan tidak ada scroll di body */
+            }
+
+            .modal-fullscreen .modal-footer {
+                padding: 0.5rem 1rem !important;
+                background: rgba(0, 0, 0, 0.8);
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1050;
+                border-top: 1px solid #dee2e6;
+            }
+
+            /* Video fullscreen di mobile */
+            #videoKamera {
+                width: 100vw !important;
+                height: 100vh !important;
+                object-fit: cover;
+                border: none !important;
+                border-radius: 0 !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                overflow: hidden;
+                /* Hilangkan overflow di video */
+            }
+
+            .modal-fullscreen .btn-close {
+                filter: invert(1);
+            }
+
+            .modal-fullscreen .btn {
+                font-size: 0.875rem;
+            }
+
+            /* Hilangkan scrollbar di modal (untuk semua browser) */
+            .modal-fullscreen::-webkit-scrollbar,
+            .modal-fullscreen .modal-content::-webkit-scrollbar {
+                display: none;
+                /* Chrome/Safari */
+            }
+
+            .modal-fullscreen {
+                -ms-overflow-style: none;
+                /* IE/Edge */
+                scrollbar-width: none;
+                /* Firefox */
+            }
+        }
+
+        /* Untuk desktop/laptop */
+        @media (min-width: 576px) {
+            #videoKamera {
+                height: auto;
+                max-height: 60vh;
+            }
+        }
+
+        /* Global: Hilangkan scroll di body saat modal terbuka (perkuat Bootstrap) */
+        body.modal-open {
+            overflow: hidden !important;
+            /* Pastikan body tidak scroll */
+            position: fixed;
+            /* Fixed body untuk mencegah shift layout di mobile */
+            width: 100%;
+            touch-action: none;
+            /* Cegah touch scroll di iOS/Android */
+        }
+
+        /* Hilangkan scrollbar di body saat modal open */
+        body.modal-open::-webkit-scrollbar {
+            display: none;
+        }
+
+        body.modal-open {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 @endpush
