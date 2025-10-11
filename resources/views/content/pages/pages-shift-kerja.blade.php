@@ -29,8 +29,8 @@
 
                         {{-- Button tambah Data Pegwai --}}
                         <div class="d-flex justify-content-end mb-5">
-                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"><i
-                                    class="bx bx-lg bx-plus"></i>
+                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"
+                                onclick="navigateToForm()"><i class="bx bx-lg bx-plus"></i>
                                 Tambah Shift</button>
                         </div>
                         {{-- END Button tambah Data Pegwai --}}
@@ -115,6 +115,10 @@
                 ]
             });
         });
+
+        function navigateToForm() {
+            window.location.href = window.location.origin + '/pages/shift-kerja/create';
+        }
     </script>
 
     <style>

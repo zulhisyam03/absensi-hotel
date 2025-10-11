@@ -37,7 +37,10 @@
       "url": "pages/shift-kerja",
       "name": "Shift Kerja",
       "icon": "menu-icon tf-icons bx bx-timer",
-      "slug": "pages-shift-kerja",
+      "slug": [
+        "pages-shift-kerja",
+        "pages-shit-kerja.create"
+      ],
       "visibleTo": [
         "staff",
         "hr",

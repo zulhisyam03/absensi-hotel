@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\pages;
 
-use App\Models\Absen;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class AbsenController extends Controller
+class ShiftKerjaController extends Controller
 {
   /**
    * Display a listing of the resource.
@@ -13,6 +13,7 @@ class AbsenController extends Controller
   public function index()
   {
     //
+    return view('content.pages.pages-shift-kerja');
   }
 
   /**
@@ -21,6 +22,7 @@ class AbsenController extends Controller
   public function create()
   {
     //
+    return view('content.pages.pages-shift-kerja-form');
   }
 
   /**
@@ -34,7 +36,7 @@ class AbsenController extends Controller
   /**
    * Display the specified resource.
    */
-  public function show(Absen $absen)
+  public function show(string $id)
   {
     //
   }
@@ -42,7 +44,7 @@ class AbsenController extends Controller
   /**
    * Show the form for editing the specified resource.
    */
-  public function edit(Absen $absen)
+  public function edit(string $id)
   {
     //
   }
@@ -50,7 +52,7 @@ class AbsenController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, Absen $absen)
+  public function update(Request $request, string $id)
   {
     //
   }
@@ -58,13 +60,7 @@ class AbsenController extends Controller
   /**
    * Remove the specified resource from storage.
    */
-  public function destroy(Absen $absen)
-  {
-    //
-  }
-
-  // Method to view the shift schedule page
-  public function viewShift()
+  public function destroy(string $id)
   {
     //
   }

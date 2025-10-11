@@ -69,7 +69,7 @@
                         </select>
                     </div>
 
-                    <button class="btn btn-primary btn-lg w-100"><i class="bx bx-printer"></i> Simpan</button>
+                    <button class="btn btn-primary btn-lg w-100"><i class="bx bx-save"></i> Simpan</button>
                 </div>
             </div>
         </div>
