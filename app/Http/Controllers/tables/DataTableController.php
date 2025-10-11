@@ -21,13 +21,11 @@ class DataTableController extends Controller
     //
     if ($request->ajax()) {
       $absensi = Absen::query()
-        ->select('absens.*') // Pilih semua kolom dari absens
+        ->select('absens.*', 'pegawais.nama_pegawai') // Pilih semua kolom dari absens
         ->leftJoin('pegawais', 'absens.no_karyawan', '=', 'pegawais.no_karyawan')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
         ->orderBy('absens.created_at', 'DESC') // Urutkan berdasarkan nama_pegawai A-Z
-        // Jika Anda ingin pengurutan created_at sebagai urutan sekunder:
-        // ->orderBy('shift_kerjas.created_at', 'DESC');
         ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
 
       return DataTables::of($absensi)
@@ -40,6 +38,19 @@ class DataTableController extends Controller
           // Menggunakan Carbon untuk memformat created_at
           return Carbon::parse($row->created_at)->format('Y-m-d H:i:s');
         })
+        // 🔥 Tambahkan filter custom di sini
+        ->filter(function ($query) use ($request) {
+          if ($request->search['value']) {
+            $search = strtolower($request->search['value']);
+            $query->where(function ($q) use ($search) {
+              $q->whereRaw('LOWER(absens.shift) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(absens.status) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(absens.keterangan) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(pegawais.nama_pegawai) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(absens.created_at) LIKE ?', ["%{$search}%"]);
+            });
+          }
+        })
         ->make(true);
     }
     return view('history-absen.index');
@@ -51,7 +62,7 @@ class DataTableController extends Controller
     if ($request->ajax()) {
       // ⭐️ 1. Lakukan JOIN ke tabel 'pegawais' dan pilih kolom yang diperlukan.
       $shiftKerja = ShiftKerja::query()
-        ->select('shift_kerjas.*') // Pilih semua kolom dari shift_kerjas
+        ->select('shift_kerjas.*', 'pegawais.nama_pegawai') // Pilih semua kolom dari shift_kerjas
         ->leftJoin('pegawais', 'shift_kerjas.no_karyawan', '=', 'pegawais.no_karyawan')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
@@ -80,6 +91,19 @@ class DataTableController extends Controller
           return $editBtn . ' ' . $deleteBtn;
         })
         ->rawColumns(['action'])
+
+        // 🔥 Tambahkan filter custom di sini
+        ->filter(function ($query) use ($request) {
+          if ($request->search['value']) {
+            $search = strtolower($request->search['value']);
+            $query->where(function ($q) use ($search) {
+              $q->whereRaw('LOWER(shift_kerjas.shift) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(shift_kerjas.waktu_masuk) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(shift_kerjas.waktu_pulang) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(pegawais.nama_pegawai) LIKE ?', ["%{$search}%"]);
+            });
+          }
+        })
         ->make(true);
     }
     return view('shift-kerja.index');
