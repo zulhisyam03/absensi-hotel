@@ -67,7 +67,7 @@
                 <div class="col-6 mb-6">
                     <div class="card h-100">
                         <div class="card-body">
-                            <p class="badge bg-label-warning fs-5 mb-1">Training</p>
+                            <p class="badge bg-label-warning fs-5 mb-1">Kehadiran</p>
                             <h4 class="card-title fs-1 text-center">2</h4>
                         </div>
                     </div>

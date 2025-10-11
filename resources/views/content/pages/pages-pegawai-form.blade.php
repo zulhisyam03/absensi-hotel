@@ -69,7 +69,7 @@
                         </select>
                     </div>
 
-                    <button class="btn btn-warning btn-lg"><i class="bx bx-printer"></i> Cetak</button>
+                    <button class="btn btn-primary btn-lg w-100"><i class="bx bx-printer"></i> Simpan</button>
                 </div>
             </div>
         </div>

@@ -69,7 +69,7 @@
                             name="total_gaji" />
                     </div>
 
-                    <button class="btn btn-warning btn-lg"><i class="bx bx-printer"></i> Cetak</button>
+                    <button class="btn btn-warning btn-lg w-100"><i class="bx bx-printer"></i> Cetak</button>
                 </div>
             </div>
         </div>
