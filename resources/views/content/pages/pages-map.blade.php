@@ -209,7 +209,7 @@
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="submit" class="btn btn-primary">Simpan Koordinat & Radius</button>
-                            <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a>
+                            {{-- <a href="{{ url()->previous() }}" class="btn btn-secondary">Kembali</a> --}}
                         </div>
                     </form>
                 </div>
@@ -361,8 +361,8 @@
             });
 
             // Default value (termasuk radius)
-            document.getElementById('latitude').value = -6.2088;
-            document.getElementById('longitude').value = 106.8456;
+            document.getElementById('latitude').value = -0.900270;
+            document.getElementById('longitude').value = 119.889012;
             document.getElementById('radius').value = 100; // Default 100m
 
             // Inisialisasi default circle (opsional, untuk tampilkan radius awal)
