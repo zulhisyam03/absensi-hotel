@@ -89,6 +89,7 @@
     "highlight.js": "~11.9.0",
     "jquery": "~3.7.1",
     "laravel-vite-plugin": "1.0.1",
+    "leaflet": "^1.9.4",
     "masonry-layout": "~4.2.2",
     "perfect-scrollbar": "~1.5.5"
   }

@@ -9,6 +9,7 @@ use App\Http\Controllers\layouts\Container;
 use App\Http\Controllers\layouts\Blank;
 use App\Http\Controllers\pages\AccountSettingsAccount;
 use App\Http\Controllers\AbsenController;
+use App\Http\Controllers\pages\MapController;
 use App\Http\Controllers\pages\ShiftKerjaController;
 use App\Http\Controllers\pages\PegawaiController;
 use App\Http\Controllers\pages\PayrollController;
@@ -81,6 +82,10 @@ Route::middleware(['auth'])->group(function () {
 
   // Payroll
   Route::get('/pages/payroll', [PayrollController::class, 'index'])->name('pages-payroll');
+
+  // Lokasi
+  Route::get('config/lokasi', [MapController::class, 'index'])->name('config-lokasi');
+  Route::post('config/lokasi/store', [MapController::class, 'store'])->name('config-lokasi.store');
 
   Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name('pages-account-settings-account');
   Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');
