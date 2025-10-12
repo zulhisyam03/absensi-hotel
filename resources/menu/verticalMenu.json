@@ -80,7 +80,7 @@
     {
       "name": "Manajemen",
       "icon": "menu-icon tf-icons bx bx-cog",
-      "slug": "ui",
+      "slug": "config",
       "hidden": false,
       "visibleTo": [
         "hr",
@@ -93,9 +93,9 @@
           "slug": "config-lokasi"
         },
         {
-          "url": "config/shift",
+          "url": "config/shift-kerja",
           "name": "Shift",
-          "slug": "config-shift"
+          "slug": "config-shift-kerja"
         },
         {
           "url": "config/user",

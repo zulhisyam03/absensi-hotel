@@ -79,6 +79,8 @@ Route::middleware(['auth'])->group(function () {
   // Shift Kerja
   Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->name('pages-shift-kerja');
   Route::get('/pages/shift-kerja/create', [ShiftKerjaController::class, 'create'])->name('pages-shift-kerja.create');
+  Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja');
+  Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja.store');
 
   // Payroll
   Route::get('/pages/payroll', [PayrollController::class, 'index'])->name('pages-payroll');

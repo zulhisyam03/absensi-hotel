@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Absen;
 use App\Models\Pegawai;
 use App\Models\ShiftKerja;
+use App\Models\Param;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -38,5 +39,9 @@ class DatabaseSeeder extends Seeder
 
     Pegawai::factory()->create([]);
     ShiftKerja::factory()->create([]);
+
+    // param
+    Param::factory()->create([]);
+    Param::factory()->lokasi()->create([]);
   }
 }

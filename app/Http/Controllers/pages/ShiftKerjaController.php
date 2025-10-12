@@ -22,7 +22,7 @@ class ShiftKerjaController extends Controller
   public function create()
   {
     //
-    return view('content.pages.pages-shift-kerja-form');
+    return view('content.form.pages-shift-kerja-form');
   }
 
   /**
@@ -63,5 +63,10 @@ class ShiftKerjaController extends Controller
   public function destroy(string $id)
   {
     //
+  }
+
+  public function viewConfig()
+  {
+    return view('content.config.shift');
   }
 }

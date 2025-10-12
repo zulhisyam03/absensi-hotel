@@ -22,7 +22,7 @@ class PegawaiController extends Controller
   public function create()
   {
     //
-    return view('content.pages.pages-pegawai-form');
+    return view('content.form.pages-pegawai-form');
   }
 
   /**
