@@ -10,7 +10,7 @@
     <div class="row g-12">
         <div class="col-md-12">
             <div class="card">
-                <h5 class="card-header"><i class="bx bx-lg bx-user"></i> Form Pegawai / {{ $flag }} Data</h5>
+                <h5 class="card-header"><i class="bx bx-lg bxs-user-account"></i> Form Pegawai / {{ $flag }} Data</h5>
                 <div class="card-body col-12 mx-auto">
                     <div class="mb-4">
                         <label for="nama_pegawai" class="form-label fs-5">Nama Pegawai</label>

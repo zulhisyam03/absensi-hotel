@@ -12,7 +12,7 @@
     {
       "url": "pages/daftar-pegawai",
       "name": "Daftar Pegawai",
-      "icon": "menu-icon tf-icons bx bx-user",
+      "icon": "menu-icon tf-icons bx bxs-user-account",
       "slug": [
         "pages-pegawai",
         "pegawai.create"
