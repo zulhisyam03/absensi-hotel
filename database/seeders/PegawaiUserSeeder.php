@@ -18,7 +18,6 @@ class PegawaiUserSeeder extends Seeder
     Pegawai::factory()->create([]);
 
     User::factory()->create([
-      'name' => 'Test User',
       'email' => 'test@example.com',
     ]);
   }
