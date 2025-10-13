@@ -19,7 +19,7 @@ class AbsenFactory extends Factory
     $shiftoptions = ['pagi', 'siang', 'malam'];
     return [
       //
-      'no_karyawan' => fake()->unique(),
+      'no_pegawai' => fake()->unique(),
       'shift' => $this->faker->randomElement($shiftoptions),
       'pict' => $this->faker->imageUrl(640, 480, 'people', true),
       'status' => 'masuk',

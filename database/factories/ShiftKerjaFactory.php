@@ -18,7 +18,7 @@ class ShiftKerjaFactory extends Factory
   {
     return [
       //
-      'no_karyawan' => 'SB001',
+      'no_pegawai' => 'SB001',
       'shift' => 'pagi',
       'waktu_masuk' => '08:00:00',
       'waktu_pulang' => '12:00:00',

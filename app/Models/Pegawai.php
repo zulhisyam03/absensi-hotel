@@ -11,7 +11,7 @@ class Pegawai extends Model
 
   public function shifts()
   {
-    return $this->hasMany(ShiftKerja::class, 'no_karyawan', 'no_karyawan');
+    return $this->hasMany(ShiftKerja::class, 'no_pegawai', 'no_pegawai');
     // Syntaks: hasMany(Model, foreign_key_di_ShiftKerja, local_key_di_Pegawai)
   }
 }

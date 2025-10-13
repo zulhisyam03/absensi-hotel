@@ -10,7 +10,7 @@ class Absen extends Model
   use HasFactory;
 
   protected $fillable = [
-    'no_karyawan',
+    'no_pegawai',
     'shift',
     'pict',
     'status',
@@ -19,7 +19,7 @@ class Absen extends Model
 
   public function pegawai()
   {
-    return $this->belongsTo(Pegawai::class, 'no_karyawan', 'no_karyawan');
+    return $this->belongsTo(Pegawai::class, 'no_pegawai', 'no_pegawai');
     // Syntaks: belongsTo(Model, foreign_key_di_Absen, owner_key_di_Pegawai)
   }
 }

@@ -12,7 +12,7 @@ return new class extends Migration {
   {
     Schema::create('absens', function (Blueprint $table) {
       $table->id();
-      $table->string('no_karyawan')->nullable();
+      $table->string('no_pegawai')->nullable();
       $table->string('shift')->nullable();
       $table->string('pict')->nullable();
       $table->string('status')->nullable();
@@ -20,8 +20,8 @@ return new class extends Migration {
       $table->timestamps();
 
       // ⭐️ 2. Definisikan Foreign Key Constraint
-      $table->foreign('no_karyawan') // Kolom di tabel absens
-        ->references('no_karyawan') // Merujuk ke kolom di tabel pegawais
+      $table->foreign('no_pegawai') // Kolom di tabel absens
+        ->references('no_pegawai') // Merujuk ke kolom di tabel pegawais
         ->on('pegawais') // Di tabel pegawais
         ->onDelete('cascade'); // Opsi: Hapus absen jika pegawai dihapus
     });

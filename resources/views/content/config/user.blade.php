@@ -1,6 +1,6 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Konfigurasi - Lokasi')
+@section('title', 'My Profile')
 
 @section('page-style')
     {{-- Custom CSS untuk peta, marker Boxicons, dan circle radius --}}

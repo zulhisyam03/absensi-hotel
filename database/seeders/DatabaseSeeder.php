@@ -25,15 +25,15 @@ class DatabaseSeeder extends Seeder
     ]);
 
     Absen::factory()->create([
-      'no_karyawan' => 'SB001',
+      'no_pegawai' => 'SB001',
       'shift' => 'pagi',
     ]);
     Absen::factory()->create([
-      'no_karyawan' => 'SB002',
+      'no_pegawai' => 'SB002',
       'shift' => 'pagi',
     ]);
     Absen::factory()->create([
-      'no_karyawan' => 'SB001',
+      'no_pegawai' => 'SB001',
       'shift' => 'pagi',
     ]);
 

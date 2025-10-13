@@ -1,6 +1,6 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Dashboard - Analytics')
+@section('title', 'Pegawai')
 
 @section('vendor-style')
     @vite('resources/assets/vendor/libs/apex-charts/apex-charts.scss')
@@ -79,8 +79,8 @@
                         searchable: false // Nomor urut tidak perlu dicari
                     },
                     {
-                        data: 'no_karyawan',
-                        name: 'no_karyawan'
+                        data: 'no_pegawai',
+                        name: 'no_pegawai'
                     },
                     {
                         data: 'nama_pegawai',

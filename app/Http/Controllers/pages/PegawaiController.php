@@ -4,6 +4,7 @@ namespace App\Http\Controllers\pages;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Pegawai;
 
 class PegawaiController extends Controller
 {
@@ -22,7 +23,7 @@ class PegawaiController extends Controller
   public function create()
   {
     //
-    return view('content.form.pages-pegawai-form');
+    return view('content.form.pages-pegawai-form', ['flag' => 'Tambah']);
   }
 
   /**
@@ -47,6 +48,18 @@ class PegawaiController extends Controller
   public function edit(string $id)
   {
     //
+    $data = Pegawai::where('id', $id)
+      ->where('status', 'aktif')
+      ->firstOrFail();
+    try {
+      if (!$data) {
+        return redirect()->route('pages-pegawai')->with('error', 'Data pegawai tidak ditemukan.');
+      } else {
+        return view('content.form.pages-pegawai-form', ['flag' => 'Edit', 'data' => $data]);
+      }
+    } catch (\Exception $e) {
+      return redirect()->route('pages-pegawai')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**

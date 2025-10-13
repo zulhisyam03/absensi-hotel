@@ -76,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
   // Pegawai
   Route::get('/pages/daftar-pegawai', [PegawaiController::class, 'index'])->name('pages-pegawai');
   Route::get('/pages/pegawai/create', [PegawaiController::class, 'create'])->name('pegawai.create');
+  Route::get('/pages/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
 
   // Shift Kerja
   Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->name('pages-shift-kerja');

@@ -11,7 +11,7 @@ class ShiftKerja extends Model
 
   public function pegawai()
   {
-    return $this->belongsTo(Pegawai::class, 'no_karyawan', 'no_karyawan');
+    return $this->belongsTo(Pegawai::class, 'no_pegawai', 'no_pegawai');
     // Syntaks: belongsTo(Model, foreign_key_di_ShiftKerja, owner_key_di_Pegawai)
   }
 }

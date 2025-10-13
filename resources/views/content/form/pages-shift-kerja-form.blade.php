@@ -1,6 +1,6 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Pegawai - Forms')
+@section('title', 'Shift Kerja - Forms')
 
 @section('page-script')
     {{-- @vite('resources/assets/js/form-basic-inputs.js') --}}

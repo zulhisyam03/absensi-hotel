@@ -22,7 +22,7 @@ class DataTableController extends Controller
     if ($request->ajax()) {
       $absensi = Absen::query()
         ->select('absens.*', 'pegawais.nama_pegawai') // Pilih semua kolom dari absens
-        ->leftJoin('pegawais', 'absens.no_karyawan', '=', 'pegawais.no_karyawan')
+        ->leftJoin('pegawais', 'absens.no_pegawai', '=', 'pegawais.no_pegawai')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
         ->orderBy('absens.created_at', 'DESC') // Urutkan berdasarkan nama_pegawai A-Z
@@ -63,7 +63,7 @@ class DataTableController extends Controller
       // ⭐️ 1. Lakukan JOIN ke tabel 'pegawais' dan pilih kolom yang diperlukan.
       $shiftKerja = ShiftKerja::query()
         ->select('shift_kerjas.*', 'pegawais.nama_pegawai') // Pilih semua kolom dari shift_kerjas
-        ->leftJoin('pegawais', 'shift_kerjas.no_karyawan', '=', 'pegawais.no_karyawan')
+        ->leftJoin('pegawais', 'shift_kerjas.no_pegawai', '=', 'pegawais.no_pegawai')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
         ->orderBy('pegawais.nama_pegawai', 'ASC') // Urutkan berdasarkan nama_pegawai A-Z
@@ -121,7 +121,7 @@ class DataTableController extends Controller
         ->addIndexColumn()
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addColumn('action', function ($row) {
-          $editBtn = '<a href="/pegawai/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
+          $editBtn = '<a href="/pages/pegawai/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
           return $editBtn . ' ' . $deleteBtn;
         })

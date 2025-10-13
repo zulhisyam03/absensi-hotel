@@ -18,13 +18,15 @@ class PegawaiFactory extends Factory
   {
     return [
       //
-      'no_karyawan' => 'SB001',
+      'no_pegawai' => 'SB001',
       'nama_pegawai' => fake()->name(),
       'no_hp' => '082234567890',
+      'alamat' => fake()->address(),
       'email' => fake()->unique()->safeEmail(),
       'tempat_lahir' => 'Palu',
       'tgl_lahir' => fake()->date(),
       'tgl_join' => fake()->date(),
+      'jenis_kelamin' => random_int(1, 2) == 1 ? 'L' : 'P',
       'jabatan' => random_int(1, 2) == 1 ? 'HR' : 'Staff',
       'status' => 'aktif',
     ];

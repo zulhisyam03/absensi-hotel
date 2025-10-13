@@ -12,7 +12,7 @@ return new class extends Migration {
   {
     Schema::create('shift_kerjas', function (Blueprint $table) {
       $table->id();
-      $table->string('no_karyawan');
+      $table->string('no_pegawai');
       $table->string('shift');
       $table->time('waktu_masuk');
       $table->time('waktu_pulang');
@@ -20,8 +20,8 @@ return new class extends Migration {
       $table->timestamps();
 
       // ⭐️ 2. Definisikan Foreign Key Constraint
-      $table->foreign('no_karyawan') // Kolom di tabel shift_kerjas
-        ->references('no_karyawan') // Merujuk ke kolom di tabel pegawais
+      $table->foreign('no_pegawai') // Kolom di tabel shift_kerjas
+        ->references('no_pegawai') // Merujuk ke kolom di tabel pegawais
         ->on('pegawais') // Di tabel pegawais
         ->onDelete('cascade'); // Opsi: Hapus shift jika pegawai dihapus
     });
