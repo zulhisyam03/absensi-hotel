@@ -21,7 +21,7 @@ class PegawaiFactory extends Factory
       'no_pegawai' => 'SB001',
       'nama_pegawai' => fake()->name(),
       'no_hp' => '082234567890',
-      'alamat' => 'fake()->address()',
+      'alamat' => fake()->address(),
       'email' => 'test@example.com',
       'tempat_lahir' => 'Palu',
       'tgl_lahir' => fake()->date(),
