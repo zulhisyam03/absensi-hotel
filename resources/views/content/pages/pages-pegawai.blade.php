@@ -27,6 +27,17 @@
                             </div>
                         </div>
 
+                        @if (session('success'))
+                            <div class="alert alert-success d-flex alert-dismissible mx-5" role="alert">
+                                <span class="alert-icon rounded-circle">
+                                    <i class="icon-base bx bxs-check-circle icon-sm"></i>
+                                </span>
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                </button>
+                            </div>
+                        @endif
+
                         {{-- Button tambah Data Pegwai --}}
                         <div class="d-flex justify-content-end mb-5">
                             <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahPegawai"
@@ -36,7 +47,7 @@
                         {{-- END Button tambah Data Pegwai --}}
 
                         {{-- Table history absensi --}}
-                        <table id="pegawaiTable" class="table table-responsive table-striped text-nowrap px-4"
+                        <table id="pegawaiTable" class="table table-responsive table-striped text-nowrap px-4 "
                             style="width:100%">
                             <thead>
                                 <tr>

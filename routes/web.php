@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
   // Pegawai
   Route::get('/pages/daftar-pegawai', [PegawaiController::class, 'index'])->name('pages-pegawai');
   Route::get('/pages/pegawai/create', [PegawaiController::class, 'create'])->name('pegawai.create');
+  Route::post('/pages/pegawai/store', [PegawaiController::class, 'store'])->name('pegawai.store');
   Route::get('/pages/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
   // Route baru: Search nama pegawai untuk autocomplete (GET)
   Route::get('/pegawai/search', [PegawaiController::class, 'searchPegawai'])->name('pegawai.search');

@@ -5,6 +5,10 @@ namespace App\Http\Controllers\pages;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pegawai;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class PegawaiController extends Controller
 {
@@ -32,6 +36,48 @@ class PegawaiController extends Controller
   public function store(Request $request)
   {
     //
+    // validasi: gunakan nama input yang sama dengan form
+    $validated = $request->validate([
+      'no_pegawai' => 'required|string|max:50',
+      'nama_pegawai' => 'required|string|max:255',
+      'jabatan' => 'required|string|max:30',
+      'email' => 'required|email|max:255',
+      'no_handphone' => 'nullable|string|max:20', // sesuai form name
+      'alamat' => 'nullable|string|max:500',
+      'tempat_lahir' => 'nullable|string|max:100',
+      'tanggal_lahir' => 'required|date', // sesuai form name
+      'tanggal_join' => 'required|date',  // sesuai form name
+      'jenis_kelamin' => 'required|string|max:10'
+    ]);
+    try {
+
+      // Save To pegawais Table
+      $pegawai = new Pegawai();
+      $pegawai->no_pegawai = strtoupper($validated['no_pegawai']);
+      $pegawai->nama_pegawai = $validated['nama_pegawai'];
+      $pegawai->jabatan = $validated['jabatan'];
+      $pegawai->email = $validated['email'];
+      $pegawai->no_hp = $validated['no_handphone'] ?? null; // map ke kolom DB
+      $pegawai->alamat = $validated['alamat'] ?? null;
+      $pegawai->tempat_lahir = $validated['tempat_lahir'] ?? null;
+      $pegawai->tgl_lahir = $validated['tanggal_lahir'];
+      $pegawai->tgl_join = $validated['tanggal_join'];
+      $pegawai->jenis_kelamin = $validated['jenis_kelamin'];
+      $pegawai->status = 'aktif';
+      $pegawai->save();
+
+      // Save To User Table
+      $user = new User();
+      $user->email = $validated['email'];
+      $user->email_verified_at = Carbon::now();
+      $user->password = Hash::make($validated['no_pegawai']);
+      $user->remember_token = str::random(10);
+      $user->save();
+
+      return redirect()->route(route: 'pages-pegawai')->with('success', 'Data pegawai berhasil ditambahkan.');
+    } catch (\Exception $e) {
+      return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**
