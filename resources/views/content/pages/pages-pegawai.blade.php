@@ -23,7 +23,7 @@
                     <div class="col-lg-12">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="card-title mb-0">
-                                <h5 class="m-0 me-2"><i class="bx bx-lg bx-user"></i> Daftar Pegawai</h5>
+                                <h5 class="m-0 me-2"><i class="bx bx-lg bx-user-account"></i> Daftar User</h5>
                             </div>
                         </div>
 
@@ -31,7 +31,7 @@
                         <div class="d-flex justify-content-end mb-5">
                             <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahPegawai"
                                 onclick="navigateToForm()"><i class="bx bx-lg bx-plus"></i>
-                                Tambah Pegawai</button>
+                                Tambah User</button>
                         </div>
                         {{-- END Button tambah Data Pegwai --}}
 

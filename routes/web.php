@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\pages\UserController;
 use App\Http\Controllers\dashboard\Analytics;
 use App\Http\Controllers\layouts\WithoutMenu;
 use App\Http\Controllers\layouts\WithoutNavbar;
@@ -88,6 +89,9 @@ Route::middleware(['auth'])->group(function () {
   // Lokasi
   Route::get('config/lokasi', [MapController::class, 'index'])->name('config-lokasi');
   Route::post('config/lokasi/store', [MapController::class, 'store'])->name('config-lokasi.store');
+
+  // user
+  Route::get("config/user", [UserController::class, 'index'])->name('config-user');
 
   Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name('pages-account-settings-account');
   Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');

@@ -33,4 +33,22 @@
             })
             .catch(() => alert("Logout gagal, coba lagi."));
     }
+
+    function navigateToUserForm() {
+        fetch("{{ route('config-user') }}", {
+                method: "GET",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json",
+                },
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; // follow redirect
+                } else {
+                    window.location.href = "/config/user";
+                }
+            })
+            .catch(() => alert("Navigation gagal, coba lagi."));
+    }
 </script>

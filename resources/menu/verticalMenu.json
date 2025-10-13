@@ -96,11 +96,6 @@
           "url": "config/shift-kerja",
           "name": "Shift",
           "slug": "config-shift-kerja"
-        },
-        {
-          "url": "config/user",
-          "name": "User",
-          "slug": "config-user"
         }
       ]
     }
