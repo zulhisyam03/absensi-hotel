@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Absen;
 use App\Models\Pegawai;
+use App\Models\Absen;
 use App\Models\ShiftKerja;
 use App\Models\Param;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -18,18 +18,8 @@ class DatabaseSeeder extends Seeder
   public function run(): void
   {
     // User::factory(10)->create();
-
-    User::factory()->create([
-      'name' => 'Test User',
-      'email' => 'test@example.com',
-    ]);
-
     Absen::factory()->create([
       'no_pegawai' => 'SB001',
-      'shift' => 'pagi',
-    ]);
-    Absen::factory()->create([
-      'no_pegawai' => 'SB002',
       'shift' => 'pagi',
     ]);
     Absen::factory()->create([
@@ -37,7 +27,6 @@ class DatabaseSeeder extends Seeder
       'shift' => 'pagi',
     ]);
 
-    Pegawai::factory()->create([]);
     ShiftKerja::factory()->create([]);
 
     // param

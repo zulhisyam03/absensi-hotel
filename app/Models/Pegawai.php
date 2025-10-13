@@ -9,9 +9,19 @@ class Pegawai extends Model
 {
   use HasFactory;
 
-  public function shifts()
+  public function absens()
   {
-    return $this->hasMany(ShiftKerja::class, 'no_pegawai', 'no_pegawai');
+    return $this->hasMany(Absen::class, 'no_pegawai', 'no_pegawai');
+    // Syntaks: hasMany(Model, foreign_key_di_ShiftKerja, local_key_di_Pegawai)
+  }
+  public function shift()
+  {
+    return $this->hasOne(Shiftkerja::class, 'no_pegawai', 'no_pegawai');
+    // Syntaks: hasMany(Model, foreign_key_di_ShiftKerja, local_key_di_Pegawai)
+  }
+  public function user()
+  {
+    return $this->hasOne(User::class, 'email', 'email');
     // Syntaks: hasMany(Model, foreign_key_di_ShiftKerja, local_key_di_Pegawai)
   }
 }

@@ -11,11 +11,13 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('pegawais', function (Blueprint $table) {
+      $table->engine = 'InnoDB';
+
       $table->id();
       $table->string('no_pegawai')->unique();
       $table->string('nama_pegawai');
       $table->string('no_hp', '14');
-      $table->string('email');
+      $table->string('email')->unique();
       $table->string('alamat');
       $table->string('tempat_lahir');
       $table->char('jenis_kelamin', 1);

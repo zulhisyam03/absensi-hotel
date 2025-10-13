@@ -55,7 +55,7 @@
                                 <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
                                     <div class="mt-sm-auto">
                                         <h4 class="mb-0">Nama Pegawai</h4>
-                                        <span class="badge bg-label-secondary fs-5">Shift Pagi</span>
+                                        <span class="badge bg-label-dark fs-5">Shift Pagi</span>
                                     </div>
                                 </div>
                                 <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"

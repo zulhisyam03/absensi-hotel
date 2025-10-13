@@ -11,6 +11,8 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('shift_kerjas', function (Blueprint $table) {
+      $table->engine = 'InnoDB';
+
       $table->id();
       $table->string('no_pegawai');
       $table->string('shift');
@@ -19,7 +21,7 @@ return new class extends Migration {
       $table->char('flag');
       $table->timestamps();
 
-      // ⭐️ 2. Definisikan Foreign Key Constraint
+      // 2. Definisikan Foreign Key Constraint
       $table->foreign('no_pegawai') // Kolom di tabel shift_kerjas
         ->references('no_pegawai') // Merujuk ke kolom di tabel pegawais
         ->on('pegawais') // Di tabel pegawais
