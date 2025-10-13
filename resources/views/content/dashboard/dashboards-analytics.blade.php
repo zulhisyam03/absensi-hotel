@@ -54,7 +54,8 @@
                             <div class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10">
                                 <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
                                     <div class="mt-sm-auto">
-                                        <h4 class="mb-0">Nama Pegawai</h4>
+                                        <h4 class="mb-0" id="nama-pegawai">
+                                            {{ Auth::user()->pegawai->nama_pegawai }}</h4>
                                         <span class="badge bg-label-dark fs-5">Shift Pagi</span>
                                     </div>
                                 </div>

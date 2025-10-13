@@ -22,17 +22,17 @@
                             <div class="mb-4">
                                 <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
                                 <input class="form-control" type="text" id="no-pegawai" name="nomor_pegawai"
-                                    value="SB001" disabled />
+                                    value="{{ Auth::user()->pegawai->no_pegawai }}" disabled />
                             </div>
                             <div class="mb-4">
                                 <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
                                 <input class="form-control" type="text" id="nama-pegawai" name="nama-pegawai"
-                                    value="User 1" disabled />
+                                    value="{{ Auth::user()->pegawai->nama_pegawai }}" disabled />
                             </div>
                             <div class="mb-4">
                                 <label for="emaol" class="form-label fs-5">Email</label>
                                 <input class="form-control" type="text" id="email" name="email"
-                                    value="test@example.com" disabled />
+                                    value="{{ Auth::user()->pegawai->email }}" disabled />
                             </div>
 
                             <hr class="my-6">
