@@ -68,7 +68,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: window.location.origin + '/shift-kerja',
+                    url: window.location.origin + '/datatable/shift-kerja',
                     type: 'GET'
                 },
                 columns: [{

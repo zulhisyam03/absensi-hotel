@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Absen;
 use App\Models\Pegawai;
+use App\Models\Param;
 use Carbon\Carbon;
 
 class DataTableController extends Controller
@@ -129,5 +130,29 @@ class DataTableController extends Controller
         ->make(true);
     }
     return view('pegawai.index');
+  }
+
+  public function viewParamShiftKerja()
+  {
+    try {
+      $param = Param::where('value', 'shift')->first();
+
+      if (!$param) {
+        return redirect()->route('config-shift-kerja')->with('error', 'Data parameter shift kerja tidak ditemukan.');
+      }
+
+      $value = json_decode($param->svalue);
+      return DataTables::of(collect($value))
+        ->addIndexColumn()
+        ->addColumn('action', function ($row) {
+          // Gunakan nilai 'val' sebagai pengganti id
+          $editBtn = '<a href="/config/shift-kerja/' . $row->val . '/edit" class="btn btn-sm btn-primary">Edit</a>';
+          return $editBtn;
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    } catch (\Exception $e) {
+      return redirect()->route('config-shift-kerja')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 }

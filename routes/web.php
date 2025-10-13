@@ -81,9 +81,10 @@ Route::middleware(['auth'])->group(function () {
   // Shift Kerja
   Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->name('pages-shift-kerja');
   Route::get('/pages/shift-kerja/create', [ShiftKerjaController::class, 'create'])->name('pages-shift-kerja.create');
-  Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja');
-  Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja.store');
   Route::get('/pages/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'edit'])->name('pages-shift-kerja.edit');
+  Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja');
+  Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'storeParameter'])->name('config-shift-kerja.store');
+  Route::get('/config/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'editParameter'])->name('config-shift-kerja.edit');
 
   // Payroll
   Route::get('/pages/payroll', [PayrollController::class, 'index'])->name('pages-payroll');
@@ -102,9 +103,10 @@ Route::middleware(['auth'])->group(function () {
   Route::get('/pages/misc-under-maintenance', [MiscUnderMaintenance::class, 'index'])->name('pages-misc-under-maintenance');
 
   // DataTables AJAX route
-  Route::get('/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
-  Route::get('/shift-kerja', [DataTableController::class, 'viewShift'])->name('shift-kerja.index');
-  Route::get('/pegawai', [DataTableController::class, 'viewPegawai'])->name('pegawai.index');
+  Route::get('/datatable/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
+  Route::get('/datatable/shift-kerja', [DataTableController::class, 'viewShift'])->name('shift-kerja.index');
+  Route::get('/datatable/param-shift-kerja', [DataTableController::class, 'viewParamShiftKerja'])->name('param-shift-kerja.index');
+  Route::get('/datatable/pegawai', [DataTableController::class, 'viewPegawai'])->name('pegawai.index');
 
 });
 

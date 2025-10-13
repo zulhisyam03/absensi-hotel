@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Param extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  protected $fillable = ['value', 'svalue', 'flag'];
 }

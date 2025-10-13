@@ -68,7 +68,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: window.location.origin + '/pegawai',
+                    url: window.location.origin + '/datatable/pegawai',
                     type: 'GET'
                 },
                 columns: [{

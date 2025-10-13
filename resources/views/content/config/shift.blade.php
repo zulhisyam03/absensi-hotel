@@ -42,12 +42,12 @@
             });
 
             $('#manajemenShiftKerja').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: false,
                 searching: false,
                 lengthChange: false,
                 ajax: {
-                    url: window.location.origin + '/pegawai',
+                    url: window.location.origin + '/datatable/param-shift-kerja',
                     type: 'GET'
                 },
                 columns: [{
@@ -58,8 +58,8 @@
                         searchable: false // Nomor urut tidak perlu dicari
                     },
                     {
-                        data: 'shift',
-                        name: 'shift'
+                        data: 'val',
+                        name: 'val'
                     },
                     {
                         data: 'waktu_masuk',

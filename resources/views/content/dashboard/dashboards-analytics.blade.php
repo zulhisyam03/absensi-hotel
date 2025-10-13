@@ -298,7 +298,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: window.location.origin + '/history-absen',
+                    url: window.location.origin + '/datatable/history-absen',
                     type: 'GET'
                 },
                 columns: [{

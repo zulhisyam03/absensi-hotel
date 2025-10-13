@@ -13,7 +13,7 @@ return new class extends Migration {
     Schema::create('params', function (Blueprint $table) {
       $table->id();
       $table->string("value");
-      $table->string("svalue");
+      $table->text("svalue");
       $table->char("flag");
       $table->timestamps();
     });

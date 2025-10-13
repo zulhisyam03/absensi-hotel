@@ -5,6 +5,7 @@ namespace App\Http\Controllers\pages;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ShiftKerja;
+use App\Models\Param;
 
 class ShiftKerjaController extends Controller
 {
@@ -83,5 +84,30 @@ class ShiftKerjaController extends Controller
   public function viewConfig()
   {
     return view('content.config.shift');
+  }
+
+  public function editParameter($request)
+  {
+    try {
+      $param = Param::where('value', 'shift')->firstOrFail();
+      // Decode JSON svalue menjadi array PHP
+      $shifts = json_decode($param->svalue, true);
+
+      // Cari item dengan val = $request
+      $dataShift = collect($shifts)->firstWhere('val', $request);
+
+      // Kalau tidak ketemu
+      if (!$dataShift) {
+        return response()->json(['error' => 'Shift ' . $request . ' tidak ditemukan'], 404);
+      }
+
+      return view('content.config.shift-form', [
+        'flag' => 'Edit',
+        'data' => (object) $dataShift // ubah array jadi object
+      ]);
+
+    } catch (\Exception $e) {
+      return redirect()->route('config-shift-kerja')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 }
