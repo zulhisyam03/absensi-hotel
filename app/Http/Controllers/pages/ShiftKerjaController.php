@@ -4,6 +4,7 @@ namespace App\Http\Controllers\pages;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\ShiftKerja;
 
 class ShiftKerjaController extends Controller
 {
@@ -22,7 +23,7 @@ class ShiftKerjaController extends Controller
   public function create()
   {
     //
-    return view('content.form.pages-shift-kerja-form');
+    return view('content.form.pages-shift-kerja-form', ['flag' => 'Tambah']);
   }
 
   /**
@@ -47,6 +48,20 @@ class ShiftKerjaController extends Controller
   public function edit(string $id)
   {
     //
+    $data = ShiftKerja::With('pegawai')
+      ->where('id', $id)
+      ->where('flag', 'a')
+      ->firstOrFail();
+
+    try {
+      if (!$data) {
+        return redirect()->route('pages-shift-kerja')->with('error', 'Data shift kerja tidak ditemukan.');
+      } else {
+        return view('content.form.pages-shift-kerja-form', ['flag' => 'Edit', 'data' => $data]);
+      }
+    } catch (\Exception $e) {
+      return redirect()->route('pages-shift-kerja')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**

@@ -86,7 +86,7 @@ class DataTableController extends Controller
         })
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addColumn('action', function ($row) {
-          $editBtn = '<a href="/shift-kerja/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
+          $editBtn = '<a href="/pages/shift-kerja/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
           return $editBtn . ' ' . $deleteBtn;
         })
