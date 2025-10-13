@@ -16,7 +16,7 @@
                         <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
                         <input class="form-control" list="datalistOptions"
                             value="{{ isset($data) ? $data->pegawai->nama_pegawai : '' }}" placeholder="Type to search..."
-                            name="nama_pegawai" id="nama-pegawai" />
+                            name="nama_pegawai" id="nama-pegawai" {{ $flag !== 'Tambah' ? 'readonly' : '' }} />
                         <datalist id="datalistOptions"></datalist>
                     </div>
                     <div class="mb-4">
