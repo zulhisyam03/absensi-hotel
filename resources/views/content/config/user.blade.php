@@ -30,7 +30,7 @@
                                     name="nama-pegawai" value="{{ Auth::user()->pegawai->nama_pegawai }}" readonly />
                             </div>
                             <div class="mb-4">
-                                <label for="emaol" class="form-label fs-5">Email</label>
+                                <label for="email" class="form-label fs-5">Email</label>
                                 <input class="form-control bg-secondary bg-opacity-25" type="text" id="email"
                                     name="email" value="{{ Auth::user()->pegawai->email }}" readonly />
                             </div>
