@@ -54,6 +54,7 @@
                                     <th>No</th>
                                     <th>Nama Pegawai</th>
                                     <th>Nomor Pegawai</th>
+                                    <th>Departemen</th>
                                     <th>No. Handphone</th>
                                     <th>Tanggal Join</th>
                                     <th>Aksi</th>
@@ -111,6 +112,10 @@
                     {
                         data: 'no_pegawai',
                         name: 'no_pegawai'
+                    },
+                    {
+                        data: 'departemen',
+                        name: 'departemen'
                     },
                     {
                         data: 'no_hp',

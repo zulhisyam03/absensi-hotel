@@ -15,7 +15,8 @@
       "icon": "menu-icon tf-icons bx bxs-user-account",
       "slug": [
         "pages-pegawai",
-        "pegawai.create"
+        "pegawai.create",
+        "pegawai.edit"
       ],
       "visibleTo": [
         "hr",

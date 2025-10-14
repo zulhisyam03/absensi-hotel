@@ -15,15 +15,22 @@ return new class extends Migration {
 
       $table->id();
       $table->string('no_pegawai')->unique();
+      $table->string('nik');
+      $table->string('npwp');
+      $table->string('bpjs');
       $table->string('nama_pegawai');
       $table->string('no_hp', '14');
+      $table->string('emergency_number', '14');
       $table->string('email')->unique();
+      $table->string('departemen');
       $table->string('alamat');
       $table->string('tempat_lahir');
       $table->char('jenis_kelamin', 1);
       $table->date('tgl_lahir');
       $table->date('tgl_join');
       $table->string('jabatan', '15');
+      $table->string('status_pegawai');
+      $table->integer('last_salary');
       $table->string('status');
       $table->timestamps();
     });

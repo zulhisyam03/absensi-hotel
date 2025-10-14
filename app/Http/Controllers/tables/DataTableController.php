@@ -63,7 +63,7 @@ class DataTableController extends Controller
     if ($request->ajax()) {
       // ⭐️ 1. Lakukan JOIN ke tabel 'pegawais' dan pilih kolom yang diperlukan.
       $shiftKerja = ShiftKerja::query()
-        ->select('shift_kerjas.*', 'pegawais.nama_pegawai') // Pilih semua kolom dari shift_kerjas
+        ->select('shift_kerjas.*', 'pegawais.nama_pegawai', 'pegawais.departemen') // Pilih semua kolom dari shift_kerjas
         ->leftJoin('pegawais', 'shift_kerjas.no_pegawai', '=', 'pegawais.no_pegawai')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi

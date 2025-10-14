@@ -23,7 +23,8 @@
                 <div class="card-body col-12 mx-auto">
                     <div class="mb-4">
                         <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
-                        <input class="form-control bg-secondary bg-opacity-25" list="datalistOptions" type="text"
+                        <input class="form-control {{ isset($data) ? 'bg-secondary bg-opacity-25' : '' }}"
+                            list="datalistOptions" type="text"
                             value="{{ old('nama_pegawai', isset($data) ? $data->pegawai->nama_pegawai : '') }}"
                             placeholder="Type to search..." name="nama_pegawai" id="nama-pegawai"
                             {{ $flag !== 'Tambah' ? 'readonly' : '' }} autocomplete="off" />
@@ -34,6 +35,12 @@
                         <input type="text" class="form-control bg-secondary bg-opacity-25" id="no-pegawai"
                             name="no_pegawai" autocomplete="off"
                             value="{{ old('no_pegawai', isset($data) ? $data->pegawai->no_pegawai : '') }}" readonly />
+                    </div>
+                    <div class="mb-4">
+                        <label for="departemen" class="form-label fs-5">Departemen</label>
+                        <input type="text" class="form-control bg-secondary bg-opacity-25" id="departemen"
+                            name="departemen" autocomplete="off"
+                            value="{{ old('departemen', isset($data) ? $data->pegawai->departemen : '') }}" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="jenis_kelamin" class="form-label fs-5">Shift Kerja</label>
@@ -142,6 +149,9 @@
                                 item.name || '');
                             const noValue = (typeof item === 'object') ? (item.no_pegawai || item.no ||
                                 '') : '';
+                            const departemenValue = (typeof item === 'object') ? (item.departemen ||
+                                item.no ||
+                                '') : '';
                             if (!namaValue) return;
 
                             const option = document.createElement('option');
@@ -152,8 +162,13 @@
                             datalist.appendChild(option);
 
                             const hiddenNo = document.getElementById('no-pegawai');
+                            const departemen = document.getElementById('departemen');
                             if (hiddenNo && noValue) {
                                 hiddenNo.value = noValue; // langsung isi no_pegawai saat ada hasil
+                            }
+                            if (departemen && departemenValue) {
+                                departemen.value =
+                                departemenValue; // langsung isi no_pegawai saat ada hasil
                             }
                         });
 

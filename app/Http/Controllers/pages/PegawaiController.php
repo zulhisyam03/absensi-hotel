@@ -42,12 +42,19 @@ class PegawaiController extends Controller
       'nama_pegawai' => 'required|string|max:255',
       'jabatan' => 'required|string|max:30',
       'email' => 'required|email|max:255',
-      'no_handphone' => 'nullable|string|max:20', // sesuai form name
-      'alamat' => 'nullable|string|max:500',
-      'tempat_lahir' => 'nullable|string|max:100',
+      'no_handphone' => 'required|string|max:20', // sesuai form name
+      'alamat' => 'required|string|max:500',
+      'tempat_lahir' => 'required|string|max:100',
       'tanggal_lahir' => 'required|date', // sesuai form name
       'tanggal_join' => 'required|date',  // sesuai form name
-      'jenis_kelamin' => 'required|string|max:10'
+      'jenis_kelamin' => 'required|string|max:10',
+      'departemen' => 'required|string|max:50', // sesuai form name
+      'status_pegawai' => 'required|string|max:20',
+      'emergency_number' => 'required|string|max:14',
+      'nik' => 'required|string|max:20',
+      'npwp' => 'required|string|max:20',
+      'bpjs' => 'required|string|max:20',
+      'last_salary' => 'required|integer|between:1,9999999999'
     ]);
     try {
 
@@ -71,10 +78,10 @@ class PegawaiController extends Controller
       $user->email = $validated['email'];
       $user->email_verified_at = Carbon::now();
       $user->password = Hash::make($validated['no_pegawai']);
-      $user->remember_token = str::random(10);
+      $user->remember_token = Str::random(10);
       $user->save();
 
-      return redirect()->route(route: 'pages-pegawai')->with('success', 'Data pegawai berhasil ditambahkan.');
+      return redirect()->route('pages-pegawai')->with('success', 'Data pegawai berhasil ditambahkan.');
     } catch (\Exception $e) {
       return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
@@ -132,7 +139,7 @@ class PegawaiController extends Controller
     }
 
     // Query DB: Partial match pada nama_pegawai, filter status 'aktif'
-    $pegawais = Pegawai::select('nama_pegawai', 'no_pegawai')
+    $pegawais = Pegawai::select('nama_pegawai', 'no_pegawai', 'departemen')
       ->where('nama_pegawai', 'LIKE', '%' . $query . '%') // Case-insensitive partial match
       ->where('status', 'aktif') // Filter hanya yang aktif (seperti request sebelumnya)
       ->distinct() // Hindari duplikat

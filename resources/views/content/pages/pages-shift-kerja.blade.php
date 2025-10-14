@@ -42,6 +42,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama Pegawai</th>
+                                    <th>Departemen</th>
                                     <th>Shift</th>
                                     <th>Waktu Masuk</th>
                                     <th>Waktu Pulang</th>
@@ -81,6 +82,10 @@
                     {
                         data: 'nama_pegawai',
                         name: 'nama_pegawai'
+                    },
+                    {
+                        data: 'departemen',
+                        name: 'departemen'
                     },
                     {
                         data: 'shift',
