@@ -6,6 +6,15 @@
     {{-- @vite('resources/assets/js/form-basic-inputs.js') --}}
 @endsection
 
+@section('page-style'){
+    <style>
+        input[type="text"] {
+            text-transform: uppercase;
+        }
+    </style>
+    }
+@endsection
+
 @section('content')
     <div class="row g-12">
         <div class="col-md-12">
@@ -14,10 +23,17 @@
                 <div class="card-body col-12 mx-auto">
                     <div class="mb-4">
                         <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
-                        <input class="form-control" list="datalistOptions"
-                            value="{{ isset($data) ? $data->pegawai->nama_pegawai : '' }}" placeholder="Type to search..."
-                            name="nama_pegawai" id="nama-pegawai" {{ $flag !== 'Tambah' ? 'readonly' : '' }} />
+                        <input class="form-control bg-secondary bg-opacity-25" list="datalistOptions" type="text"
+                            value="{{ old('nama_pegawai', isset($data) ? $data->pegawai->nama_pegawai : '') }}"
+                            placeholder="Type to search..." name="nama_pegawai" id="nama-pegawai"
+                            {{ $flag !== 'Tambah' ? 'readonly' : '' }} autocomplete="off" />
                         <datalist id="datalistOptions"></datalist>
+                    </div>
+                    <div class="mb-4">
+                        <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
+                        <input type="text" class="form-control bg-secondary bg-opacity-25" id="no-pegawai"
+                            name="no_pegawai" autocomplete="off"
+                            value="{{ old('no_pegawai', isset($data) ? $data->pegawai->no_pegawai : '') }}" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="jenis_kelamin" class="form-label fs-5">Shift Kerja</label>
@@ -54,6 +70,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('nama-pegawai');
             const datalist = document.getElementById('datalistOptions');
+
             let timeout; // Untuk debounce
 
             if (!input || !datalist) return; // Safety check
@@ -84,6 +101,7 @@
 
                 // Tampilkan loading (opsional)
                 datalist.innerHTML = '<option value="Searching...">Searching...</option>';
+
 
                 fetch(url, {
                         method: 'GET',
@@ -118,11 +136,38 @@
                         }
 
                         // Tambah option untuk setiap nama
-                        results.forEach(nama => {
+                        results.forEach(item => {
+                            // jika response berupa string atau object, ambil nilai nama dan no pegawai
+                            const namaValue = (typeof item === 'string') ? item : (item.nama_pegawai ||
+                                item.name || '');
+                            const noValue = (typeof item === 'object') ? (item.no_pegawai || item.no ||
+                                '') : '';
+                            if (!namaValue) return;
+
                             const option = document.createElement('option');
-                            option.value = nama;
+                            // tampilkan nama dalam UPPERCASE (atau gunakan nama asli sesuai kebutuhan)
+                            option.value = String(namaValue).toUpperCase();
+                            // simpan no_pegawai di data attribute supaya bisa diambil saat dipilih
+                            // if (noValue) option.dataset.noPegawai = noValue;
                             datalist.appendChild(option);
+
+                            const hiddenNo = document.getElementById('no-pegawai');
+                            if (hiddenNo && noValue) {
+                                hiddenNo.value = noValue; // langsung isi no_pegawai saat ada hasil
+                            }
                         });
+
+                        // ketika user mengetik/memilih item dari datalist, isi input no-pegawai
+                        // input.addEventListener('input', function() {
+                        //     const val = this.value;
+                        //     const match = Array.from(datalist.options).find(o => o.value === val);
+                        //     const hiddenNo = document.getElementById('no-pegawai');
+                        //     if (match && hiddenNo) {
+                        //         hiddenNo.value = match.dataset.noPegawai || '';
+                        //     } else if (hiddenNo) {
+                        //         hiddenNo.value = ''; // bersihkan jika tidak ada match
+                        //     }
+                        // });
                     })
                     .catch(error => {
                         console.error('Error fetching pegawai:', error);

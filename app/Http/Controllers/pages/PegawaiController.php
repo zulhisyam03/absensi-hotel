@@ -132,14 +132,13 @@ class PegawaiController extends Controller
     }
 
     // Query DB: Partial match pada nama_pegawai, filter status 'aktif'
-    $pegawais = Pegawai::select('nama_pegawai')
+    $pegawais = Pegawai::select('nama_pegawai', 'no_pegawai')
       ->where('nama_pegawai', 'LIKE', '%' . $query . '%') // Case-insensitive partial match
       ->where('status', 'aktif') // Filter hanya yang aktif (seperti request sebelumnya)
       ->distinct() // Hindari duplikat
       ->limit(10) // Batasi 10 hasil untuk performa
       ->orderBy('nama_pegawai', 'ASC') // Urutkan alfabetis
-      ->pluck('nama_pegawai') // Ambil hanya array nama_pegawai
-      ->toArray();
+      ->get();
     // Return JSON response
     return response()->json($pegawais); // Array sederhana: ["Rendy", "Ana", ...]
     // Atau dengan wrapper jika ingin: return response()->json(['data' => $pegawais]);

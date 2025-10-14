@@ -36,7 +36,7 @@
                         {{-- END Button tambah Data Pegwai --}}
 
                         {{-- Table history absensi --}}
-                        <table id="shiftTable" class="table table-responsive table-striped text-nowrap px-4"
+                        <table id="shiftTable" class="table table-responsive table-striped text-nowrap px-4 table-sm"
                             style="width:100%">
                             <thead>
                                 <tr>

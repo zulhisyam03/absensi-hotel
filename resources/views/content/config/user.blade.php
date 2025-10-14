@@ -21,18 +21,18 @@
                         <div class="card-body col-12 mx-auto">
                             <div class="mb-4">
                                 <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
-                                <input class="form-control" type="text" id="no-pegawai" name="nomor_pegawai"
-                                    value="{{ Auth::user()->pegawai->no_pegawai }}" disabled />
+                                <input class="form-control bg-secondary bg-opacity-25" type="text" id="no-pegawai"
+                                    name="nomor_pegawai" value="{{ Auth::user()->pegawai->no_pegawai }}" readonly />
                             </div>
                             <div class="mb-4">
                                 <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
-                                <input class="form-control" type="text" id="nama-pegawai" name="nama-pegawai"
-                                    value="{{ Auth::user()->pegawai->nama_pegawai }}" disabled />
+                                <input class="form-control bg-secondary bg-opacity-25" type="text" id="nama-pegawai"
+                                    name="nama-pegawai" value="{{ Auth::user()->pegawai->nama_pegawai }}" readonly />
                             </div>
                             <div class="mb-4">
                                 <label for="emaol" class="form-label fs-5">Email</label>
-                                <input class="form-control" type="text" id="email" name="email"
-                                    value="{{ Auth::user()->pegawai->email }}" disabled />
+                                <input class="form-control bg-secondary bg-opacity-25" type="text" id="email"
+                                    name="email" value="{{ Auth::user()->pegawai->email }}" readonly />
                             </div>
 
                             <hr class="my-6">

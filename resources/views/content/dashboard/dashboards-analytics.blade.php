@@ -28,7 +28,7 @@
                             </div>
                         </div>
                         {{-- Table history absensi --}}
-                        <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4"
+                        <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4 table-sm"
                             style="width:100%">
                             <thead>
                                 <tr>

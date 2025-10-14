@@ -47,13 +47,13 @@
                         {{-- END Button tambah Data Pegwai --}}
 
                         {{-- Table history absensi --}}
-                        <table id="pegawaiTable" class="table table-responsive table-striped text-nowrap px-4 "
+                        <table id="pegawaiTable" class="table table-responsive table-striped text-nowrap px-4 table-sm"
                             style="width:100%">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Nomor Pegawai</th>
                                     <th>Nama Pegawai</th>
+                                    <th>Nomor Pegawai</th>
                                     <th>No. Handphone</th>
                                     <th>Tanggal Join</th>
                                     <th>Aksi</th>
@@ -68,6 +68,21 @@
 @endsection
 
 @push('scripts')
+    <!-- jQuery + DataTables core (harus sebelum DataTables Buttons) -->
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> --}}
+
+    <!-- DataTables Buttons CSS/JS (CDN) -->
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script> --}}
+
     <script>
         window.addEventListener('load', function() {
             $('#pegawaiTable').on('init.dt', function() {
@@ -90,12 +105,12 @@
                         searchable: false // Nomor urut tidak perlu dicari
                     },
                     {
-                        data: 'no_pegawai',
-                        name: 'no_pegawai'
-                    },
-                    {
                         data: 'nama_pegawai',
                         name: 'nama_pegawai'
+                    },
+                    {
+                        data: 'no_pegawai',
+                        name: 'no_pegawai'
                     },
                     {
                         data: 'no_hp',
@@ -110,6 +125,40 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
+                    }
+                ],
+                // dom: 'Bfrtip', // tombol di atas table
+                buttons: [{
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        className: 'btn btn-success btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: 'CSV',
+                        className: 'btn btn-info btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'PDF',
+                        className: 'btn btn-danger btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Print',
+                        className: 'btn btn-secondary btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
                     }
                 ],
                 language: {

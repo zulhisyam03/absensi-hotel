@@ -6,6 +6,15 @@
     {{-- @vite('resources/assets/js/form-basic-inputs.js') --}}
 @endsection
 
+@section('page-style'){
+    <style>
+        input[type="text"] {
+            text-transform: uppercase;
+        }
+    </style>
+    }
+@endsection
+
 @section('content')
     <div class="row g-12">
         <div class="col-md-12">
@@ -45,14 +54,21 @@
 
                     <div class="mb-4">
                         <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
-                        <input class="form-control" list="datalistOptions" id="nama-pegawai" placeholder="Type to search..."
-                            name="nama_pegawai" />
+                        <input class="form-control" list="datalistOptions" type="text" id="nama-pegawai"
+                            placeholder="Type to search..." name="nama_pegawai" autocomplete="off" />
                         <datalist id="datalistOptions"></datalist> {{-- Datalist kosong, diisi JS --}}
                         @error('nama_pegawai')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                         {{-- <div id="defaultFormControlHelp" class="form-text">We'll never share your details with anyone else.
                         </div> --}}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
+                        <input type="text" class="form-control bg-secondary bg-opacity-25" id="no-pegawai"
+                            name="no_pegawai" autocomplete="off"
+                            value="{{ old('no_pegawai', isset($data) ? $data->pegawai->no_pegawai : '') }}" readonly />
                     </div>
 
                     <div class="mb-4">
@@ -142,10 +158,24 @@
                         }
 
                         // Tambah option untuk setiap nama
-                        results.forEach(nama => {
+                        results.forEach(item => {
+                            // jika response berupa string atau object, ambil nilai nama yang benar
+                            const namaValue = (typeof item === 'string') ? item : (item.nama_pegawai ||
+                                item.name || '');
+                            const noValue = (typeof item === 'string') ? '' : (item.no_pegawai || '');
+
+                            const hiddenNo = document.getElementById('no-pegawai');
+                            if (!namaValue) return;
+
+                            console.log(item);
                             const option = document.createElement('option');
-                            option.value = nama;
+                            // set value uppercase
+                            option.value = String(namaValue).toUpperCase();
                             datalist.appendChild(option);
+                            // set hidden input no pegawai
+                            if (hiddenNo && noValue) {
+                                hiddenNo.value = noValue;
+                            }
                         });
                     })
                     .catch(error => {
