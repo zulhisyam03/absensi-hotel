@@ -53,6 +53,7 @@
       "name": "Payroll",
       "icon": "menu-icon tf-icons bx bx-dollar-circle",
       "slug": "pages-payroll",
+      "hidden": true,
       "visibleTo": [
         "hr",
         "admin"

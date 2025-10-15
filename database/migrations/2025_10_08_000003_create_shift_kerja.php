@@ -25,7 +25,8 @@ return new class extends Migration {
       $table->foreign('no_pegawai') // Kolom di tabel shift_kerjas
         ->references('no_pegawai') // Merujuk ke kolom di tabel pegawais
         ->on('pegawais') // Di tabel pegawais
-        ->onDelete('cascade'); // Opsi: Hapus shift jika pegawai dihapus
+        ->onDelete('cascade')
+        ->onUpdate('cascade'); // Opsi: Hapus shift jika pegawai dihapus
     });
   }
 

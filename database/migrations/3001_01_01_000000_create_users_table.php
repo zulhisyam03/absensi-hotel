@@ -24,7 +24,8 @@ return new class extends Migration {
       $table->foreign('email') // Kolom di tabel users
         ->references('email') // Merujuk ke kolom di tabel pegawais
         ->on('pegawais') // Di tabel pegawais
-        ->onDelete('cascade'); // Opsi: Hapus shift jika pegawai dihapus
+        ->onDelete('cascade')
+        ->onUpdate('cascade'); // Opsi: Hapus shift jika pegawai dihapus
     });
 
     Schema::create('password_reset_tokens', function (Blueprint $table) {

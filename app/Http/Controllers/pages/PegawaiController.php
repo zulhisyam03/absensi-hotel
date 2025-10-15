@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class PegawaiController extends Controller
 {
@@ -71,6 +72,13 @@ class PegawaiController extends Controller
       $pegawai->tgl_join = $validated['tanggal_join'];
       $pegawai->jenis_kelamin = $validated['jenis_kelamin'];
       $pegawai->status = 'aktif';
+      $pegawai->departemen = $validated['departemen'];
+      $pegawai->status_pegawai = $validated['status_pegawai'];
+      $pegawai->emergency_number = $validated['emergency_number'];
+      $pegawai->nik = $validated['nik'];
+      $pegawai->npwp = $validated['npwp'];
+      $pegawai->bpjs = $validated['bpjs'];
+      $pegawai->last_salary = $validated['last_salary'];
       $pegawai->save();
 
       // Save To User Table
@@ -120,7 +128,68 @@ class PegawaiController extends Controller
    */
   public function update(Request $request, string $id)
   {
-    //
+    $validator = Validator::make($request->all(), [
+      'no_pegawai' => 'required|string|max:50',
+      'nama_pegawai' => 'required|string|max:255',
+      'jabatan' => 'required|string|max:30',
+      'email' => 'required|email|max:255',
+      'no_handphone' => 'required|string|max:20', // sesuai form name
+      'alamat' => 'required|string|max:500',
+      'tempat_lahir' => 'required|string|max:100',
+      'tanggal_lahir' => 'required|date', // sesuai form name
+      'tanggal_join' => 'required|date',  // sesuai form name
+      'jenis_kelamin' => 'required|string|max:10',
+      'departemen' => 'required|string|max:50', // sesuai form name
+      'status_pegawai' => 'required|string|max:20',
+      'emergency_number' => 'required|string|max:14',
+      'nik' => 'required|string|max:20',
+      'npwp' => 'required|string|max:20',
+      'bpjs' => 'required|string|max:20',
+      'last_salary' => 'required|integer|between:1,9999999999'
+    ]);
+    if ($validator->fails()) {
+      return redirect()->back()->withErrors($validator)->withInput();
+    }
+    $validated = $validator->validated();
+
+    try {
+      $pegawai = Pegawai::find($id);
+      if (!$pegawai) {
+        return redirect()->route('pages-pegawai')->with('error', 'Data pegawai tidak ditemukan.');
+      }
+
+      // Update fields
+      $pegawai->no_pegawai = strtoupper($validated['no_pegawai']);
+      $pegawai->nama_pegawai = $validated['nama_pegawai'];
+      $pegawai->jabatan = $validated['jabatan'];
+      $pegawai->email = $validated['email'];
+      $pegawai->no_hp = $validated['no_handphone']; // map ke kolom DB
+      $pegawai->alamat = $validated['alamat'];
+      $pegawai->tempat_lahir = $validated['tempat_lahir'];
+      $pegawai->tgl_lahir = $validated['tanggal_lahir'];
+      $pegawai->tgl_join = $validated['tanggal_join'];
+      $pegawai->jenis_kelamin = $validated['jenis_kelamin'];
+      $pegawai->departemen = $validated['departemen'];
+      $pegawai->status_pegawai = $validated['status_pegawai'];
+      $pegawai->emergency_number = $validated['emergency_number'];
+      $pegawai->nik = $validated['nik'];
+      $pegawai->npwp = $validated['npwp'];
+      $pegawai->bpjs = $validated['bpjs'];
+      $pegawai->last_salary = $validated['last_salary'];
+      // Simpan perubahan
+      $pegawai->save();
+
+      // Update User Table jika email berubah
+      $user = User::where('email', $pegawai->email)->first();
+      if ($user) {
+        $user->email = $validated['email'];
+        $user->save();
+      }
+
+      return redirect()->route('pages-pegawai')->with('success', 'Data pegawai berhasil diperbarui.');
+    } catch (\Exception $e) {
+      return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**
@@ -128,7 +197,25 @@ class PegawaiController extends Controller
    */
   public function destroy(string $id)
   {
-    //
+    try {
+      \DB::beginTransaction();
+
+      // Cari pegawai, throws ModelNotFoundException jika tidak ada
+      $pegawai = Pegawai::findOrFail($id);
+
+      // Hapus pegawai
+      $pegawai->delete();
+
+      \DB::commit();
+
+      return redirect()->route('pages-pegawai')->with('success', 'Data pegawai berhasil dihapus.');
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      \DB::rollBack();
+      return redirect()->route('pages-pegawai')->with('error', 'Data pegawai tidak ditemukan.');
+    } catch (\Exception $e) {
+      \DB::rollBack();
+      return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   public function searchPegawai(Request $request)

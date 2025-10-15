@@ -69,21 +69,6 @@
 @endsection
 
 @push('scripts')
-    <!-- jQuery + DataTables core (harus sebelum DataTables Buttons) -->
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> --}}
-
-    <!-- DataTables Buttons CSS/JS (CDN) -->
-    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script> --}}
-
     <script>
         window.addEventListener('load', function() {
             $('#pegawaiTable').on('init.dt', function() {
@@ -184,6 +169,41 @@
         function navigateToForm() {
             window.location.href = window.location.origin + '/pages/pegawai/create';
         }
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.delete-btn');
+            if (!btn) return;
+            e.preventDefault();
+
+            const id = btn.dataset.id;
+            if (!id) return;
+
+            if (!confirm('Yakin ingin menghapus Pegawai ini? Tindakan ini tidak dapat dibatalkan.')) return;
+
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                '{{ csrf_token() }}';
+            const url = '{{ url('/pages/pegawai/delete') }}' + '/' + encodeURIComponent(id);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            form.style.display = 'none';
+
+            const inputToken = document.createElement('input');
+            inputToken.type = 'hidden';
+            inputToken.name = '_token';
+            inputToken.value = token;
+            form.appendChild(inputToken);
+
+            const inputMethod = document.createElement('input');
+            inputMethod.type = 'hidden';
+            inputMethod.name = '_method';
+            inputMethod.value = 'DELETE';
+            form.appendChild(inputMethod);
+
+            document.body.appendChild(form);
+            form.submit();
+        });
     </script>
 
     <style>
