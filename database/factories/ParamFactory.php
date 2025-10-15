@@ -20,24 +20,6 @@ class ParamFactory extends Factory
       //
       'value' => 'shift',
       'svalue' => json_encode([
-        [
-          'val' => 'Pagi',
-          'waktu_masuk' => '06:00',
-          'waktu_pulang' => '14:00',
-          'updated_at' => '2025-10-30 00:00:00',
-        ],
-        [
-          'val' => 'Siang',
-          'waktu_masuk' => '14:00',
-          'waktu_pulang' => '22:00',
-          'updated_at' => '2025-10-30 00:00:00',
-        ],
-        [
-          'val' => 'Malam',
-          'waktu_masuk' => '22:00',
-          'waktu_pulang' => '06:00',
-          'updated_at' => '2025-10-30 00:00:00',
-        ],
       ], JSON_UNESCAPED_UNICODE),
       'flag' => '1',
     ];

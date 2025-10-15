@@ -147,7 +147,8 @@ class DataTableController extends Controller
         ->addColumn('action', function ($row) {
           // Gunakan nilai 'val' sebagai pengganti id
           $editBtn = '<a href="/config/shift-kerja/' . $row->val . '/edit" class="btn btn-sm btn-primary">Edit</a>';
-          return $editBtn;
+          $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->val . '">Delete</button>';
+          return $editBtn . ' ' . $deleteBtn;
         })
         ->rawColumns(['action'])
         ->make(true);

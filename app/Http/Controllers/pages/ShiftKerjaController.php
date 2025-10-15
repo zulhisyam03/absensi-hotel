@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ShiftKerja;
 use App\Models\Param;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class ShiftKerjaController extends Controller
 {
@@ -108,6 +110,111 @@ class ShiftKerjaController extends Controller
 
     } catch (\Exception $e) {
       return redirect()->route('config-shift-kerja')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+  }
+
+  public function createParameter()
+  {
+    return view('content.config.shift-form', ['flag' => 'Tambah']);
+  }
+
+  public function storeParameter(Request $request)
+  {
+    $validator = Validator::make($request->all(), [
+      'shift' => 'required|string|max:50',
+      'waktu_masuk' => 'required|date_format:H:i',
+      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+    ]);
+
+    $validated = $validator->validated();
+    $shiftUpper = strtoupper($validated['shift']);
+
+    try {
+      // Ambil data param shift
+      $param = Param::where('value', 'shift')->firstOrFail();
+      $shifts = json_decode($param->svalue, associative: true);
+
+      // Cek apakah shift sudah ada
+      $existingShift = collect($shifts)->firstWhere('val', $shiftUpper);
+      if ($existingShift) {
+        return redirect()->back()->withInput()->with('error', 'Shift ' . $shiftUpper . ' sudah ada.');
+      }
+
+      // Tambah data baru
+      $newShift = [
+        'val' => $shiftUpper,
+        'waktu_masuk' => $validated['waktu_masuk'],
+        'waktu_pulang' => $validated['waktu_pulang'],
+        'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+      ];
+      $shifts[] = $newShift;
+
+      // Simpan kembali ke database
+      $param->svalue = json_encode($shifts);
+      $param->save();
+
+      return redirect()->route('config-shift-kerja')->with('success', 'Parameter shift kerja berhasil ditambahkan.');
+    } catch (\Exception $e) {
+      return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+  }
+
+  public function updateParameter(Request $request, $id)
+  {
+    $validator = Validator::make($request->all(), [
+      'shift' => 'required|string|max:50',
+      'waktu_masuk' => 'required|date_format:H:i',
+      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+    ]);
+
+    $validated = $validator->validated();
+
+    try {
+      // Ambil data param shift
+      $param = Param::where('value', 'shift')->firstOrFail();
+      $shifts = json_decode($param->svalue, associative: true);
+
+      // Cari index item dengan val = $id
+      $index = collect($shifts)->search(fn($item) => $item['val'] === $id);
+      if ($index === false) {
+        return redirect()->back()->withInput()->with('error', 'Shift ' . $id . ' tidak ditemukan.');
+      }
+
+      // Update data di index tersebut
+      $shifts[$index]['waktu_masuk'] = $validated['waktu_masuk'];
+      $shifts[$index]['waktu_pulang'] = $validated['waktu_pulang'];
+      $shifts[$index]['updated_at'] = Carbon::now()->format('Y-m-d H:i:s');
+
+      // Simpan kembali ke database
+      $param->svalue = json_encode($shifts);
+      $param->save();
+
+      return redirect()->route('config-shift-kerja')->with('success', 'Parameter shift kerja berhasil diupdate.');
+    } catch (\Exception $e) {
+      return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+  }
+
+  public function deleteParameter($id)
+  {
+    try {
+      // Ambil data param shift
+      $param = Param::where('value', 'shift')->firstOrFail();
+      $shifts = json_decode($param->svalue, associative: true);
+
+      // Filter keluar item dengan val = $id
+      $filteredShifts = array_filter($shifts, fn($item) => $item['val'] !== $id);
+      if (count($shifts) === count($filteredShifts)) {
+        return redirect()->back()->with('error', 'Shift ' . $id . ' tidak ditemukan.');
+      }
+
+      // Simpan kembali ke database
+      $param->svalue = json_encode(array_values($filteredShifts)); // reindex array
+      $param->save();
+
+      return redirect()->route('config-shift-kerja')->with('success', 'Parameter shift kerja berhasil dihapus.');
+    } catch (\Exception $e) {
+      return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
   }
 }
