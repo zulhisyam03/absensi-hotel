@@ -164,9 +164,22 @@
             <div class="card">
                 <h5 class="card-header"><i class="bx bx-lg bx-map-alt"></i> Manajemen / Lokasi
                 </h5>
+
+                @if (session('success'))
+                    <div class="alert alert-success d-flex alert-dismissible mx-5" role="alert">
+                        <span class="alert-icon rounded-circle">
+                            <i class="icon-base bx bxs-check-circle icon-sm"></i>
+                        </span>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        </button>
+                    </div>
+                @endif
+
                 <div class="card-body col-12 mx-auto">
-                    <form id="mapForm" method="POST" action="{{ route('config-lokasi.store') }}">
+                    <form id="mapForm" method="post" action="{{ route('config-lokasi.update', 'lokasi') }}">
                         @csrf
+                        @method('PUT')
 
                         <div class="row">
                             <div class="col-md-4 mb-3"> {{-- Ubah ke col-md-4 untuk fit 3 input --}}
@@ -236,9 +249,73 @@
                 iconAnchor: [15, 30],
                 popupAnchor: [0, -30]
             });
+            var latitude, longitude, radius;
+            // Ambil data dari Parameter Lokasi
+            // Ambil data lokasi via jQuery AJAX (synchronous agar nilai tersedia sebelum inisialisasi peta)
+            // Ganti '1' pada route jika perlu dengan ID yang sesuai
+            var url = "{{ route('config-lokasi.show', 'lokasi') }}";
+            try {
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    dataType: 'json',
+                    async: false, // synchronous to keep existing flow (kurangi jika ingin async)
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(data) {
+                        // Asumsikan respon JSON berisi { latitude: ..., longitude: ..., radius: ... }
+                        latitude = data.latitude !== undefined && data.latitude !== null ? parseFloat(
+                            data.latitude) : null;
+                        longitude = data.longitude !== undefined && data.longitude !== null ?
+                            parseFloat(data.longitude) : null;
+                        radius = data.radius !== undefined && data.radius !== null ? parseInt(data
+                            .radius) : null;
+
+                        if (!isNaN(latitude)) document.getElementById('latitude').value = latitude
+                            .toFixed(6);
+                        if (!isNaN(longitude)) document.getElementById('longitude').value = longitude
+                            .toFixed(6);
+                        if (!isNaN(radius)) document.getElementById('radius').value = radius;
+
+                        console.log('Data lokasi berhasil diambil via jQuery AJAX:', {
+                            latitude,
+                            longitude,
+                            radius
+                        });
+
+                        document.getElementById('latitude').value = latitude !== null ? latitude
+                            .toFixed(6) : '';
+                        document.getElementById('longitude').value = longitude !== null ? longitude
+                            .toFixed(6) : '';
+                        document.getElementById('radius').value = radius !== null ? radius : 100;
+                    },
+                    error: function(xhr, status, error) {
+                        console.warn('Gagal mengambil data lokasi. Status:', status, 'HTTP:', xhr
+                            .status, 'Error:', error);
+                    }
+                });
+            } catch (e) {
+                console.error('Error ketika mengambil data lokasi via jQuery AJAX:', e);
+            }
+
+            var longitudeStr = (typeof longitude !== 'undefined' && longitude !== null) ? String(longitude) : (
+                document.getElementById('longitude').value || '');
+            longitudeStr = longitudeStr.trim();
+
+            var splitLongtitude = '';
+            var lastTwoLongtitude = '';
+
+            if (longitudeStr.length >= 2) {
+                splitLongtitude = longitudeStr.slice(0, -2);
+                lastTwoLongtitude = longitudeStr.slice(-2);
+            } else {
+                // jika kurang dari 2 karakter, simpan seluruhnya di lastTwoLongtitude
+                lastTwoLongtitude = longitudeStr;
+            }
 
             // Inisialisasi peta
-            var map = L.map('map').setView([-0.900270, 119.8890], 12);
+            var map = L.map('map').setView([latitude, splitLongtitude], lastTwoLongtitude);
 
             // Tile layer OSM (sama seperti sebelumnya)
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -253,7 +330,7 @@
             // Fungsi untuk update radius (dipanggil saat textbox berubah atau marker baru)
             function updateRadius(lat, lng) {
                 var radiusValue = parseInt(document.getElementById('radius').value) ||
-                    100; // Default 100m jika kosong
+                    radius; // Default 100m jika kosong
                 radiusValue = Math.max(10, Math.min(5000, radiusValue)); // Clamp antara 10-5000m
 
                 // Hapus circle lama jika ada
@@ -360,15 +437,38 @@
                 console.log('Klik manual dengan radius:', lat, lng);
             });
 
-            // Default value (termasuk radius)
-            document.getElementById('latitude').value = -0.900270;
-            document.getElementById('longitude').value = 119.889012;
-            document.getElementById('radius').value = 100; // Default 100m
+            // --- Inisialisasi default dari input / server ---
+            // Jika server mengirimkan nilai lewat blade/old, gunakan itu. Jika tidak, pakai fallback.
+            var initialLat = parseFloat(document.getElementById('latitude').value) || latitude;
+            var initialLng = parseFloat(document.getElementById('longitude').value) || longitude;
+            var initialRadius = parseInt(document.getElementById('radius').value) || radius;
 
-            // Inisialisasi default circle (opsional, untuk tampilkan radius awal)
-            updateRadius(-6.2088, 106.8456);
+            // Set inputs jika masih kosong
+            document.getElementById('latitude').value = initialLat.toFixed(6);
+            document.getElementById('longitude').value = initialLng.toFixed(6);
+            document.getElementById('radius').value = initialRadius;
 
-            console.log('Peta siap dengan fitur radius! Ubah textbox untuk update lingkaran.');
+            // Buat marker dan circle awal agar langsung terlihat ketika halaman dibuka
+            if (window.currentMarker) {
+                map.removeLayer(window.currentMarker);
+            }
+            if (window.currentCircle) {
+                map.removeLayer(window.currentCircle);
+            }
+
+            window.currentMarker = L.marker([initialLat, initialLng], {
+                    icon: customIcon
+                })
+                .addTo(map)
+                .bindPopup('Lokasi Default: ' + initialLat.toFixed(6) + ', ' + initialLng.toFixed(6) +
+                    '<br>Radius: ' + initialRadius + 'm');
+
+            updateRadius(initialLat, initialLng);
+
+            // Pusatkan peta ke koordinat awal
+            map.setView([initialLat, initialLng], 14);
+
+            console.log('Peta siap dengan fitur radius! Lokasi awal ditampilkan.');
         });
     </script>
 @endpush

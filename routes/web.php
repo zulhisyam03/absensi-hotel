@@ -90,7 +90,8 @@ Route::middleware(['auth'])->group(function () {
 
   // Lokasi
   Route::get('config/lokasi', [MapController::class, 'index'])->name('config-lokasi');
-  Route::post('config/lokasi/store', [MapController::class, 'store'])->name('config-lokasi.store');
+  Route::get('config/lokasi/{id}', [MapController::class, 'show'])->name('config-lokasi.show');
+  Route::put('config/lokasi/updated/{id}', [MapController::class, 'update'])->name('config-lokasi.update');
 
   // user
   Route::get("config/user", [UserController::class, 'index'])->name('config-user');

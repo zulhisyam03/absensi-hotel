@@ -4,6 +4,7 @@ namespace App\Http\Controllers\pages;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Param;
 
 class MapController extends Controller
 {
@@ -38,6 +39,18 @@ class MapController extends Controller
   public function show(string $id)
   {
     //
+    try {
+      $param = Param::where('value', $id)->first();
+      $data = json_decode($param->svalue, true);
+
+      if (!$data) {
+        return redirect()->route('config-lokasi')->with('error', 'Data tidak ditemukan.');
+      }
+      return response()->json($data);
+      // return view('content.config.map', ['data' => $data, 'flag'
+    } catch (\Exception $e) {
+      return redirect()->route('config-lokasi')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**
@@ -54,6 +67,31 @@ class MapController extends Controller
   public function update(Request $request, string $id)
   {
     //
+    $request->validate([
+      'latitude' => 'required|numeric',
+      'longitude' => 'required|numeric',
+      'radius' => 'required|integer|min:1',
+    ]);
+    try {
+      $param = Param::where('value', $id)->first();
+
+      if (!$param) {
+        return redirect()->route('config-lokasi')->with('error', 'Data parameter lokasi tidak ditemukan.');
+      }
+
+      $newData = [
+        'latitude' => $request->input('latitude'),
+        'longitude' => $request->input('longitude'),
+        'radius' => $request->input('radius'),
+      ];
+
+      $param->svalue = json_encode($newData);
+      $param->save();
+
+      return redirect()->route('config-lokasi')->with('success', 'Data lokasi berhasil diperbarui.');
+    } catch (\Exception $e) {
+      return redirect()->route('config-lokasi')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**

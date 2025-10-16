@@ -206,6 +206,9 @@
                                         <option @selected(old('jabatan', $data->jabatan ?? '') == 'Staff') value="Staff">
                                             Staff
                                         </option>
+                                        <option @selected(old('jabatan', $data->jabatan ?? '') == 'Supervisor') value="Supervisor">
+                                            Supervisor
+                                        </option>
                                     </select>
                                     @error('jabatan')
                                         <div class="text-danger mt-2">
@@ -243,7 +246,7 @@
                                 <div class="mb-4">
                                     <label for="status-pegawai" class="form-label fs-5">Status Pegawai</label>
                                     <select id="status-pegawai" class="form-select" name="status_pegawai">
-                                        <option hidden value="">-- Departemen --</option>
+                                        <option hidden value="">-- Status Pegawai --</option>
                                         <option @selected(old('status_pegawai', $data->status_pegawai ?? '') == 'Casual') value="Casual">
                                             Casual</option>
                                         <option @selected(old('status_pegawai', $data->status_pegawai ?? '') == 'DW') value="DW">
