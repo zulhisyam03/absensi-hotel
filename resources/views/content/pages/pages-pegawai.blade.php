@@ -38,6 +38,35 @@
                             </div>
                         @endif
 
+                        {{-- Button Export Excel --}}
+                        <div class="card-body px-4">
+                            <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
+                                Export
+                                Data</button>
+                            <div class="row justify-content-center" id="exportFilter">
+                                <div class="col-md-4">
+                                    <label for="filterDateStart" class="form-label mt-3">Departemen:</label>
+                                    <select id="filterDepartemen" name="filterDepartemen" class="form-select">
+                                        <option value="all">Semua Departemen</option>
+                                        <option value="A&G">A&G</option>
+                                        <option value="ACCOUNTING">ACCOUNTING</option>
+                                        <option value="FB PRODUCT">FB PRODUCT</option>
+                                        <option value="FB SERVICE">FB SERVICE</option>
+                                        <option value="FRONT OFFICE">FRONT OFFICE</option>
+                                        <option value="HOUSEKEEPING">HOUSEKEEPING</option>
+                                        <option value="HRD">HRD</option>
+                                        <option value="SALES & MARKETING">SALES & MARKETING</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="btnDownload" class="form-label mt-3">&nbsp;</label>
+                                    <button class="btn btn-primary w-100" id="btnDownload"><i class="bx bxs-download"></i>
+                                        Download</button>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- END Button Export Excel --}}
+
                         {{-- Button tambah Data Pegwai --}}
                         <div class="d-flex justify-content-end mb-5">
                             <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahPegawai"
@@ -163,6 +192,16 @@
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
                 ]
+            });
+
+            // Toggle filter export
+            // Sembunyikan filter di awal (opsional)
+            $('#exportFilter').hide();
+
+            // Saat tombol Export diklik
+            $('#btnExport').on('click', function(e) {
+                e.preventDefault(); // mencegah reload jika tombol di dalam form
+                $('#exportFilter').slideToggle(300); // toggle dengan animasi
             });
         });
 

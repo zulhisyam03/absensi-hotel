@@ -63,9 +63,4 @@ class AbsenController extends Controller
     //
   }
 
-  // Method to view the shift schedule page
-  public function viewShift()
-  {
-    //
-  }
 }

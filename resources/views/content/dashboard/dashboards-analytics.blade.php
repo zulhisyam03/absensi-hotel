@@ -27,6 +27,43 @@
                                 <h5 class="m-0 me-2"><i class="bx bx-lg bx-history"></i> History</h5>
                             </div>
                         </div>
+                        {{-- Button Export Excel --}}
+                        <div class="card-body px-4">
+                            <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
+                                Export
+                                Data</button>
+                            <div class="row" id="exportFilter">
+                                <div class="col-md-3">
+                                    <label for="filterDateStart" class="form-label mt-3">Tanggal Awal:</label>
+                                    <input type="date" id="filterDateStart" name="filterDateStart"
+                                        class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filterDateEnd" class="form-label mt-3">Tanggal Akhir:</label>
+                                    <input type="date" id="filterDateEnd" name="filterDateEnd" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="filterDateStart" class="form-label mt-3">Departemen:</label>
+                                    <select id="filterDepartemen" name="filterDepartemen" class="form-select">
+                                        <option value="all">Semua Departemen</option>
+                                        <option value="A&G">A&G</option>
+                                        <option value="ACCOUNTING">ACCOUNTING</option>
+                                        <option value="FB PRODUCT">FB PRODUCT</option>
+                                        <option value="FB SERVICE">FB SERVICE</option>
+                                        <option value="FRONT OFFICE">FRONT OFFICE</option>
+                                        <option value="HOUSEKEEPING">HOUSEKEEPING</option>
+                                        <option value="HRD">HRD</option>
+                                        <option value="SALES & MARKETING">SALES & MARKETING</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="btnDownload" class="form-label mt-3">&nbsp;</label>
+                                    <button class="btn btn-primary w-100" id="btnDownload"><i class="bx bxs-download"></i>
+                                        Download</button>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- END Button Export Excel --}}
                         {{-- Table history absensi --}}
                         <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4 table-sm"
                             style="width:100%">
@@ -34,6 +71,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Nama Pegawai</th>
+                                    <th>Departemen</th>
                                     <th>Shift</th>
                                     <th>Waktu</th>
                                     <th>Status</th>
@@ -314,6 +352,10 @@
                         name: 'nama_pegawai'
                     },
                     {
+                        data: 'departemen',
+                        name: 'departemen'
+                    },
+                    {
                         data: 'shift',
                         name: 'shift'
                     },
@@ -348,6 +390,16 @@
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
                 ]
+            });
+
+            // Toggle filter export
+            // Sembunyikan filter di awal (opsional)
+            $('#exportFilter').hide();
+
+            // Saat tombol Export diklik
+            $('#btnExport').on('click', function(e) {
+                e.preventDefault(); // mencegah reload jika tombol di dalam form
+                $('#exportFilter').slideToggle(300); // toggle dengan animasi
             });
 
         });

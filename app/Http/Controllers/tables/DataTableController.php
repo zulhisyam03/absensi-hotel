@@ -22,7 +22,7 @@ class DataTableController extends Controller
     //
     if ($request->ajax()) {
       $absensi = Absen::query()
-        ->select('absens.*', 'pegawais.nama_pegawai') // Pilih semua kolom dari absens
+        ->select('absens.*', 'pegawais.nama_pegawai', 'pegawais.departemen') // Pilih semua kolom dari absens
         ->leftJoin('pegawais', 'absens.no_pegawai', '=', 'pegawais.no_pegawai')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
@@ -34,6 +34,9 @@ class DataTableController extends Controller
         ->addIndexColumn()
         ->addColumn('nama_pegawai', function ($row) {
           return $row->pegawai ? $row->pegawai->nama_pegawai : 'N/A';
+        })
+        ->addColumn('departemen', function ($row) {
+          return $row->pegawai ? $row->pegawai->departemen : 'N/A';
         })
         ->editColumn('created_at', function ($row) {
           // Menggunakan Carbon untuk memformat created_at
@@ -48,6 +51,7 @@ class DataTableController extends Controller
                 ->orWhereRaw('LOWER(absens.status) LIKE ?', ["%{$search}%"])
                 ->orWhereRaw('LOWER(absens.keterangan) LIKE ?', ["%{$search}%"])
                 ->orWhereRaw('LOWER(pegawais.nama_pegawai) LIKE ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(pegawais.departemen) LIKE ?', ["%{$search}%"])
                 ->orWhereRaw('LOWER(absens.created_at) LIKE ?', ["%{$search}%"]);
             });
           }
