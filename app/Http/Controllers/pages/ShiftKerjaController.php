@@ -35,6 +35,36 @@ class ShiftKerjaController extends Controller
   public function store(Request $request)
   {
     //
+    $validator = validator()->make($request->all(), [
+      'no_pegawai' => 'required',
+      'shift_kerja' => 'required|string|max:50',
+      'waktu_masuk' => 'required|date_format:H:i',
+      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+    ]);
+    $validated = $validator->validated();
+
+    try {
+      $cekData = Shiftkerja::where('no_pegawai', $validated['no_pegawai'])
+        ->where('shift', $validated['shift_kerja'])
+        ->where('flag', 'a')
+        ->first();
+
+      if (!empty($cekData)) {
+        return redirect()->route('pages-shift-kerja.create')->with('error', 'Data shift kerja untuk pegawai tersebut sudah ada.');
+      } else {
+        $shiftKerja = new ShiftKerja();
+        $shiftKerja->no_pegawai = $validated['no_pegawai'];
+        $shiftKerja->shift = strtoupper($validated['shift_kerja']);
+        $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
+        $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
+        $shiftKerja->flag = 'a';
+        $shiftKerja->save();
+
+        return redirect()->route('pages-shift-kerja')->with('success', 'Data shift kerja pegawai ' . $request['nama_pegawai'] . ' berhasil ditambahkan.');
+      }
+    } catch (\Exception $e) {
+      return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**
@@ -73,6 +103,38 @@ class ShiftKerjaController extends Controller
   public function update(Request $request, string $id)
   {
     //
+    $validator = validator()->make($request->all(), [
+      'no_pegawai' => 'required',
+      'shift_kerja' => 'required|string|max:50',
+      'waktu_masuk' => 'required|date_format:H:i',
+      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+    ]);
+
+    $validated = $validator->validated();
+
+    try {
+      $cekData = Shiftkerja::where('no_pegawai', $validated['no_pegawai'])
+        ->where('shift', $validated['shift_kerja'])
+        ->where('flag', 'a')
+        ->first();
+
+      if (!empty($cekData)) {
+        return redirect()->back()->with('error', 'Data shift kerja untuk pegawai tersebut sudah ada.');
+      } else {
+        $shiftKerja = ShiftKerja::findOrFail($id);
+        $shiftKerja->no_pegawai = $validated['no_pegawai'];
+        $shiftKerja->shift = strtoupper($validated['shift_kerja']);
+        $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
+        $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
+        $shiftKerja->save();
+
+        return redirect()->route('pages-shift-kerja')->with('success', 'Data shift kerja pegawai ' . strtoupper($request['nama_pegawai'] . ' berhasil diupdate.'));
+      }
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      return redirect()->route('pages-shift-kerja')->with('error', 'Data shift kerja tidak ditemukan.');
+    } catch (\Exception $e) {
+      return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**
@@ -81,11 +143,49 @@ class ShiftKerjaController extends Controller
   public function destroy(string $id)
   {
     //
+    try {
+      \DB::beginTransaction();
+
+      // Cari pegawai, throws ModelNotFoundException jika tidak ada
+      $shiftKerja = ShiftKerja::findOrFail($id);
+
+      // Hapus shiftKerja
+      $shiftKerja->delete();
+
+      \DB::commit();
+
+      return redirect()->route('pages-shift-kerja')->with('success', 'Data shift pegawai berhasil dihapus.');
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+      \DB::rollBack();
+      return redirect()->route('pages-shift-kerja')->with('error', 'Data shift pegawai tidak ditemukan.');
+    } catch (\Exception $e) {
+      \DB::rollBack();
+      return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   public function viewConfig()
   {
     return view('content.config.shift');
+  }
+
+  public function viewParameter($routBack)
+  {
+    try {
+      $param = Param::where('value', 'shift')->firstOrFail();
+      // Decode JSON svalue menjadi array PHP
+      $shifts = [];
+      if ($param && $param->svalue && $param->svalue != '[]') {
+        // $shifts = json_decode($param->svalue, true); // array of {val, waktu_masuk, waktu_pulang, ...}
+        return json_decode($param->svalue, true);
+      } else {
+        return ['error' => 'Parameter Shift Belum di atur pada Manajemen / Shift'];
+        // return redirect()->route($routBack)->with('error', 'Shift tidak ditemukan');
+      }
+
+    } catch (\Exception $e) {
+      return redirect()->route($routBack)->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   public function editParameter($request)
@@ -215,6 +315,32 @@ class ShiftKerjaController extends Controller
       return redirect()->route('config-shift-kerja')->with('success', 'Parameter shift kerja berhasil dihapus.');
     } catch (\Exception $e) {
       return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+  }
+
+  public function showParameterByShift($shift)
+  {
+    try {
+      $param = Param::where('value', 'shift')->firstOrFail();
+      // Decode JSON svalue menjadi array PHP
+      $shifts = [];
+      if ($param && $param->svalue && $param->svalue != '[]') {
+        $shifts = json_decode($param->svalue, true); // array of {val, waktu_masuk, waktu_pulang, ...}
+        // Cari item dengan val = $shift
+        $dataShift = collect($shifts)->firstWhere('val', $shift);
+
+        // Kalau tidak ketemu
+        if (!$dataShift) {
+          return response()->json(['error' => 'Shift ' . $shift . ' tidak ditemukan'], 404);
+        }
+
+        return response()->json(['data' => $dataShift], 200);
+      } else {
+        return response()->json(['error' => 'Parameter Shift Belum di atur pada Manajemen / Shift'], 404);
+      }
+
+    } catch (\Exception $e) {
+      return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
     }
   }
 }

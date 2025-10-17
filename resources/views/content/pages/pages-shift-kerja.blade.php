@@ -27,6 +27,28 @@
                             </div>
                         </div>
 
+                        @if (session('error'))
+                            <div class="alert alert-danger d-flex alert-dismissible mx-5" role="alert">
+                                <span class="alert-icon rounded-circle">
+                                    <i class="icon-base bx bxs-error-circle icon-sm"></i>
+                                </span>
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                </button>
+                            </div>
+                        @endif
+
+                        @if (session('success'))
+                            <div class="alert alert-success d-flex alert-dismissible mx-5" role="alert">
+                                <span class="alert-icon rounded-circle">
+                                    <i class="icon-base bx bxs-check-circle icon-sm"></i>
+                                </span>
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                </button>
+                            </div>
+                        @endif
+
                         {{-- Button tambah Data Pegwai --}}
                         <div class="d-flex justify-content-end mb-5">
                             <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"
@@ -124,6 +146,41 @@
         function navigateToForm() {
             window.location.href = window.location.origin + '/pages/shift-kerja/create';
         }
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.delete-btn');
+            if (!btn) return;
+            e.preventDefault();
+
+            const id = btn.dataset.id;
+            if (!id) return;
+
+            if (!confirm('Yakin ingin menghapus Shift Pegawai ini? Tindakan ini tidak dapat dibatalkan.')) return;
+
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                '{{ csrf_token() }}';
+            const url = '{{ url('/pages/shift-kerja/delete') }}' + '/' + encodeURIComponent(id);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            form.style.display = 'none';
+
+            const inputToken = document.createElement('input');
+            inputToken.type = 'hidden';
+            inputToken.name = '_token';
+            inputToken.value = token;
+            form.appendChild(inputToken);
+
+            const inputMethod = document.createElement('input');
+            inputMethod.type = 'hidden';
+            inputMethod.name = '_method';
+            inputMethod.value = 'DELETE';
+            form.appendChild(inputMethod);
+
+            document.body.appendChild(form);
+            form.submit();
+        });
     </script>
 
     <style>

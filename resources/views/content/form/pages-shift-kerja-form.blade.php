@@ -6,13 +6,12 @@
     {{-- @vite('resources/assets/js/form-basic-inputs.js') --}}
 @endsection
 
-@section('page-style'){
+@section('page-style')
     <style>
         input[type="text"] {
             text-transform: uppercase;
         }
     </style>
-    }
 @endsection
 
 @section('content')
@@ -20,52 +19,68 @@
         <div class="col-md-12">
             <div class="card">
                 <h5 class="card-header"><i class="bx bx-lg bx-timer"></i> Form Shift Kerja / {{ $flag }} Data</h5>
+                @if (session('error'))
+                    <div class="alert alert-danger d-flex alert-dismissible mx-5" role="alert">
+                        <span class="alert-icon rounded-circle">
+                            <i class="icon-base bx bxs-error-circle icon-sm"></i>
+                        </span>
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        </button>
+                    </div>
+                @endif
                 <div class="card-body col-12 mx-auto">
-                    <div class="mb-4">
-                        <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
-                        <input class="form-control {{ isset($data) ? 'bg-secondary bg-opacity-25' : '' }}"
-                            list="datalistOptions" type="text"
-                            value="{{ old('nama_pegawai', isset($data) ? $data->pegawai->nama_pegawai : '') }}"
-                            placeholder="Type to search..." name="nama_pegawai" id="nama-pegawai"
-                            {{ $flag !== 'Tambah' ? 'readonly' : '' }} autocomplete="off" />
-                        <datalist id="datalistOptions"></datalist>
-                    </div>
-                    <div class="mb-4">
-                        <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
-                        <input type="text" class="form-control bg-secondary bg-opacity-25" id="no-pegawai"
-                            name="no_pegawai" autocomplete="off"
-                            value="{{ old('no_pegawai', isset($data) ? $data->pegawai->no_pegawai : '') }}" readonly />
-                    </div>
-                    <div class="mb-4">
-                        <label for="departemen" class="form-label fs-5">Departemen</label>
-                        <input type="text" class="form-control bg-secondary bg-opacity-25" id="departemen"
-                            name="departemen" autocomplete="off"
-                            value="{{ old('departemen', isset($data) ? $data->pegawai->departemen : '') }}" readonly />
-                    </div>
-                    <div class="mb-4">
-                        <label for="jenis_kelamin" class="form-label fs-5">Shift Kerja</label>
-                        <select id="jenis_kelamin" class="form-select" name="jenis_kelamin">
-                            <option hidden>-- Shift Kerja --</option>
-                            <option {{ isset($data) && $data->shift == 'malam' ? 'selected' : '' }} value="malam">Malam
-                            </option>
-                            <option {{ isset($data) && $data->shift == 'pagi' ? 'selected' : '' }} value="pagi">Pagi
-                            </option>
-                            <option {{ isset($data) && $data->shift == 'siang' ? 'selected' : '' }} value="siang">Siang
-                            </option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="waktu-masuk" class="form-label fs-5">Waktu Masuk</label>
-                        <input type="time" class="form-control" id="waktu-masuk" name="waktu_masuk" autocomplete="off"
-                            value="{{ isset($data) ? $data->waktu_masuk : '' }}" />
-                    </div>
-                    <div class="mb-4">
-                        <label for="waktu-pulang" class="form-label fs-5">Waktu Pulang</label>
-                        <input type="time" class="form-control" id="waktu-pulang" name="waktu_pulang"
-                            value="{{ isset($data) ? $data->waktu_pulang : '' }}" />
-                    </div>
+                    <form
+                        action="{{ isset($data) ? route('pages-shift-kerja.update', $data->id) : route('pages-shift-kerja.store') }}"
+                        method="post">
+                        @csrf
+                        @if (isset($data))
+                            @method('PUT')
+                        @endif
 
-                    <button class="btn btn-primary btn-lg w-100"><i class="bx bx-save"></i> Simpan</button>
+                        <div class="mb-4">
+                            <label for="nama-pegawai" class="form-label fs-5">Nama Pegawai</label>
+                            <input class="form-control {{ isset($data) ? 'bg-secondary bg-opacity-25' : '' }}"
+                                list="datalistOptions" type="text"
+                                value="{{ old('nama_pegawai', isset($data) ? $data->pegawai->nama_pegawai : '') }}"
+                                placeholder="Type to search..." name="nama_pegawai" id="nama-pegawai"
+                                {{ $flag !== 'Tambah' ? 'readonly' : '' }} autocomplete="off" />
+                            <datalist id="datalistOptions"></datalist>
+                        </div>
+                        <div class="mb-4">
+                            <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
+                            <input type="text" class="form-control bg-secondary bg-opacity-25" id="no-pegawai"
+                                name="no_pegawai" autocomplete="off"
+                                value="{{ old('no_pegawai', isset($data) ? $data->pegawai->no_pegawai : '') }}" readonly />
+                        </div>
+                        <div class="mb-4">
+                            <label for="departemen" class="form-label fs-5">Departemen</label>
+                            <input type="text" class="form-control bg-secondary bg-opacity-25" id="departemen"
+                                name="departemen" autocomplete="off"
+                                value="{{ old('departemen', isset($data) ? $data->pegawai->departemen : '') }}" readonly />
+                        </div>
+                        <div class="mb-4">
+                            <label for="shift-kerja" class="form-label fs-5">Shift Kerja</label>
+                            <select id="shift-kerja" class="form-select" name="shift_kerja">
+                                <option hidden>-- Shift Kerja --</option>
+                                {{-- Opsi akan diisi melalui AJAX --}}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="waktu-masuk" class="form-label fs-5">Waktu Masuk</label>
+                            <input type="time" class="form-control bg-secondary bg-opacity-25" id="waktu-masuk"
+                                name="waktu_masuk" autocomplete="off" value="{{ isset($data) ? $data->waktu_masuk : '' }}"
+                                readonly />
+                        </div>
+                        <div class="mb-4">
+                            <label for="waktu-pulang" class="form-label fs-5">Waktu Pulang</label>
+                            <input type="time" class="form-control bg-secondary bg-opacity-25" id="waktu-pulang"
+                                name="waktu_pulang" value="{{ isset($data) ? $data->waktu_pulang : '' }}" readonly />
+                        </div>
+
+                        <button class="btn btn-primary btn-lg w-100"><i class="bx bx-save"></i> Simpan</button>
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -168,7 +183,7 @@
                             }
                             if (departemen && departemenValue) {
                                 departemen.value =
-                                departemenValue; // langsung isi no_pegawai saat ada hasil
+                                    departemenValue; // langsung isi no_pegawai saat ada hasil
                             }
                         });
 
@@ -194,6 +209,77 @@
                         }
                     });
             }
+
+            // Ambil data Parameter Shift dari server
+            let redirectPage = 'pages-shift-kerja';
+            $.ajax({
+                url: '/param/shift-kerja/view/' + encodeURIComponent(redirectPage),
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // Gunakan data response untuk mengisi dropdown shift jika perlu
+                    if (response.error) {
+                        window.location.href = '/set-error?message=' +
+                            encodeURIComponent(response.error) +
+                            '&redirect=' + encodeURIComponent(redirectPage);
+                        return;
+                    } else {
+                        const shiftSelect = $('#shift-kerja');
+                        if (shiftSelect.length && response) {
+                            // Kosongkan opsi yang ada
+                            shiftSelect.empty();
+                            shiftSelect.append('<option hidden>-- Shift Kerja --</option>');
+                            // Tambah opsi dari response
+                            response.forEach(shift => {
+                                // isi Field Automatis
+                                var isSelected;
+                                if (shift.val === '{{ isset($data) ? $data->shift : '' }}') {
+                                    isSelected = 'selected';
+                                    document.getElementById('waktu-masuk').value = shift
+                                        .waktu_masuk;
+                                    document.getElementById('waktu-pulang').value = shift
+                                        .waktu_pulang;
+                                }
+                                // End isi Field Automatis
+
+                                shiftSelect.append(
+                                    `<option value="${shift.val}" ${isSelected}>${shift.val}</option>`
+                                );
+                            });
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching shift parameters:', error);
+                }
+            })
+
+            document.getElementById('shift-kerja').addEventListener('change', function() {
+                const selectedShift = this.value;
+                if (!selectedShift) return;
+
+                // Ambil detail shift dari server berdasarkan shift yang dipilih
+                $.ajax({
+                    url: '/param/shift-kerja/show/' + encodeURIComponent(selectedShift),
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(shift) {
+                        if (shift.error) {
+                            alert('Error: ' + shift.error);
+                            return;
+                        }
+                        // Isi waktu masuk dan pulang berdasarkan data yang diterima
+                        document.getElementById('waktu-masuk').value = shift.data.waktu_masuk ||
+                            '';
+                        document.getElementById('waktu-pulang').value = shift.data
+                            .waktu_pulang ||
+                            '';
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching shift details:', error);
+                    }
+                });
+            });
         });
     </script>
 @endpush

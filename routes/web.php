@@ -3,54 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\pages\UserController;
 use App\Http\Controllers\dashboard\Analytics;
-use App\Http\Controllers\layouts\WithoutMenu;
-use App\Http\Controllers\layouts\WithoutNavbar;
-use App\Http\Controllers\layouts\Fluid;
-use App\Http\Controllers\layouts\Container;
-use App\Http\Controllers\layouts\Blank;
-use App\Http\Controllers\pages\AccountSettingsAccount;
-use App\Http\Controllers\AbsenController;
 use App\Http\Controllers\pages\MapController;
 use App\Http\Controllers\pages\ShiftKerjaController;
 use App\Http\Controllers\pages\PegawaiController;
 use App\Http\Controllers\pages\PayrollController;
-use App\Http\Controllers\pages\AccountSettingsNotifications;
-use App\Http\Controllers\pages\AccountSettingsConnections;
-use App\Http\Controllers\pages\MiscError;
-use App\Http\Controllers\pages\MiscUnderMaintenance;
 use App\Http\Controllers\authentications\LoginBasic;
-use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\authentications\ForgotPasswordBasic;
-use App\Http\Controllers\cards\CardBasic;
-use App\Http\Controllers\user_interface\Accordion;
-use App\Http\Controllers\user_interface\Alerts;
-use App\Http\Controllers\user_interface\Badges;
-use App\Http\Controllers\user_interface\Buttons;
-use App\Http\Controllers\user_interface\Carousel;
-use App\Http\Controllers\user_interface\Collapse;
-use App\Http\Controllers\user_interface\Dropdowns;
-use App\Http\Controllers\user_interface\Footer;
-use App\Http\Controllers\user_interface\ListGroups;
-use App\Http\Controllers\user_interface\Modals;
-use App\Http\Controllers\user_interface\Navbar;
-use App\Http\Controllers\user_interface\Offcanvas;
-use App\Http\Controllers\user_interface\PaginationBreadcrumbs;
-use App\Http\Controllers\user_interface\Progress;
-use App\Http\Controllers\user_interface\Spinners;
-use App\Http\Controllers\user_interface\TabsPills;
-use App\Http\Controllers\user_interface\Toasts;
-use App\Http\Controllers\user_interface\TooltipsPopovers;
-use App\Http\Controllers\user_interface\Typography;
-use App\Http\Controllers\extended_ui\PerfectScrollbar;
-use App\Http\Controllers\extended_ui\TextDivider;
-use App\Http\Controllers\icons\Boxicons;
-use App\Http\Controllers\form_elements\BasicInput;
-use App\Http\Controllers\form_elements\InputGroups;
-use App\Http\Controllers\form_layouts\VerticalForm;
-use App\Http\Controllers\form_layouts\HorizontalForm;
-use App\Http\Controllers\tables\Basic as TablesBasic;
 use App\Http\Controllers\tables\DataTableController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 // Main Page Route
 // Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
@@ -78,13 +39,18 @@ Route::middleware(['auth'])->group(function () {
   // Shift Kerja
   Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->name('pages-shift-kerja');
   Route::get('/pages/shift-kerja/create', [ShiftKerjaController::class, 'create'])->name('pages-shift-kerja.create');
+  Route::post('/pages/shift-kerja/store', [ShiftKerjaController::class, 'store'])->name('pages-shift-kerja.store');
   Route::get('/pages/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'edit'])->name('pages-shift-kerja.edit');
+  Route::put('/pages/shift-kerja/{id}', [ShiftKerjaController::class, 'update'])->name('pages-shift-kerja.update');
+  Route::delete('/pages/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'destroy'])->name(name: 'pages-shift-kerja.delete');
   Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja');
   Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'storeParameter'])->name('config-shift-kerja.store');
   Route::get('/config/shift-kerja/create', [ShiftKerjaController::class, 'createParameter'])->name('config-shift-kerja.creaete');
   Route::get('/config/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'editParameter'])->name('config-shift-kerja.edit');
   Route::put('/config/shift-kerja/{id}', [ShiftKerjaController::class, 'updateParameter'])->name('config-shift-kerja.update');
   Route::delete('/config/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'deleteParameter'])->name('config-shift-kerja.delete');
+  Route::get('/param/shift-kerja/view/{rout}', [ShiftKerjaController::class, 'viewParameter'])->name('param-shift-kerja.view');
+  Route::get('/param/shift-kerja/show/{shift}', [ShiftKerjaController::class, 'showParameterByShift'])->name('param-shift-kerja.showByShift');
   // Payroll
   Route::get('/pages/payroll', [PayrollController::class, 'index'])->name('pages-payroll');
 
@@ -103,6 +69,18 @@ Route::middleware(['auth'])->group(function () {
   Route::get('/datatable/pegawai', [DataTableController::class, 'viewPegawai'])->name('pegawai.index');
 
   Route::post('/logout', [LoginBasic::class, 'logout'])->name('logout');
+
+  Route::get('/set-error', function (Request $request) {
+    // Ambil parameter
+    $message = $request->query('message', 'Terjadi kesalahan tidak diketahui.');
+    $redirect = $request->query('redirect', '/'); // default ke '/' kalau tidak ada
+
+    // Simpan ke session
+    session()->flash('error', $message);
+
+    // Redirect ke halaman yang diminta
+    return redirect()->route($redirect);
+  });
 });
 
 // authentication
