@@ -101,6 +101,19 @@ class PegawaiController extends Controller
   public function show(string $id)
   {
     //
+    $data = Pegawai::where('id', $id)
+      ->where('status', 'aktif')
+      ->firstOrFail();
+
+    try {
+      if (!$data) {
+        return redirect()->route('pages-pegawai')->with('error', 'Data pegawai tidak ditemukan.');
+      } else {
+        return response()->json($data);
+      }
+    } catch (\Exception $e) {
+      return redirect()->route('pages-pegawai')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
   }
 
   /**

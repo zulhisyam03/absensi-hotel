@@ -14,6 +14,17 @@
     @vite('resources/assets/js/dashboards-analytics.js')
 @endsection
 
+@section('page-style')
+    <style>
+        /* Custom styles for the page can be added here */
+        span {
+            text-transform: uppercase;
+            font-style: italic;
+            font-weight: bold;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div class="row">
         <!-- Attendence -->
@@ -95,6 +106,114 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLongTitle">Detail Pegawai</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 pe-2">
+                            <div class="mb-4">
+                                <label for="nama-pegawai" class="form-label fs-6 col-md-4">NAMA PEGAWAI</label>
+                                <span class="col-md-1">:</span>
+                                <span id="nama-pegawai"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="nik" class="form-label fs-6 col-md-4">NIK</label>
+                                <span class="col-md-1">:</span>
+                                <span id ='nik'></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="npwp" class="form-label fs-6 col-md-4">NPWP</label>
+                                <span class="col-md-1">:</span>
+                                <span id="npwp"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="bpjs" class="form-label fs-6 col-md-4">BPJS</label>
+                                <span class="col-md-1">:</span>
+                                <span id="bpjs"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="no-pegawai" class="form-label fs-6 col-md-4">NOMOR PEGAWAI</label>
+                                <span class="col-md-1">:</span>
+                                <span id="no-pegawai"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="form-label fs-6 col-md-4">EMAIL</label>
+                                <span class="col-md-1">:</span>
+                                <span id="email"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="no-handphone" class="form-label fs-6 col-md-4">NO. HANDPHONE</label>
+                                <span class="col-md-1">:</span>
+                                <span id="no-handphone"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="emergency-number" class="form-label fs-6 col-md-4">EMERGENCY NUMBER</label>
+                                <span class="col-md-1">:</span>
+                                <span id="emergency-number"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="tempat-lahir" class="form-label fs-6 col-md-4">TEMPAT LAHIR</label>
+                                <span class="col-md-1">:</span>
+                                <span id="tempat-lahir"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="tanggal-lahir" class="form-label fs-6 col-md-4">TANGGAL LAHIR</label>
+                                <span class="col-md-1">:</span>
+                                <span id="tanggal-lahir"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="jenis-kelamin" class="form-label fs-6 col-md-4">JENIS KELAMIN</label>
+                                <span class="col-md-1">:</span>
+                                <span id="jenis-kelamin"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="alamat" class="form-label fs-6 col-md-4">ALAMAT</label>
+                                <span class="col-md-1">:</span>
+                                <span id="alamat"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="tanggal-join" class="form-label fs-6 col-md-4">TANGGAL JOIN</label>
+                                <span class="col-md-1">:</span>
+                                <span id="tanggal-join"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="jabatan" class="form-label fs-6 col-md-4">JABATAN</label>
+                                <span class="col-md-1">:</span>
+                                <span id="jabatan"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="departemen" class="form-label fs-6 col-md-4">DEPARTEMEN</label>
+                                <span class="col-md-1">:</span>
+                                <span id="departemen"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="status-pegawai" class="form-label fs-6 col-md-4">STATUS PEGAWAI</label>
+                                <span class="col-md-1">:</span>
+                                <span id="status-pegawai"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="last-salary" class="form-label fs-6 col-md-4">LAST SALARY</label>
+                                <span class="col-md-1">:</span>
+                                <span id="last-salary"></span>
+                            </div>
+                        </div>
+                        {{-- END RIGHT COLUMN --}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -203,46 +322,104 @@
                 e.preventDefault(); // mencegah reload jika tombol di dalam form
                 $('#exportFilter').slideToggle(300); // toggle dengan animasi
             });
+
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.delete-btn');
+                const btnDetail = e.target.closest('.btnDetail');
+
+                // Delete Button
+                if (btn) {
+                    e.preventDefault();
+                    const id = btn.dataset.id;
+                    if (!id) return;
+
+                    if (!confirm('Yakin ingin menghapus Pegawai ini? Tindakan ini tidak dapat dibatalkan.'))
+                        return;
+
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                            'content') ||
+                        '{{ csrf_token() }}';
+                    const url = '{{ url('/pages/pegawai/delete') }}' + '/' + encodeURIComponent(id);
+
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+                    form.style.display = 'none';
+
+                    const inputToken = document.createElement('input');
+                    inputToken.type = 'hidden';
+                    inputToken.name = '_token';
+                    inputToken.value = token;
+                    form.appendChild(inputToken);
+
+                    const inputMethod = document.createElement('input');
+                    inputMethod.type = 'hidden';
+                    inputMethod.name = '_method';
+                    inputMethod.value = 'DELETE';
+                    form.appendChild(inputMethod);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+
+                // === Detail Pegawai ===
+                if (btnDetail) {
+                    e.preventDefault();
+
+                    const id = btnDetail.dataset.id;
+
+                    // Jalankan fungsi Ambil data pegawai
+                    showPegawaiDetail(id);
+                }
+            });
+
+            function showPegawaiDetail(pegawaiId) {
+                // Lakukan permintaan AJAX untuk mendapatkan detail pegawai
+                $.ajax({
+                    url: window.location.origin + '/pegawai/' + pegawaiId + '/detail',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // Isi data ke dalam modal
+                        $('#nama-pegawai').text(data.nama_pegawai);
+                        $('#nik').text(data.nik);
+                        $('#npwp').text(data.npwp);
+                        $('#bpjs').text(data.bpjs);
+                        $('#no-pegawai').text(data.no_pegawai);
+                        $('#email').text(data.email);
+                        $('#no-handphone').text(data.no_hp);
+                        $('#emergency-number').text(data.emergency_number);
+                        $('#tempat-lahir').text(data.tempat_lahir);
+                        $('#tanggal-lahir').text(data.tgl_lahir);
+                        $('#jenis-kelamin').text(data.jenis_kelamin);
+                        $('#alamat').text(data.alamat);
+                        $('#tanggal-join').text(data.tgl_join);
+                        $('#jabatan').text(data.jabatan);
+                        $('#departemen').text(data.departemen);
+                        $('#status-pegawai').text(data.status_pegawai);
+                        $('#last-salary').text((formatRupiah(data.last_salary)));
+
+                        // Tampilkan modal
+                        // detailModal.show();
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data pegawai.');
+                    }
+                });
+            }
         });
+
+        // Fungsi helper untuk format ke Rupiah
+        function formatRupiah(angka) {
+            if (!angka) return '-';
+            return 'Rp. ' + parseInt(angka)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
 
         function navigateToForm() {
             window.location.href = window.location.origin + '/pages/pegawai/create';
         }
-
-        document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.delete-btn');
-            if (!btn) return;
-            e.preventDefault();
-
-            const id = btn.dataset.id;
-            if (!id) return;
-
-            if (!confirm('Yakin ingin menghapus Pegawai ini? Tindakan ini tidak dapat dibatalkan.')) return;
-
-            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
-                '{{ csrf_token() }}';
-            const url = '{{ url('/pages/pegawai/delete') }}' + '/' + encodeURIComponent(id);
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
-            form.style.display = 'none';
-
-            const inputToken = document.createElement('input');
-            inputToken.type = 'hidden';
-            inputToken.name = '_token';
-            inputToken.value = token;
-            form.appendChild(inputToken);
-
-            const inputMethod = document.createElement('input');
-            inputMethod.type = 'hidden';
-            inputMethod.name = '_method';
-            inputMethod.value = 'DELETE';
-            form.appendChild(inputMethod);
-
-            document.body.appendChild(form);
-            form.submit();
-        });
     </script>
 
     <style>

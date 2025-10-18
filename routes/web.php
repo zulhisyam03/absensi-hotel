@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
   Route::get('/pages/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
   Route::put('/pages/pegawai/{id}', [PegawaiController::class, 'update'])->name('pegawai.update');
   Route::delete('/pages/pegawai/delete/{id}', [PegawaiController::class, 'destroy'])->name('pegawai.delete');
+  Route::get('/pegawai/{id}/detail', [PegawaiController::class, 'show'])->name('pegawai.show');
   // Route baru: Search nama pegawai untuk autocomplete (GET)
   Route::get('/pegawai/search', [PegawaiController::class, 'searchPegawai'])->name('pegawai.search');
 

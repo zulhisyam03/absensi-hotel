@@ -26,7 +26,7 @@ class DataTableController extends Controller
         ->leftJoin('pegawais', 'absens.no_pegawai', '=', 'pegawais.no_pegawai')
 
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
-        ->orderBy('absens.created_at', 'DESC') // Urutkan berdasarkan nama_pegawai A-Z
+        ->orderBy('absens.created_at', direction: 'DESC') // Urutkan berdasarkan nama_pegawai A-Z
         ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
 
       return DataTables::of($absensi)
@@ -124,13 +124,19 @@ class DataTableController extends Controller
       return DataTables::of($pegawai)
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addIndexColumn()
+        // Edit Column Nama Pegawai
+        ->editColumn('nama_pegawai', function ($row) {
+          return '<a href="#" data-bs-toggle="modal" data-id="' . $row->id . '" data-bs-target="#detailModal" class="btnDetail">'
+            . e($row->nama_pegawai) .
+            '</a>';
+        })
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addColumn('action', function ($row) {
           $editBtn = '<a href="/pages/pegawai/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
           return $editBtn . ' ' . $deleteBtn;
         })
-        ->rawColumns(['action'])
+        ->rawColumns(['nama_pegawai', 'action'])
         ->make(true);
     }
     return view('pegawai.index');
