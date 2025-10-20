@@ -22,6 +22,9 @@ class AbsenFactory extends Factory
       'no_pegawai' => fake()->unique(),
       'shift' => $this->faker->randomElement($shiftoptions),
       'pict' => $this->faker->imageUrl(640, 480, 'people', true),
+      'shift_masuk' => '08:00:00',
+      'shift_pulang' => '12:00:00',
+      'check_in' => now(),
       'status' => 'masuk',
       'keterangan' => '',
     ];

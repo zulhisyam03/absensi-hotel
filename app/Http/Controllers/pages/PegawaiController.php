@@ -109,6 +109,7 @@ class PegawaiController extends Controller
       if (!$data) {
         return redirect()->route('pages-pegawai')->with('error', 'Data pegawai tidak ditemukan.');
       } else {
+        $data['jenis_kelamin'] = $data->jenis_kelamin === 'L' ? 'Laki-laki' : ($data->jenis_kelamin === 'P' ? 'Perempuan' : 'Tidak Diketahui');
         return response()->json($data);
       }
     } catch (\Exception $e) {

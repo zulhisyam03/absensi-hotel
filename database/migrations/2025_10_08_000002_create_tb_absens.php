@@ -14,10 +14,14 @@ return new class extends Migration {
       $table->engine = 'InnoDB';
 
       $table->id();
-      $table->string('no_pegawai')->nullable();
-      $table->string('shift')->nullable();
-      $table->string('pict')->nullable();
+      $table->string('no_pegawai');
+      $table->string('shift');
+      $table->timestamp('check_in')->nullable();
+      $table->timestamp('check_out')->nullable();
+      $table->time('shift_masuk')->nullable();
+      $table->time('shift_pulang')->nullable();
       $table->string('status')->nullable();
+      $table->string('pict')->nullable();
       $table->string('keterangan')->nullable();
       $table->timestamps();
 

@@ -45,7 +45,7 @@
                                 <div class="col-md-3">
                                     <label for="filterDateStart" class="form-label mt-3">Departemen:</label>
                                     <select id="filterDepartemen" name="filterDepartemen" class="form-select">
-                                        <option value="all">Semua Departemen</option>
+                                        <option value="">Semua Departemen</option>
                                         <option value="A&G">A&G</option>
                                         <option value="ACCOUNTING">ACCOUNTING</option>
                                         <option value="FB PRODUCT">FB PRODUCT</option>
@@ -73,7 +73,9 @@
                                     <th>Nama Pegawai</th>
                                     <th>Departemen</th>
                                     <th>Shift</th>
-                                    <th>Waktu</th>
+                                    <th>Waktu Shift</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
                                     <th>Status</th>
                                     <th>Keterangan</th>
                                 </tr>
@@ -158,6 +160,50 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+
+            // Export Function
+            document.getElementById('btnDownload').addEventListener('click', function() {
+                var startDate = document.getElementById('filterDateStart').value;
+                var endDate = document.getElementById('filterDateEnd').value;
+
+                if (startDate === '' || endDate === '') {
+                    alert('Tanggal Awal dan Tanggal Akhir harus di isi');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('filterDateStart', document.getElementById('filterDateStart').value);
+                formData.append('filterDateEnd', document.getElementById('filterDateEnd').value);
+                formData.append('filterDepartemen', document.getElementById('filterDepartemen').value);
+                formData.append('_token', '{{ csrf_token() }}'); // CSRF token untuk Laravel
+                // Kirim via fetch (AJAX)
+                fetch('{{ route('attendance.export') }}', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.blob(); // Mendapatkan file sebagai blob
+                        } else {
+                            throw new Error('Export gagal');
+                        }
+                    })
+                    .then(blob => {
+                        // Buat link download otomatis
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'attendance_' + new Date().toISOString().slice(0, 19).replace(/:/g,
+                            '-') + '.xlsx';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                    })
+                    .catch(error => {
+                        alert('Terjadi kesalahan: ' + error.message);
+                    });
+            });
+            // End Export Function
 
             // Event saat modal dibuka: Scroll ke atas + akses kamera
             document.getElementById('backDropModal').addEventListener('shown.bs.modal', function() {
@@ -360,8 +406,16 @@
                         name: 'shift'
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at'
+                        data: 'waktu_shift',
+                        name: 'waktu_shift'
+                    },
+                    {
+                        data: 'check_in',
+                        name: 'check_in'
+                    },
+                    {
+                        data: 'check_out',
+                        name: 'check_out'
                     },
                     {
                         data: 'status',

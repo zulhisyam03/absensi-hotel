@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\pages\UserController;
 use App\Http\Controllers\dashboard\Analytics;
@@ -25,6 +26,9 @@ Route::get('/', function () {
 // pages on middleware
 Route::middleware(['auth'])->group(function () {
   Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
+
+  // Export Absen History
+  Route::post('/attendance/export', [AbsenController::class, 'export'])->name('attendance.export');
 
   // Pegawai
   Route::get('/pages/daftar-pegawai', [PegawaiController::class, 'index'])->name('pages-pegawai');

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AttendanceExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Absen;
 use Illuminate\Http\Request;
 
@@ -63,4 +65,16 @@ class AbsenController extends Controller
     //
   }
 
+  public function export(Request $request)
+  {
+    // Validasi input jika diperlukan
+    $request->validate([
+      'filterDateStart' => 'nullable|date',
+      'filterDateEnd' => 'nullable|date',
+      'filterDepartemen' => 'nullable|string',
+    ]);
+    // Export dengan nama file dinamis
+    $filename = 'attendance_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+    return Excel::download(new AttendanceExport($request), $filename);
+  }
 }

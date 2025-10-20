@@ -42,6 +42,10 @@ class DataTableController extends Controller
           // Menggunakan Carbon untuk memformat created_at
           return Carbon::parse($row->created_at)->format('Y-m-d H:i:s');
         })
+        ->editColumn('waktu_shift', function ($row) {
+          // Menggunakan Carbon untuk memformat created_at
+          return $row->shift_masuk . ' - ' . $row->shift_pulang;
+        })
         // 🔥 Tambahkan filter custom di sini
         ->filter(function ($query) use ($request) {
           if ($request->search['value']) {
