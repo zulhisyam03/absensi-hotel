@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
   Route::get('/pegawai/{id}/detail', [PegawaiController::class, 'show'])->name('pegawai.show');
   // Route baru: Search nama pegawai untuk autocomplete (GET)
   Route::get('/pegawai/search', [PegawaiController::class, 'searchPegawai'])->name('pegawai.search');
+  // Export Pegawai
+  Route::post('/pegawai/export', [PegawaiController::class, 'export'])->name('pegawai.export');
 
   // Shift Kerja
   Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->name('pages-shift-kerja');

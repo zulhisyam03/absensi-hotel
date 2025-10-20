@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\pages;
 
 use App\Http\Controllers\Controller;
+use App\Exports\PegawaiExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use App\Models\Pegawai;
 use App\Models\User;
@@ -250,5 +252,16 @@ class PegawaiController extends Controller
     // Return JSON response
     return response()->json($pegawais); // Array sederhana: ["Rendy", "Ana", ...]
     // Atau dengan wrapper jika ingin: return response()->json(['data' => $pegawais]);
+  }
+
+  public function export(Request $request)
+  {
+    // Validasi input jika diperlukan
+    $request->validate([
+      'filterDepartemen' => 'nullable|string',
+    ]);
+    // Export dengan nama file dinamis
+    $filename = 'Daftar_Pegawai_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+    return Excel::download(new PegawaiExport($request), $filename);
   }
 }

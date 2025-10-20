@@ -74,7 +74,7 @@ class AbsenController extends Controller
       'filterDepartemen' => 'nullable|string',
     ]);
     // Export dengan nama file dinamis
-    $filename = 'attendance_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+    $filename = 'absen_history' . now()->format('Y-m-d_H-i-s') . '.xlsx';
     return Excel::download(new AttendanceExport($request), $filename);
   }
 }
