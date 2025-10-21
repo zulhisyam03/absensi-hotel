@@ -96,7 +96,8 @@
                                     <div class="mt-sm-auto">
                                         <h4 class="mb-0" id="nama-pegawai">
                                             {{ Auth::user()->pegawai->nama_pegawai }}</h4>
-                                        <span class="badge bg-label-dark fs-5">Shift Pagi</span>
+                                        <span class="badge bg-label-dark fs-5" id="shift-pegawai">Shift
+                                            {{ ucfirst($shiftAktif->shift) }}</span>
                                     </div>
                                 </div>
                                 <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"
@@ -443,7 +444,13 @@
                 lengthMenu: [
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
-                ]
+                ],
+                // 🔥 Tambahkan createdRow untuk pewarnaan baris berdasarkan is_late
+                createdRow: function(row, data, dataIndex) {
+                    if (data.is_late) {
+                        $(row).addClass('table-danger'); // Bootstrap class untuk warna kuning
+                    }
+                }
             });
 
             // Toggle filter export

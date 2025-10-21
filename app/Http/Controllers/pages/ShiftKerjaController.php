@@ -54,7 +54,7 @@ class ShiftKerjaController extends Controller
       } else {
         $shiftKerja = new ShiftKerja();
         $shiftKerja->no_pegawai = $validated['no_pegawai'];
-        $shiftKerja->shift = strtoupper($validated['shift_kerja']);
+        $shiftKerja->shift = strtolower($validated['shift_kerja']);
         $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
         $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
         $shiftKerja->flag = 'a';
@@ -123,7 +123,7 @@ class ShiftKerjaController extends Controller
       } else {
         $shiftKerja = ShiftKerja::findOrFail($id);
         $shiftKerja->no_pegawai = $validated['no_pegawai'];
-        $shiftKerja->shift = strtoupper($validated['shift_kerja']);
+        $shiftKerja->shift = strtolower($validated['shift_kerja']);
         $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
         $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
         $shiftKerja->save();
@@ -227,7 +227,7 @@ class ShiftKerjaController extends Controller
     ]);
 
     $validated = $validator->validated();
-    $shiftUpper = strtoupper($validated['shift']);
+    $shiftLower = strtolower($validated['shift']);
 
     try {
       // Ambil data param shift
@@ -235,14 +235,14 @@ class ShiftKerjaController extends Controller
       $shifts = json_decode($param->svalue, associative: true);
 
       // Cek apakah shift sudah ada
-      $existingShift = collect($shifts)->firstWhere('val', $shiftUpper);
+      $existingShift = collect($shifts)->firstWhere('val', $shiftLower);
       if ($existingShift) {
-        return redirect()->back()->withInput()->with('error', 'Shift ' . $shiftUpper . ' sudah ada.');
+        return redirect()->back()->withInput()->with('error', 'Shift ' . strtoupper($validated["shift"]) . ' sudah ada.');
       }
 
       // Tambah data baru
       $newShift = [
-        'val' => $shiftUpper,
+        'val' => $shiftLower,
         'waktu_masuk' => $validated['waktu_masuk'],
         'waktu_pulang' => $validated['waktu_pulang'],
         'updated_at' => Carbon::now()->format('Y-m-d H:i:s')

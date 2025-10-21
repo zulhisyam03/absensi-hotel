@@ -11,6 +11,10 @@
         input[type="text"] {
             text-transform: uppercase;
         }
+
+        select {
+            text-transform: uppercase;
+        }
     </style>
 @endsection
 

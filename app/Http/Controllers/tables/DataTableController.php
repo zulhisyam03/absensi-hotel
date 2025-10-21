@@ -46,6 +46,19 @@ class DataTableController extends Controller
           // Menggunakan Carbon untuk memformat created_at
           return $row->shift_masuk . ' - ' . $row->shift_pulang;
         })
+        // 🔥 Tambahkan kolom is_late untuk flag pewarnaan (tidak ditampilkan di tabel)
+        ->addColumn('is_late', function ($row) {
+          $shiftMasuk = $row->shift_masuk ? Carbon::parse($row->shift_masuk) : null;
+          $checkIn = $row->check_in ? Carbon::parse($row->check_in) : null;
+          // Jika keduanya ada, bandingkan waktu saja (abaikan tanggal)
+          if ($checkIn && $shiftMasuk) {
+            // Ekstrak waktu dari check_in dan bandingkan
+            $checkInTime = $checkIn->format('H:i:s');
+            $shiftMasukTime = $shiftMasuk->format('H:i:s');
+            return $checkInTime > $shiftMasukTime ? true : false;
+          }
+          return false; // Jika salah satu null, tidak kuning
+        })
         // 🔥 Tambahkan filter custom di sini
         ->filter(function ($query) use ($request) {
           if ($request->search['value']) {
@@ -163,6 +176,10 @@ class DataTableController extends Controller
           $editBtn = '<a href="/config/shift-kerja/' . $row->val . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->val . '">Delete</button>';
           return $editBtn . ' ' . $deleteBtn;
+        })
+        ->editColumn('val', function ($row) {
+          $val = strtoupper($row->val);
+          return $val;
         })
         ->rawColumns(['action'])
         ->make(true);
