@@ -87,7 +87,7 @@ class PegawaiController extends Controller
       $user = new User();
       $user->email = $validated['email'];
       $user->email_verified_at = Carbon::now();
-      $user->password = Hash::make($validated['no_pegawai']);
+      $user->password = Hash::make(strtolower($validated['no_pegawai']));
       $user->remember_token = Str::random(10);
       $user->save();
 

@@ -17,7 +17,7 @@
 @section('page-style')
     <style>
         /* Custom styles for the page can be added here */
-        span {
+        .modal-body span {
             text-transform: uppercase;
             font-style: italic;
             font-weight: bold;

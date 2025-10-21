@@ -4,6 +4,9 @@ namespace App\Http\Controllers\pages;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth; // Untuk mengakses user yang sedang login
+use Illuminate\Support\Facades\Hash; // Untuk hashing password
 
 class UserController extends Controller
 {
@@ -51,9 +54,23 @@ class UserController extends Controller
   /**
    * Update the specified resource in storage.
    */
-  public function update(Request $request, string $id)
+  public function update(Request $request)
   {
     //
+    // Validasi input
+    $request->validate([
+      'password_baru' => 'required|min:8|confirmed', // 'confirmed' akan otomatis cek dengan 'ver_password_baru'
+    ]);
+    // Ambil user yang sedang login
+    $user = Auth::user();
+    // Hash dan simpan password baru
+    $user->password = Hash::make($request->password_baru);
+    $user->save();
+    // Kembalikan respons JSON untuk AJAX
+    return response()->json([
+      'success' => true,
+      'message' => 'Password berhasil diubah. Silahkan Login Kembali'
+    ]);
   }
 
   /**
