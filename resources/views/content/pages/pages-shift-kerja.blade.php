@@ -49,13 +49,15 @@
                             </div>
                         @endif
 
-                        {{-- Button tambah Data Pegwai --}}
-                        <div class="d-flex justify-content-end mb-5">
-                            <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"
-                                onclick="navigateToForm()"><i class="bx bx-lg bx-plus"></i>
-                                Tambah Shift</button>
-                        </div>
-                        {{-- END Button tambah Data Pegwai --}}
+                        @if (strtolower(Auth::user()->pegawai->jabatan) == 'hr' || strtolower(Auth::user()->pegawai->jabatan) == 'supervisor')
+                            {{-- Button tambah Data Pegwai --}}
+                            <div class="d-flex justify-content-end mb-5">
+                                <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahShift"
+                                    onclick="navigateToForm()"><i class="bx bx-lg bx-plus"></i>
+                                    Tambah Shift</button>
+                            </div>
+                            {{-- END Button tambah Data Pegwai --}}
+                        @endif
 
                         {{-- Table history absensi --}}
                         <table id="shiftTable" class="table table-responsive table-striped text-nowrap px-4 table-sm"

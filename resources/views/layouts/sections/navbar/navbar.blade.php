@@ -72,8 +72,8 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="mb-0">{{ Auth::user()->pegawai->nama_pegawai }}</h6>
-                                <small class="text-muted">{{ Auth::user()->pegawai->jabatan }}</small>
+                                <h6 class="mb-0">{{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h6>
+                                <small class="text-muted">{{ ucfirst(Auth::user()->pegawai->jabatan) }}</small>
                             </div>
                         </div>
                     </a>

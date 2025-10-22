@@ -110,6 +110,10 @@ class DataTableController extends Controller
   public function viewShift(Request $request)
   {
     //
+    $user = Auth::user();
+    $role = $user->pegawai->jabatan;
+    $departemen = $user->pegawai->departemen;
+
     if ($request->ajax()) {
       // ⭐️ 1. Lakukan JOIN ke tabel 'pegawais' dan pilih kolom yang diperlukan.
       $shiftKerja = ShiftKerja::query()
@@ -121,6 +125,17 @@ class DataTableController extends Controller
         // Jika Anda ingin pengurutan created_at sebagai urutan sekunder:
         // ->orderBy('shift_kerjas.created_at', 'DESC');
         ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
+
+      // 🔥 Logika Filter Berdasarkan Jabatan dan Departemen
+      if (strtolower($role) != 'hr') {
+        if (strtolower($role) == 'supervisor') {
+          // Jika Supervisor → tampilkan semua dalam departemen yang sama
+          $shiftKerja->where('pegawais.departemen', $departemen);
+        } else {
+          // Selain itu → tampilkan yang jabatan sama
+          $shiftKerja->where('pegawais.no_pegawai', $user->pegawai->no_pegawai);
+        }
+      }
 
       return DataTables::of($shiftKerja)
         ->addIndexColumn()
@@ -136,10 +151,13 @@ class DataTableController extends Controller
           return $row->pegawai ? $row->pegawai->nama_pegawai : 'N/A';
         })
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
-        ->addColumn('action', function ($row) {
+        ->addColumn('action', function ($row) use ($role) {
           $editBtn = '<a href="/pages/shift-kerja/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
-          return $editBtn . ' ' . $deleteBtn;
+
+          if (strtolower($role) == 'hr' || strtolower($role) == 'supervisor') {
+            return $editBtn . ' ' . $deleteBtn;
+          }
         })
         ->rawColumns(['action'])
 
@@ -163,9 +181,24 @@ class DataTableController extends Controller
   public function viewPegawai(Request $request)
   {
     //
+    $user = Auth::user();
+    $role = $user->pegawai->jabatan;
+    $departemen = $user->pegawai->departemen;
+
     if ($request->ajax()) {
       $pegawai = Pegawai::query()
         ->orderBy('nama_pegawai', 'ASC');
+
+      // 🔥 Logika Filter Berdasarkan Jabatan dan Departemen
+      if (strtolower($role) != 'hr') {
+        if (strtolower($role) == 'supervisor') {
+          // Jika Supervisor → tampilkan semua dalam departemen yang sama
+          $pegawai->where('pegawais.departemen', $departemen);
+        } else {
+          // Selain itu → tampilkan yang jabatan sama
+          $pegawai->where('pegawais.no_pegawai', $user->pegawai->no_pegawai);
+        }
+      }
 
       return DataTables::of($pegawai)
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
@@ -177,10 +210,12 @@ class DataTableController extends Controller
             '</a>';
         })
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
-        ->addColumn('action', function ($row) {
+        ->addColumn('action', function ($row) use ($role) {
           $editBtn = '<a href="/pages/pegawai/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
-          return $editBtn . ' ' . $deleteBtn;
+          if (strtolower($role) == 'hr') {
+            return $editBtn . ' ' . $deleteBtn;
+          }
         })
         ->rawColumns(['nama_pegawai', 'action'])
         ->make(true);

@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class PegawaiController extends Controller
 {
@@ -236,18 +237,33 @@ class PegawaiController extends Controller
 
   public function searchPegawai(Request $request)
   {
+    $user = Auth::user();
+    $role = $user->pegawai->jabatan;
+    $departemen = $user->pegawai->departemen;
+
     $query = $request->get('q', ''); // Ambil keyword dari query param 'q'
     if (empty($query) || strlen($query) < 2) { // Minimal 2 char untuk hindari spam request
       return response()->json([]); // Return array kosong
     }
 
-    // Query DB: Partial match pada nama_pegawai, filter status 'aktif'
+    // Bangun query dasar
     $pegawais = Pegawai::select('nama_pegawai', 'no_pegawai', 'departemen')
-      ->where('nama_pegawai', 'LIKE', '%' . $query . '%') // Case-insensitive partial match
-      ->where('status', 'aktif') // Filter hanya yang aktif (seperti request sebelumnya)
-      ->distinct() // Hindari duplikat
-      ->limit(10) // Batasi 10 hasil untuk performa
-      ->orderBy('nama_pegawai', 'ASC') // Urutkan alfabetis
+      ->where('status', 'aktif')
+      ->where('nama_pegawai', 'LIKE', '%' . $query . '%');
+
+    // 🔥 Filter tambahan berdasarkan role
+    if (strtolower($role) === 'supervisor') {
+      $pegawais->where('departemen', $departemen);
+    } elseif (strtolower($role) !== 'hr') {
+      // Jika bukan HR dan bukan supervisor (misal staff)
+      $pegawais->where('no_pegawai', $user->pegawai->no_pegawai);
+    }
+
+    // Eksekusi query dengan limit & urutan
+    $pegawais = $pegawais
+      ->orderBy('nama_pegawai', 'ASC')
+      ->limit(10)
+      ->distinct()
       ->get();
     // Return JSON response
     return response()->json($pegawais); // Array sederhana: ["Rendy", "Ana", ...]
