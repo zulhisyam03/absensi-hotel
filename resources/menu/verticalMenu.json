@@ -20,7 +20,7 @@
       ],
       "visibleTo": [
         "hr",
-        "admin"
+        "supervisor"
       ]
     },
     {
@@ -45,7 +45,7 @@
       "visibleTo": [
         "staff",
         "hr",
-        "admin"
+        "supervisor"
       ]
     },
     {
@@ -85,8 +85,7 @@
       "slug": "config",
       "hidden": false,
       "visibleTo": [
-        "hr",
-        "admin"
+        "hr"
       ],
       "submenu": [
         {
