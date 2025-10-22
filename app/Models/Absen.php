@@ -17,6 +17,12 @@ class Absen extends Model
     'keterangan',
   ];
 
+  protected $casts = [
+    'check_in' => 'datetime',
+    'check_out' => 'datetime',
+  ];
+
+
   public function pegawai()
   {
     return $this->belongsTo(Pegawai::class, 'no_pegawai', 'no_pegawai');

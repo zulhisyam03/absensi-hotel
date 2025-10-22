@@ -27,7 +27,7 @@
                     {{-- Button tambah Data Config Shift --}}
                     <div class="d-flex justify-content-end mb-5">
                         <button class="btn btn-dark btn-lg mx-5 float-end w-100" id="btnTambahConfigShift"
-                            onclick="location.href='{{ route('config-shift-kerja.creaete') }}'"><i
+                            onclick="location.href='{{ route('config-shift-kerja.create') }}'"><i
                                 class="bx bx-lg bx-plus"></i>
                             Tambah Parameter Shift Kerja</button>
                     </div>

@@ -90,23 +90,30 @@
             <div class="row">
                 <div class="col-12 mb-6">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10">
-                                <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
-                                    <div class="mt-sm-auto">
-                                        <h4 class="mb-0" id="nama-pegawai">
-                                            {{ Auth::user()->pegawai->nama_pegawai }}</h4>
-                                        <span class="badge bg-label-dark fs-5" id="shift-pegawai">Shift
-                                            {{ ucfirst($shiftAktif->shift) }}</span>
-                                    </div>
-                                </div>
+
+                        <div class="card-body d-flex flex-column align-items-center text-center">
+                            <!-- Bagian atas: Nama + Shift -->
+                            <div class="mb-4">
+                                <h4 class="mb-1" id="nama-pegawai">
+                                    {{ Auth::user()->pegawai->nama_pegawai }}
+                                </h4>
+                                <span class="badge bg-label-dark fs-5" id="shift-pegawai">
+                                    Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) : '' }}
+                                </span>
+                            </div>
+
+                            <!-- Bagian bawah: Tombol di tengah -->
+                            <div class="d-flex justify-content-center w-100">
                                 <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"
-                                    data-bs-toggle="modal" data-bs-target="#backDropModal">Masuk</button>
+                                    data-bs-toggle="modal" data-bs-target="#backDropModal">
+                                    {{ $statusAbsen }}
+                                </button>
                             </div>
                         </div>
+
                     </div>
                 </div>
-                <div class="col-6 mb-6">
+                {{-- <div class="col-6 mb-6">
                     <div class="card h-100">
                         <div class="card-body">
                             <p class="badge bg-label-warning fs-5 mb-1">Kehadiran</p>
@@ -121,7 +128,7 @@
                             <h4 class="card-title fs-1 text-center">12</h4>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -447,7 +454,7 @@
                 ],
                 // 🔥 Tambahkan createdRow untuk pewarnaan baris berdasarkan is_late
                 createdRow: function(row, data, dataIndex) {
-                    if (data.is_late) {
+                    if (data.is_late || data.keterangan == 'Tidak Check Out') {
                         $(row).addClass('table-danger'); // Bootstrap class untuk warna kuning
                     }
                 }

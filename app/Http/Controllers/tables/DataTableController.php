@@ -42,9 +42,22 @@ class DataTableController extends Controller
           // Menggunakan Carbon untuk memformat created_at
           return Carbon::parse($row->created_at)->format('Y-m-d H:i:s');
         })
+        ->editColumn('check_in', function ($row) {
+          // Menggunakan Carbon untuk memformat created_at
+          return Carbon::parse($row->check_in)->format('Y-m-d H:i:s');
+        })
+        ->editColumn('check_out', function ($row) {
+          // Menggunakan Carbon untuk memformat created_at
+          $checkOut = $row->check_out != null ? Carbon::parse($row->check_out)->format('Y-m-d H:i:s') : '';
+          return $checkOut;
+        })
         ->editColumn('waktu_shift', function ($row) {
           // Menggunakan Carbon untuk memformat created_at
           return $row->shift_masuk . ' - ' . $row->shift_pulang;
+        })
+        ->editColumn('keterangan', function ($row) {
+          $keterangan = $row->keterangan == 'tco' ? 'Tidak Check Out' : '';
+          return $keterangan;
         })
         // 🔥 Tambahkan kolom is_late untuk flag pewarnaan (tidak ditampilkan di tabel)
         ->addColumn('is_late', function ($row) {

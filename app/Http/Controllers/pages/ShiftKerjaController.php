@@ -39,25 +39,25 @@ class ShiftKerjaController extends Controller
       'no_pegawai' => 'required',
       'shift_kerja' => 'required|string|max:50',
       'waktu_masuk' => 'required|date_format:H:i',
-      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+      'waktu_pulang' => 'required|date_format:H:i'
     ]);
     $validated = $validator->validated();
 
     try {
       $cekData = Shiftkerja::where('no_pegawai', $validated['no_pegawai'])
         ->where('shift', $validated['shift_kerja'])
-        ->where('flag', 'a')
         ->first();
 
       if (!empty($cekData)) {
         return redirect()->route('pages-shift-kerja.create')->with('error', 'Data shift kerja untuk pegawai tersebut sudah ada.');
       } else {
+        $flag = $validated['waktu_masuk'] > $validated['waktu_pulang'] ? 'm' : 'n';
         $shiftKerja = new ShiftKerja();
         $shiftKerja->no_pegawai = $validated['no_pegawai'];
         $shiftKerja->shift = strtolower($validated['shift_kerja']);
         $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
         $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
-        $shiftKerja->flag = 'a';
+        $shiftKerja->flag = $flag;
         $shiftKerja->save();
 
         return redirect()->route('pages-shift-kerja')->with('success', 'Data shift kerja pegawai ' . $request['nama_pegawai'] . ' berhasil ditambahkan.');
@@ -83,7 +83,6 @@ class ShiftKerjaController extends Controller
     //
     $data = ShiftKerja::With('pegawai')
       ->where('id', $id)
-      ->where('flag', 'a')
       ->firstOrFail();
 
     try {
@@ -107,7 +106,7 @@ class ShiftKerjaController extends Controller
       'no_pegawai' => 'required',
       'shift_kerja' => 'required|string|max:50',
       'waktu_masuk' => 'required|date_format:H:i',
-      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+      'waktu_pulang' => 'required|date_format:H:i'
     ]);
 
     $validated = $validator->validated();
@@ -115,17 +114,18 @@ class ShiftKerjaController extends Controller
     try {
       $cekData = Shiftkerja::where('no_pegawai', $validated['no_pegawai'])
         ->where('shift', $validated['shift_kerja'])
-        ->where('flag', 'a')
         ->first();
 
       if (!empty($cekData)) {
         return redirect()->back()->with('error', 'Data shift kerja untuk pegawai tersebut sudah ada.');
       } else {
+        $flag = $validated['waktu_masuk'] > $validated['waktu_pulang'] ? 'm' : 'n';
         $shiftKerja = ShiftKerja::findOrFail($id);
         $shiftKerja->no_pegawai = $validated['no_pegawai'];
         $shiftKerja->shift = strtolower($validated['shift_kerja']);
         $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
         $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
+        $shiftKerja->waktu_pulang = $flag;
         $shiftKerja->save();
 
         return redirect()->route('pages-shift-kerja')->with('success', 'Data shift kerja pegawai ' . strtoupper($request['nama_pegawai'] . ' berhasil diupdate.'));
@@ -223,7 +223,7 @@ class ShiftKerjaController extends Controller
     $validator = Validator::make($request->all(), [
       'shift' => 'required|string|max:50',
       'waktu_masuk' => 'required|date_format:H:i',
-      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+      'waktu_pulang' => 'required|date_format:H:i'
     ]);
 
     $validated = $validator->validated();
@@ -264,7 +264,7 @@ class ShiftKerjaController extends Controller
     $validator = Validator::make($request->all(), [
       'shift' => 'required|string|max:50',
       'waktu_masuk' => 'required|date_format:H:i',
-      'waktu_pulang' => 'required|date_format:H:i|after:waktu_masuk'
+      'waktu_pulang' => 'required|date_format:H:i'
     ]);
 
     $validated = $validator->validated();

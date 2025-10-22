@@ -49,10 +49,10 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/pages/shift-kerja/store', [ShiftKerjaController::class, 'store'])->name('pages-shift-kerja.store');
   Route::get('/pages/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'edit'])->name('pages-shift-kerja.edit');
   Route::put('/pages/shift-kerja/{id}', [ShiftKerjaController::class, 'update'])->name('pages-shift-kerja.update');
-  Route::delete('/pages/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'destroy'])->name(name: 'pages-shift-kerja.delete');
+  Route::delete('/pages/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'destroy'])->name('pages-shift-kerja.delete');
   Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->name('config-shift-kerja');
   Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'storeParameter'])->name('config-shift-kerja.store');
-  Route::get('/config/shift-kerja/create', [ShiftKerjaController::class, 'createParameter'])->name('config-shift-kerja.creaete');
+  Route::get('/config/shift-kerja/create', [ShiftKerjaController::class, 'createParameter'])->name('config-shift-kerja.create');
   Route::get('/config/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'editParameter'])->name('config-shift-kerja.edit');
   Route::put('/config/shift-kerja/{id}', [ShiftKerjaController::class, 'updateParameter'])->name('config-shift-kerja.update');
   Route::delete('/config/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'deleteParameter'])->name('config-shift-kerja.delete');
