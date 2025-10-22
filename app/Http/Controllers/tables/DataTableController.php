@@ -11,6 +11,7 @@ use App\Models\Absen;
 use App\Models\Pegawai;
 use App\Models\Param;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DataTableController extends Controller
 {
@@ -20,6 +21,10 @@ class DataTableController extends Controller
   public function index(Request $request)
   {
     //
+    $user = Auth::user();
+    $role = $user->pegawai->jabatan;
+    $departemen = $user->pegawai->departemen;
+
     if ($request->ajax()) {
       $absensi = Absen::query()
         ->select('absens.*', 'pegawais.nama_pegawai', 'pegawais.departemen') // Pilih semua kolom dari absens
@@ -28,6 +33,17 @@ class DataTableController extends Controller
         // ⭐️ 2. Lakukan pengurutan berdasarkan kolom relasi
         ->orderBy('absens.created_at', direction: 'DESC') // Urutkan berdasarkan nama_pegawai A-Z
         ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
+
+      // 🔥 Logika Filter Berdasarkan Jabatan dan Departemen
+      if (strtolower($role) != 'hr') {
+        if (strtolower($role) == 'supervisor') {
+          // Jika Supervisor → tampilkan semua dalam departemen yang sama
+          $absensi->where('pegawais.departemen', $departemen);
+        } else {
+          // Selain itu → tampilkan yang jabatan sama
+          $absensi->where('pegawais.no_pegawai', $user->pegawai->no_pegawai);
+        }
+      }
 
       return DataTables::of($absensi)
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis

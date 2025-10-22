@@ -27,43 +27,47 @@
                                 <h5 class="m-0 me-2"><i class="bx bx-lg bx-history"></i> History</h5>
                             </div>
                         </div>
-                        {{-- Button Export Excel --}}
-                        <div class="card-body px-4">
-                            <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
-                                Export
-                                Data</button>
-                            <div class="row" id="exportFilter">
-                                <div class="col-md-3">
-                                    <label for="filterDateStart" class="form-label mt-3">Tanggal Awal:</label>
-                                    <input type="date" id="filterDateStart" name="filterDateStart"
-                                        class="form-control" />
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="filterDateEnd" class="form-label mt-3">Tanggal Akhir:</label>
-                                    <input type="date" id="filterDateEnd" name="filterDateEnd" class="form-control" />
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="filterDateStart" class="form-label mt-3">Departemen:</label>
-                                    <select id="filterDepartemen" name="filterDepartemen" class="form-select">
-                                        <option value="">Semua Departemen</option>
-                                        <option value="A&G">A&G</option>
-                                        <option value="ACCOUNTING">ACCOUNTING</option>
-                                        <option value="FB PRODUCT">FB PRODUCT</option>
-                                        <option value="FB SERVICE">FB SERVICE</option>
-                                        <option value="FRONT OFFICE">FRONT OFFICE</option>
-                                        <option value="HOUSEKEEPING">HOUSEKEEPING</option>
-                                        <option value="HRD">HRD</option>
-                                        <option value="SALES & MARKETING">SALES & MARKETING</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="btnDownload" class="form-label mt-3">&nbsp;</label>
-                                    <button class="btn btn-primary w-100" id="btnDownload"><i class="bx bxs-download"></i>
-                                        Download</button>
+                        @if (strtolower(Auth::user()->pegawai->jabatan) == 'hr')
+                            {{-- Button Export Excel --}}
+                            <div class="card-body px-4">
+                                <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
+                                    Export
+                                    Data</button>
+                                <div class="row" id="exportFilter">
+                                    <div class="col-md-3">
+                                        <label for="filterDateStart" class="form-label mt-3">Tanggal Awal:</label>
+                                        <input type="date" id="filterDateStart" name="filterDateStart"
+                                            class="form-control" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filterDateEnd" class="form-label mt-3">Tanggal Akhir:</label>
+                                        <input type="date" id="filterDateEnd" name="filterDateEnd"
+                                            class="form-control" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filterDateStart" class="form-label mt-3">Departemen:</label>
+                                        <select id="filterDepartemen" name="filterDepartemen" class="form-select">
+                                            <option value="">Semua Departemen</option>
+                                            <option value="A&G">A&G</option>
+                                            <option value="ACCOUNTING">ACCOUNTING</option>
+                                            <option value="FB PRODUCT">FB PRODUCT</option>
+                                            <option value="FB SERVICE">FB SERVICE</option>
+                                            <option value="FRONT OFFICE">FRONT OFFICE</option>
+                                            <option value="HOUSEKEEPING">HOUSEKEEPING</option>
+                                            <option value="HRD">HRD</option>
+                                            <option value="SALES & MARKETING">SALES & MARKETING</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="btnDownload" class="form-label mt-3">&nbsp;</label>
+                                        <button class="btn btn-primary w-100" id="btnDownload"><i
+                                                class="bx bxs-download"></i>
+                                            Download</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {{-- END Button Export Excel --}}
+                            {{-- END Button Export Excel --}}
+                        @endif
                         {{-- Table history absensi --}}
                         <table id="usersTable" class="table table-responsive table-striped text-nowrap px-4 table-sm"
                             style="width:100%">
@@ -95,10 +99,12 @@
                             <!-- Bagian atas: Nama + Shift -->
                             <div class="mb-4">
                                 <h4 class="mb-1" id="nama-pegawai">
-                                    {{ Auth::user()->pegawai->nama_pegawai }}
+                                    {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}
                                 </h4>
-                                <span class="badge bg-label-dark fs-5" id="shift-pegawai">
+                                <span class="badge bg-label-info fs-5" id="shift-pegawai">
                                     Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) : '' }}
+                                    <input type="hidden" name="shiftAktif"
+                                        value="{{ isset($shiftAktif) ? strtolower($shiftAktif) : '' }}">
                                 </span>
                             </div>
 
@@ -170,47 +176,52 @@
         window.addEventListener('load', function() {
 
             // Export Function
-            document.getElementById('btnDownload').addEventListener('click', function() {
-                var startDate = document.getElementById('filterDateStart').value;
-                var endDate = document.getElementById('filterDateEnd').value;
+            const btnDownload = document.getElementById('btnDownload');
 
-                if (startDate === '' || endDate === '') {
-                    alert('Tanggal Awal dan Tanggal Akhir harus di isi');
-                    return;
-                }
-                const formData = new FormData();
-                formData.append('filterDateStart', document.getElementById('filterDateStart').value);
-                formData.append('filterDateEnd', document.getElementById('filterDateEnd').value);
-                formData.append('filterDepartemen', document.getElementById('filterDepartemen').value);
-                formData.append('_token', '{{ csrf_token() }}'); // CSRF token untuk Laravel
-                // Kirim via fetch (AJAX)
-                fetch('{{ route('attendance.export') }}', {
-                        method: 'POST',
-                        body: formData,
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.blob(); // Mendapatkan file sebagai blob
-                        } else {
-                            throw new Error('Export gagal');
-                        }
-                    })
-                    .then(blob => {
-                        // Buat link download otomatis
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'attendance_' + new Date().toISOString().slice(0, 19).replace(/:/g,
-                            '-') + '.xlsx';
-                        document.body.appendChild(a);
-                        a.click();
-                        a.remove();
-                        window.URL.revokeObjectURL(url);
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan: ' + error.message);
-                    });
-            });
+            if (btnDownload) {
+                btnDownload.addEventListener('click', function() {
+                    var startDate = document.getElementById('filterDateStart').value;
+                    var endDate = document.getElementById('filterDateEnd').value;
+
+                    if (startDate === '' || endDate === '') {
+                        alert('Tanggal Awal dan Tanggal Akhir harus di isi');
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('filterDateStart', document.getElementById('filterDateStart').value);
+                    formData.append('filterDateEnd', document.getElementById('filterDateEnd').value);
+                    formData.append('filterDepartemen', document.getElementById('filterDepartemen').value);
+                    formData.append('_token', '{{ csrf_token() }}'); // CSRF token untuk Laravel
+                    // Kirim via fetch (AJAX)
+                    fetch('{{ route('attendance.export') }}', {
+                            method: 'POST',
+                            body: formData,
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.blob(); // Mendapatkan file sebagai blob
+                            } else {
+                                throw new Error('Export gagal');
+                            }
+                        })
+                        .then(blob => {
+                            // Buat link download otomatis
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'attendance_' + new Date().toISOString().slice(0, 19).replace(
+                                /:/g,
+                                '-') + '.xlsx';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(url);
+                        })
+                        .catch(error => {
+                            alert('Terjadi kesalahan: ' + error.message);
+                        });
+                });
+            }
             // End Export Function
 
             // Event saat modal dibuka: Scroll ke atas + akses kamera
