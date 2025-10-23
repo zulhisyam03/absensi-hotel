@@ -142,7 +142,8 @@
     <!-- Modal -->
     <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-fullscreen">
-            <form class="modal-content">
+            <form class="modal-content" id="formAbsen" method="post">
+                @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="backDropModalTitle" class="text-light">Absensi Wajah</h5>
                     {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
@@ -166,7 +167,8 @@
                     <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama) }}</h6>
                     <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
                     <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-dismiss="modal">Close</button>
                     &nbsp;
                     <button type="button" id="btnSaveAbsensi" class="btn btn-primary btn-sm">Simpan</button>
                 </div>

@@ -69,21 +69,35 @@ class DataTableController extends Controller
         })
         ->editColumn('waktu_shift', function ($row) {
           // Menggunakan Carbon untuk memformat created_at
-          return $row->shift_masuk . ' - ' . $row->shift_pulang;
+          return Carbon::parse($row->shift_masuk)->format('H:i') . ' - ' . Carbon::parse($row->shift_pulang)->format('H:i');
         })
         ->editColumn('keterangan', function ($row) {
           $keterangan = $row->keterangan == 'tco' ? 'Tidak Check Out' : $row->keterangan;
           return $keterangan;
         })
-        // Tambah kolom is_fast untuk flag pulang cepat
         ->addColumn('is_fast', function ($row) {
-          $shiftPulang = $row->shift_pulang ? Carbon::parse($row->shift_pulang) : null;
-          $checkOut = $row->check_out ? Carbon::parse($row->check_out) : null;
-          if ($checkOut && $shiftPulang) {
-            $checkOutTime = $checkOut->format('H:i:s');
-            $shiftPulangTime = $shiftPulang->format('H:i:s');
-            return $checkOutTime < $shiftPulangTime ? true : false;
+          if (!$row->shift_pulang || !$row->check_out) {
+            return null;
           }
+
+          // Buat object waktu
+          // shift_pulang hanya jam -> pakai tanggal dari check_out agar konsisten
+          $checkOut = Carbon::parse($row->check_out);
+          $shiftPulang = Carbon::parse($checkOut->format('Y-m-d') . ' ' . $row->shift_pulang);
+
+          // Jika jam checkout < jam shift pulang
+          if ($checkOut->lt($shiftPulang)) {
+            // Hitung selisih dalam jam
+            $diffInHours = $shiftPulang->diffInHours($checkOut, false);
+
+            // Kalau selisih besar (misalnya > 6 jam), berarti checkout lewat tengah malam
+            if (abs($diffInHours) > 6) {
+              $checkOut->addDay(); // anggap checkout di hari berikutnya
+            }
+          }
+
+          // Return true kalau checkout lebih cepat dari shift_pulang
+          return $checkOut->lt($shiftPulang);
         })
         // 🔥 Tambahkan kolom is_late untuk flag pewarnaan (tidak ditampilkan di tabel)
         ->addColumn('is_late', function ($row) {

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Absen;
-use Illuminate\Support\Facades\Artisan; // ✅ Tambahkan ini
+use Illuminate\Support\Facades\Artisan;
 
 class Analytics extends Controller
 {
@@ -38,17 +38,40 @@ class Analytics extends Controller
         $shiftAktif = $absen['shift'] . ' ( ' . Carbon::parse($absen->shift_masuk)->format('H:i') . ' - ' . Carbon::parse($absen->shift_pulang)->format('H:i') . ' )';
         $statusAbsen = 'Check Out';
       } else {
-        // 🔹 Jika tidak ada absen aktif, cek apakah sudah checkout hari ini
-        $hasCheckedOutToday = Absen::where('no_pegawai', $pegawai->no_pegawai)
-          ->whereNotNull('check_out')
-          ->whereDate('check_out', today()) // Asumsi check_out adalah datetime, filter hari ini
-          ->exists();
+        // 🔹 Jika tidak ada absen aktif, cari shift berikutnya berdasarkan waktu sekarang
+        $now = now()->format('H:i:s');
+        $nowCarbon = now(); // Untuk perhitungan waktu yang lebih akurat
 
-        if ($hasCheckedOutToday) {
-          // Jika sudah checkout hari ini, langsung cari shift berikutnya
-          $now = now()->format('H:i:s');
-          $shifts = $pegawai->shift->sortBy('waktu_masuk');
+        // Ambil semua shift milik pegawai (urut berdasarkan waktu_masuk)
+        $shifts = $pegawai->shift->sortBy('waktu_masuk');
 
+        // Cek apakah sekarang ada shift aktif (jika lintas hari misal 22:00–05:00), TAPI pastikan belum check_out hari ini
+        $shiftAktif = $shifts->first(function ($shift) use ($now, $pegawai) {
+          // 🔹 Cek apakah shift ini sudah di-check_out hari ini (gunakan tanggal check_in untuk akurasi, karena check_in biasanya hari yang sama)
+          $hasCheckedOut = Absen::where('no_pegawai', $pegawai->no_pegawai)
+            ->where('shift', $shift->shift)
+            ->whereNotNull('check_out')
+            ->whereDate('check_in', today()) // Asumsi check_in adalah hari shift dimulai
+            ->exists();
+
+          if ($hasCheckedOut) {
+            return false; // Lewati shift ini jika sudah check_out
+          }
+
+          // Jika belum check_out, cek apakah waktu sekarang dalam rentang shift
+          $start = $shift->waktu_masuk;
+          $end = $shift->waktu_pulang;
+
+          // Jika lintas hari (contoh 22:00 - 05:00)
+          if ($end < $start) {
+            return ($now >= $start || $now <= $end);
+          }
+
+          return ($now >= $start && $now <= $end);
+        });
+
+        // Jika tidak ada shift aktif (atau sudah check_out), cari shift berikutnya
+        if (!$shiftAktif) {
           $shiftBerikutnya = $shifts->first(function ($shift) use ($now) {
             return $shift->waktu_masuk > $now;
           });
@@ -61,28 +84,19 @@ class Analytics extends Controller
           // Update info status
           $shiftAktif = $shiftBerikutnya->shift . ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
         } else {
-          // 🔹 Jika tidak ada absen aktif, cari shift berikutnya berdasarkan waktu sekarang
-          $now = now()->format('H:i:s');
-          $nowCarbon = now(); // Untuk perhitungan waktu yang lebih akurat
+          // Jika ada shift aktif, periksa apakah sudah ada checkin dalam 2 jam dari waktu_masuk
+          $waktuMasukCarbon = Carbon::parse($shiftAktif->waktu_masuk);
+          $batasWaktuCheckin = $waktuMasukCarbon->copy()->addHours(2);
 
-          // Ambil semua shift milik pegawai (urut berdasarkan waktu_masuk)
-          $shifts = $pegawai->shift->sortBy('waktu_masuk');
+          // Periksa apakah ada absen (checkin) untuk shift ini hari ini dalam batas 2 jam
+          $hasCheckin = Absen::where('no_pegawai', $pegawai->no_pegawai)
+            ->where('shift', $shiftAktif->shift)
+            ->whereDate('check_in', today())
+            ->where('check_in', '<=', $batasWaktuCheckin)
+            ->exists();
 
-          // Cek apakah sekarang ada shift aktif (jika lintas hari misal 22:00–05:00)
-          $shiftAktif = $shifts->first(function ($shift) use ($now) {
-            $start = $shift->waktu_masuk;
-            $end = $shift->waktu_pulang;
-
-            // Jika lintas hari (contoh 22:00 - 05:00)
-            if ($end < $start) {
-              return ($now >= $start || $now <= $end);
-            }
-
-            return ($now >= $start && $now <= $end);
-          });
-
-          // Jika tidak ada shift aktif, cari shift berikutnya
-          if (!$shiftAktif) {
+          // Jika sudah lebih dari 2 jam dari waktu_masuk dan belum ada checkin, anggap shift tidak aktif, lanjut ke berikutnya
+          if ($nowCarbon->greaterThan($batasWaktuCheckin) && !$hasCheckin) {
             $shiftBerikutnya = $shifts->first(function ($shift) use ($now) {
               return $shift->waktu_masuk > $now;
             });
@@ -93,40 +107,10 @@ class Analytics extends Controller
             }
 
             // Update info status
-            // $statusAbsen = "Shift Berikutnya: {$shiftBerikutnya->shift} (Mulai: {$shiftBerikutnya->waktu_masuk})";
             $shiftAktif = $shiftBerikutnya->shift . ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
           } else {
-            // Jika ada shift aktif, periksa apakah sudah ada checkin dalam 3 jam dari waktu_masuk
-            $waktuMasukCarbon = Carbon::parse($shiftAktif->waktu_masuk);
-            $batasWaktuCheckin = $waktuMasukCarbon->copy()->addHours(2);
-
-            // Periksa apakah ada absen (checkin) untuk shift ini hari ini dalam batas 3 jam
-            $hasCheckin = Absen::where('no_pegawai', $pegawai->no_pegawai)
-              ->where('shift', $shiftAktif->shift) // Asumsi kolom 'shift' di tabel Absen sesuai dengan nama shift
-              ->whereDate('check_in', today()) // Asumsi check_in adalah datetime, filter hari ini
-              ->where('check_in', '<=', $batasWaktuCheckin)
-              ->exists();
-
-            // Jika sudah lebih dari 3 jam dari waktu_masuk dan belum ada checkin, anggap shift tidak aktif
-            if ($nowCarbon->greaterThan($batasWaktuCheckin) && !$hasCheckin) {
-              // Lanjut ke shift berikutnya
-              $shiftBerikutnya = $shifts->first(function ($shift) use ($now) {
-                return $shift->waktu_masuk > $now;
-              });
-
-              // Jika semua shift sudah lewat, ambil shift pertama (besok)
-              if (!$shiftBerikutnya) {
-                $shiftBerikutnya = $shifts->first();
-              }
-
-              // Update info status
-              // $statusAbsen = "Shift Berikutnya: {$shiftBerikutnya->shift} (Mulai: {$shiftBerikutnya->waktu_masuk})";
-              $shiftAktif = $shiftBerikutnya->shift . ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
-            } else {
-              // Jika ada shift aktif dan kondisi checkin terpenuhi
-              // $statusAbsen = "Shift Aktif: {$shiftAktif->shift} (Selesai: {$shiftAktif->waktu_pulang})";
-              $shiftAktif = $shiftAktif->shift . ' ( ' . Carbon::parse($shiftAktif->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftAktif->waktu_pulang)->format('H:i') . ' )';
-            }
+            // Jika ada shift aktif dan kondisi checkin terpenuhi
+            $shiftAktif = $shiftAktif->shift . ' ( ' . Carbon::parse($shiftAktif->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftAktif->waktu_pulang)->format('H:i') . ' )';
           }
         }
       }
@@ -137,6 +121,4 @@ class Analytics extends Controller
 
     return view('content.dashboard.dashboards-analytics', compact('user', 'pegawai', 'shiftAktif', 'statusAbsen'));
   }
-
-
 }
