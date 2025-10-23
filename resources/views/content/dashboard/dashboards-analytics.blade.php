@@ -155,17 +155,23 @@
                                 class="d-block w-100 h-100"
                                 style="border: 1px solid #ddd; border-radius: 5px; object-fit: cover;">
                             </video>
-                            <p class="text-muted small mt-2 d-none d-md-block">
+                            {{-- <p class="text-muted small mt-2 d-none d-md-block">
                                 Arahkan kamera ke wajah Anda untuk absensi.
-                            </p>
+                            </p> --}}
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer pt-0 pb-2 px-2">
+                <!-- Panel Informasi (Putih di bawah video) -->
+                <div class="position-absolute bottom-0 w-100 bg-white text-center py-3 shadow-lg" style="opacity: 0.95;">
+                    <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama) }}</h6>
+                    <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
+                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
                     &nbsp;
                     <button type="button" id="btnSaveAbsensi" class="btn btn-primary btn-sm">Simpan</button>
                 </div>
+                {{-- <div class="modal-footer pt-0 pb-2 px-2">
+                </div> --}}
             </form>
         </div>
     </div>
@@ -174,6 +180,30 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+
+            function updateTanggalDanJam() {
+                const now = new Date();
+
+                // Format tanggal Indonesia
+                const optionsTanggal = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                const tanggal = now.toLocaleDateString('id-ID', optionsTanggal);
+                const jam = now.toLocaleTimeString('id-ID', {
+                    hour12: false
+                });
+
+                document.getElementById('tanggalSekarang').textContent = tanggal;
+                document.getElementById('jamSekarang').textContent = jam;
+            }
+
+            // Jalankan setiap detik
+            setInterval(updateTanggalDanJam, 1000);
+            updateTanggalDanJam();
+
 
             // Export Function
             const btnDownload = document.getElementById('btnDownload');
