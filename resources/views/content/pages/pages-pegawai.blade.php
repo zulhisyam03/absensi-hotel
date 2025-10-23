@@ -122,6 +122,10 @@
                     <div class="row">
                         <div class="col-md-12 pe-2">
                             <div class="mb-4">
+                                <img src="" id="foto-pegawai" alt="foto-pegawai"
+                                    style="width: 200px; height: 200px; object-fit: cover;" class="d-block mx-auto rounded">
+                            </div>
+                            <div class="mb-4">
                                 <label for="nama-pegawai" class="form-label fs-6 col-md-4">NAMA PEGAWAI</label>
                                 <span class="col-md-1">:</span>
                                 <span id="nama-pegawai"></span>
@@ -425,6 +429,7 @@
                     dataType: 'json',
                     success: function(data) {
                         // Isi data ke dalam modal
+                        $('#foto-pegawai').attr('src', data.foto);
                         $('#nama-pegawai').text(data.nama_pegawai);
                         $('#nik').text(data.nik);
                         $('#npwp').text(data.npwp);

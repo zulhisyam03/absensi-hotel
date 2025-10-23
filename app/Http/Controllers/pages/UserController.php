@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth; // Untuk mengakses user yang sedang login
 use Illuminate\Support\Facades\Hash; // Untuk hashing password
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -79,5 +80,43 @@ class UserController extends Controller
   public function destroy(string $id)
   {
     //
+  }
+
+  public function updateFoto(Request $request)
+  {
+    $request->validate([
+      'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    $user = Auth::user();
+    $pegawai = $user->pegawai;
+
+    if (!$pegawai) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Data pegawai tidak ditemukan.'
+      ], 404);
+    }
+
+    $namaFile = str_replace(' ', '_', strtolower($pegawai->nama_pegawai)) . '_' . $pegawai->no_pegawai . '.jpg';
+
+    // Hapus foto lama jika ada
+    if ($pegawai->foto && Storage::disk('public')->exists('foto_pegawai/' . $pegawai->foto)) {
+      Storage::disk('public')->delete('foto_pegawai/' . $pegawai->foto);
+    }
+
+    // Simpan file baru
+    $request->file('foto')->storeAs('foto_pegawai', $namaFile, 'public');
+
+    // Update kolom foto
+    $pegawai->update([
+      'foto' => $namaFile,
+    ]);
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Foto pegawai berhasil diperbarui!',
+      'foto_url' => asset('storage/foto_pegawai/' . $namaFile),
+    ]);
   }
 }

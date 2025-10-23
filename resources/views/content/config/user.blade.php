@@ -21,6 +21,22 @@
                             @csrf
                             <div class="card-body col-12 mx-auto">
                                 <div class="mb-4">
+                                    <!-- Preview Gambar -->
+                                    <div class="mb-3 text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <img id="preview-image"
+                                                src="{{ Auth::user()->pegawai->foto ? '/storage/foto_pegawai/' . Auth::user()->pegawai->foto : '/assets/img/avatars/user.png' }}"
+                                                alt="Preview Foto" class="img-thumbnail rounded"
+                                                style="width: 200px; height: 200px; object-fit: cover;">
+                                        </div>
+                                        <input class="form-control mt-3 mb-2 col-3" type="file" id="foto"
+                                            name="foto" accept="image/*">
+                                        <button class="btn btn-primary btn-md w-100" id="btnGantiFoto"><i
+                                                class="bx bx-save"></i> Upload Foto</button>
+                                        <hr class="my-6">
+                                    </div>
+                                </div>
+                                <div class="mb-4">
                                     <label for="no-pegawai" class="form-label fs-5">Nomor Pegawai</label>
                                     <input class="form-control bg-secondary bg-opacity-25" type="text" id="no-pegawai"
                                         name="nomor_pegawai" value="{{ Auth::user()->pegawai->no_pegawai }}" readonly />
@@ -73,6 +89,7 @@
             const verNewPasswordInput = document.getElementById('ver-new-password');
             const alertPassword = document.getElementById('alert-password');
             const alertVerPassword = document.getElementById('alert-ver-password');
+            const btnGantiFoto = document.getElementById('btnGantiFoto');
 
             // Debug: Pastikan elemen ditemukan
             console.log('newPasswordInput:', newPasswordInput);
@@ -92,6 +109,69 @@
                 alertPassword.textContent = '';
                 alertVerPassword.textContent = '';
             }
+
+            // Event Listener Ganti Foto
+            btnGantiFoto.addEventListener('click', function(event) {
+                event.preventDefault();
+                clearAlerts();
+
+                const inputFoto = document.getElementById('foto');
+                if (!inputFoto.files.length) {
+                    alert('Silakan pilih foto terlebih dahulu.');
+                    return;
+                }
+                // Ambil CSRF token
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfMeta) {
+                    console.error(
+                        'CSRF token tidak ditemukan. Pastikan meta tag <meta name="csrf-token" content="{{ csrf_token() }}"> ada di HTML.'
+                    );
+                    alert('Error: CSRF token tidak ditemukan.');
+                    return;
+                }
+                const csrfToken = csrfMeta.getAttribute('content');
+                // Jika valid, kirim AJAX
+                const formData = new FormData();
+                formData.append('foto', inputFoto.files[0]);
+                formData.append('_token', csrfToken); // Sertakan CSRF token
+
+                // 🔹 Tampilkan loading
+                btnGantiFoto.innerHTML = 'Mengunggah...';
+
+                fetch('/config/user/update-foto', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        const contentType = response.headers.get('content-type');
+                        if (!response.ok) throw new Error('HTTP error ' + response.status);
+
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json();
+                        } else {
+                            throw new Error(
+                                'Response bukan JSON, kemungkinan redirect atau error CSRF');
+                        }
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            document.getElementById('preview-image').src = data.foto_url; // update foto
+                            window.location = '/config/user'
+                        } else {
+                            alert('Gagal: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan jaringan. Coba lagi.');
+                    });
+
+            })
+            // END Event Listener Ganti Foto
 
             // Event listener untuk tombol
             btnGantiPassword.addEventListener('click', function(event) {
@@ -141,6 +221,8 @@
                 formData.append('password_baru_confirmation', verPasswordBaru);
                 formData.append('_token', csrfToken); // Sertakan CSRF token
 
+                // 🔹 Tampilkan loading
+                btnGantiPassword.innerHTML = 'Processing...';
                 fetch('/config/user/update', { // Ganti URL jika berbeda
                         method: 'POST',
                         body: formData,

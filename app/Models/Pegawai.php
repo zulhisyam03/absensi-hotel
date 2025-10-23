@@ -9,6 +9,20 @@ class Pegawai extends Model
 {
   use HasFactory;
 
+  protected $fillable = [
+    'no_pegawai',
+    'nama_pegawai',
+    'nik',
+    'npwp',
+    'bpjs',
+    'departemen',
+    'jabatan',
+    'alamat',
+    'tanggal_join',
+    'status_karyawan',
+    'foto', // 🔹 Tambahkan ini
+  ];
+
   public function absens()
   {
     return $this->hasMany(Absen::class, 'no_pegawai', 'no_pegawai');

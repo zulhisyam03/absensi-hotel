@@ -69,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
   // user
   Route::get("config/user", [UserController::class, 'index'])->name('config-user');
   Route::post("config/user/update", [UserController::class, 'update'])->name('config-user.update');
+  Route::post("config/user/update-foto", [UserController::class, 'updateFoto'])->name('config-user.update-foto');
 
   // DataTables AJAX route
   Route::get('/datatable/history-absen', [DataTableController::class, 'index'])->name('history-absen.index');
