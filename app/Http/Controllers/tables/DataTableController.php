@@ -72,8 +72,18 @@ class DataTableController extends Controller
           return $row->shift_masuk . ' - ' . $row->shift_pulang;
         })
         ->editColumn('keterangan', function ($row) {
-          $keterangan = $row->keterangan == 'tco' ? 'Tidak Check Out' : '';
+          $keterangan = $row->keterangan == 'tco' ? 'Tidak Check Out' : $row->keterangan;
           return $keterangan;
+        })
+        // Tambah kolom is_fast untuk flag pulang cepat
+        ->addColumn('is_fast', function ($row) {
+          $shiftPulang = $row->shift_pulang ? Carbon::parse($row->shift_pulang) : null;
+          $checkOut = $row->check_out ? Carbon::parse($row->check_out) : null;
+          if ($checkOut && $shiftPulang) {
+            $checkOutTime = $checkOut->format('H:i:s');
+            $shiftPulangTime = $shiftPulang->format('H:i:s');
+            return $checkOutTime < $shiftPulangTime ? true : false;
+          }
         })
         // 🔥 Tambahkan kolom is_late untuk flag pewarnaan (tidak ditampilkan di tabel)
         ->addColumn('is_late', function ($row) {

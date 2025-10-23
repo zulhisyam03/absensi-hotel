@@ -495,7 +495,8 @@
                 ],
                 // 🔥 Tambahkan createdRow untuk pewarnaan baris berdasarkan is_late
                 createdRow: function(row, data, dataIndex) {
-                    if (data.is_late || data.keterangan == 'Tidak Check Out') {
+                    if (data.is_late || data.is_fast || data.keterangan == 'Tidak Check Out' || data
+                        .keterangan == 'telat' || data.keterangan == 'cepat pulang') {
                         $(row).addClass('table-danger'); // Bootstrap class untuk warna kuning
                     }
                 }
@@ -593,7 +594,7 @@
         @media (min-width: 576px) {
             #videoKamera {
                 height: auto;
-                max-height: 60vh;
+                max-height: 80vh;
             }
         }
 
