@@ -102,9 +102,7 @@
                                     {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}
                                 </h4>
                                 <span class="badge bg-label-info fs-5" id="shift-pegawai">
-                                    Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) : '' }}
-                                    <input type="hidden" name="shiftAktif"
-                                        value="{{ isset($shiftAktif) ? strtolower($shiftAktif) : '' }}">
+                                    Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) . ' ' . $waktuShiftAktif : '' }}
                                 </span>
                             </div>
 
@@ -142,7 +140,8 @@
     <!-- Modal -->
     <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-fullscreen">
-            <form class="modal-content" id="formAbsen" method="post">
+            <form class="modal-content" id="formAbsen" method="post" action="{{ route('absen.store') }}"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="backDropModalTitle" class="text-light">Absensi Wajah</h5>
@@ -164,6 +163,12 @@
                 </div>
                 <!-- Panel Informasi (Putih di bawah video) -->
                 <div class="position-absolute bottom-0 w-100 bg-white text-center py-3 shadow-lg" style="opacity: 0.95;">
+                    <input type="hidden" name="shiftAktif" value="{{ isset($shiftAktif) ? strtolower($shiftAktif) : '' }}">
+                    <input type="hidden" name="Baselatitude" id="Baselatitude">
+                    <input type="hidden" name="Baselongitude" id="Baselongitude"><br>
+                    <input type="hidden" name="Baseradius" id="Baseradius"><br>
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
                     <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama) }}</h6>
                     <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
                     <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
@@ -182,6 +187,10 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+
+            const btnSaveAbsensi = document.getElementById('btnSaveAbsensi');
+            const formAbsen = document.getElementById('formAbsen');
+            btnSaveAbsensi.disabled = true;
 
             function updateTanggalDanJam() {
                 const now = new Date();
@@ -257,7 +266,7 @@
             // End Export Function
 
             // Event saat modal dibuka: Scroll ke atas + akses kamera
-            document.getElementById('backDropModal').addEventListener('shown.bs.modal', function() {
+            document.getElementById('backDropModal').addEventListener('shown.bs.modal', async function() {
                 // Scroll halaman utama ke atas secara otomatis
                 window.scrollTo(0, 0);
 
@@ -280,11 +289,93 @@
                     })
                     .catch(function(err) {
                         console.error('Error accessing camera: ', err);
-                        alert('Gagal mengakses kamera. Izinkan permission di browser dan coba lagi.');
+                        alert(
+                            'Gagal mengakses kamera. Izinkan permission di browser dan coba lagi.'
+                        );
                         // Optional: Tutup modal jika gagal
                         // bootstrap.Modal.getInstance(document.getElementById('backDropModal')).hide();
                     });
+
+                // Cek Lokasi
+                // --- Ambil parameter lokasi dari server
+                const lokasiData = await fetchConfigLokasi();
+                if (!lokasiData) {
+                    alert('Gagal memuat konfigurasi lokasi.');
+                    return;
+                }
+
+                // --- Ambil posisi sekarang
+                if (!navigator.geolocation) {
+                    alert('Browser tidak mendukung geolocation.');
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(function(posisi) {
+                    const currentLat = posisi.coords.latitude;
+                    const currentLng = posisi.coords.longitude;
+
+                    document.getElementById('latitude').value = currentLat;
+                    document.getElementById('longitude').value = currentLng;
+
+                    const paramLat = lokasiData.latitude;
+                    const paramLng = lokasiData.longitude;
+                    const radius = lokasiData.radius;
+
+                    const dalamRadius = isInsideRadius(paramLat, paramLng, radius, currentLat,
+                        currentLng);
+
+                    if (dalamRadius) {
+                        btnSaveAbsensi.disabled = false;
+                        console.log('✅ Anda berada dalam radius lokasi yang diizinkan');
+                    } else {
+                        btnSaveAbsensi.disabled = true;
+                        console.log('❌ Anda berada di luar radius lokasi');
+                    }
+                }, function(error) {
+                    console.error('Gagal mendapatkan lokasi:', error);
+                });
+                // END Cek Lokasi
             });
+
+            async function fetchConfigLokasi() {
+                try {
+                    const res = await fetch(`/config/lokasi/lokasi`);
+                    const data = await res.json();
+                    document.getElementById('Baselatitude').value = data.latitude;
+                    document.getElementById('Baselongitude').value = data.longitude;
+                    document.getElementById('Baseradius').value = data.radius;
+                    return data;
+                } catch (error) {
+                    console.error('Error fetch lokasi:', error);
+                    return null;
+                }
+            }
+
+            //  Menghitung radius lokasi sekarang dengan Parameter Lokasi
+            function isInsideRadius(paramLat, paramLng, radiusMeter, currentLat, currentLng) {
+                if ([paramLat, paramLng, radiusMeter, currentLat, currentLng].some(isNaN)) {
+                    console.warn('❗ Data koordinat tidak valid');
+                    return false;
+                }
+
+                const R = 6371e3;
+                const lat1 = paramLat * Math.PI / 180;
+                const lat2 = currentLat * Math.PI / 180;
+                const deltaLat = (currentLat - paramLat) * Math.PI / 180;
+                const deltaLng = (currentLng - paramLng) * Math.PI / 180;
+
+                const a = Math.sin(deltaLat / 2) ** 2 +
+                    Math.cos(lat1) * Math.cos(lat2) *
+                    Math.sin(deltaLng / 2) ** 2;
+
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c;
+
+                console.log(`Jarak dari titik pusat: ${distance.toFixed(2)} meter`);
+                return distance <= radiusMeter;
+            }
+            // END Menghitung radius lokasi sekarang dengan Parameter Lokasi
+
 
             // KAMERA
             // Definisikan elemen-elemen yang diperlukan (INI YANG KURANG DI SCRIPT ANDA)
@@ -375,51 +466,104 @@
             });
 
             // Event untuk tombol Save (capture gambar) - SEKARANG VARIABEL VIDEO DAN MODAL SUDAH ADA
-            const btnSaveAbsensi = document.getElementById('btnSaveAbsensi');
+            // Elemen loading buffer (bisa kamu styling sesuai Bootstrap)
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.innerHTML = `
+  <div id="loadingOverlay" style="
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      z-index: 2000;
+      display: none;
+  ">
+      <div class="spinner-border text-light me-2"></div> Mengirim absensi...
+  </div>
+`;
+            document.body.appendChild(loadingOverlay);
+            const overlay = document.getElementById('loadingOverlay');
+
             if (btnSaveAbsensi) {
-                btnSaveAbsensi.addEventListener('click', function() {
-                    if (!video || !video.videoWidth || !video.videoHeight) {
-                        alert(
-                            'Kamera belum siap. Pastikan feed kamera muncul dulu (lihat console untuk error).'
-                        );
-                        return;
+                btnSaveAbsensi.addEventListener('click', async function() {
+                    btnSaveAbsensi.disabled = true;
+                    btnSaveAbsensi.innerHTML = '⏳ Menyimpan...';
+
+                    try {
+                        // 1️⃣ Ambil gambar dari video
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        // 2️⃣ Konversi ke blob (file)
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                        if (!blob) {
+                            alert('❌ Gagal menangkap gambar dari kamera.');
+                            return;
+                        }
+                        const file = new File([blob], `absensi-${Date.now()}.png`, {
+                            type: 'image/png'
+                        });
+
+                        // 3️⃣ Ambil koordinat lokasi
+                        const latitude = document.getElementById('latitude').value;
+                        const longitude = document.getElementById('longitude').value;
+                        const Baseradius = document.getElementById('Baseradius').value;
+                        const Baselatitude = document.getElementById('Baselatitude').value;
+                        const Baselongitude = document.getElementById('Baselongitude').value;
+
+                        // 4️⃣ Siapkan data form
+                        const formData = new FormData();
+                        formData.append('_token', '{{ csrf_token() }}');
+                        formData.append('latitude', latitude);
+                        formData.append('longitude', longitude);
+                        formData.append('Baseradius', Baseradius);
+                        formData.append('Baselatitude', Baselatitude);
+                        formData.append('Baselongitude', Baselongitude);
+                        formData.append('foto_absensi', file);
+
+                        console.log('File : ', file);
+                        console.log('Form Data ', formData);
+                        for (const [key, value] of formData.entries()) {
+                            console.log(key, value, value instanceof File ? '(File detected ✅)' : '');
+                        }
+
+                        // 5️⃣ Kirim ke Laravel pakai fetch
+                        const response = await fetch('{{ route('absen.store') }}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').content
+                            }
+                        });
+
+                        const result = await response.json();
+                        console.log('✅ Respon server:', result);
+
+                        if (response.ok) {
+                            alert('✅ Absensi berhasil disimpan!');
+                        } else {
+                            alert('⚠️ Terjadi kesalahan: ' + (result.message || 'Server error.'));
+                        }
+
+                    } catch (error) {
+                        console.error('❌ Error saat menyimpan absensi:', error);
+                        alert('Terjadi error saat menyimpan absensi.');
+                    } finally {
+                        btnSaveAbsensi.disabled = false;
+                        btnSaveAbsensi.innerHTML = 'Simpan';
                     }
-
-                    console.log('Mencoba capture gambar...'); // Debugging
-
-                    // Ambil snapshot dari video (menggunakan canvas)
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0);
-
-                    // Konversi ke base64 atau kirim ke server untuk proses absensi
-                    const imageData = canvas.toDataURL('image/png');
-                    console.log('Gambar absensi berhasil dicapture:', imageData.substring(0, 50) +
-                        '... (lihat console lengkap)'); // Debugging: Tampilkan sebagian data
-
-                    // Tutup modal setelah save
-                    const modalInstance = bootstrap.Modal.getInstance(modal);
-                    if (modalInstance) {
-                        modalInstance.hide();
-                    }
-
-                    // Opsional: Tampilkan pesan sukses
-                    alert('Absensi berhasil disimpan! (Gambar ada di console untuk testing)');
-
-                    // Opsional: Download gambar untuk testing (hapus jika tidak perlu)
-                    const link = document.createElement('a');
-                    link.href = imageData;
-                    link.download = 'absensi-' + new Date().toISOString().slice(0, 19).replace(/:/g, '-') +
-                        '.png';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
                 });
             } else {
-                console.error('Tombol #btnSaveAbsensi tidak ditemukan di modal.');
+                console.error('❌ Tombol #btnSaveAbsensi tidak ditemukan di modal.');
             }
+
 
             console.log('Script kamera selesai diinisialisasi.'); // Debugging akhir
             // END KAMERA

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Absen;
+use App\Models\ShiftKerja;
 use Illuminate\Support\Facades\Artisan;
 
 class Analytics extends Controller
@@ -35,7 +36,8 @@ class Analytics extends Controller
 
       if ($absen) {
         // 🔹 Pegawai sedang aktif shift dan belum check-out
-        $shiftAktif = $absen['shift'] . ' ( ' . Carbon::parse($absen->shift_masuk)->format('H:i') . ' - ' . Carbon::parse($absen->shift_pulang)->format('H:i') . ' )';
+        $shiftAktif = $absen['shift'];
+        $waktuShiftAktif = ' ( ' . Carbon::parse($absen->shift_masuk)->format('H:i') . ' - ' . Carbon::parse($absen->shift_pulang)->format('H:i') . ' )';
         $statusAbsen = 'Check Out';
       } else {
         // 🔹 Jika tidak ada absen aktif, cari shift berikutnya berdasarkan waktu sekarang
@@ -82,7 +84,8 @@ class Analytics extends Controller
           }
 
           // Update info status
-          $shiftAktif = $shiftBerikutnya->shift . ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
+          $shiftAktif = $shiftBerikutnya->shift;
+          $waktuShiftAktif = ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
         } else {
           // Jika ada shift aktif, periksa apakah sudah ada checkin dalam 2 jam dari waktu_masuk
           $waktuMasukCarbon = Carbon::parse($shiftAktif->waktu_masuk);
@@ -107,10 +110,12 @@ class Analytics extends Controller
             }
 
             // Update info status
-            $shiftAktif = $shiftBerikutnya->shift . ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
+            $shiftAktif = $shiftBerikutnya->shift;
+            $waktuShiftAktif = ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
           } else {
             // Jika ada shift aktif dan kondisi checkin terpenuhi
-            $shiftAktif = $shiftAktif->shift . ' ( ' . Carbon::parse($shiftAktif->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftAktif->waktu_pulang)->format('H:i') . ' )';
+            $shiftAktif = $shiftAktif->shift;
+            $waktuShiftAktif = ' ( ' . Carbon::parse($shiftAktif->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftAktif->waktu_pulang)->format('H:i') . ' )';
           }
         }
       }
@@ -119,6 +124,12 @@ class Analytics extends Controller
       // Log::error($e->getMessage());
     }
 
-    return view('content.dashboard.dashboards-analytics', compact('user', 'pegawai', 'shiftAktif', 'statusAbsen'));
+    // Cek Pengaturan Shift Pegawai
+    $shiftPegawai = ShiftKerja::where('no_pegawai', $user->pegawai->no_pegawai)->first();
+    if (empty($shiftPegawai)) {
+      $shiftAktif = '( Belum Memiliki Shift Kerja )';
+      $waktuShiftAktif = '';
+    }
+    return view('content.dashboard.dashboards-analytics', compact('user', 'pegawai', 'shiftAktif', 'waktuShiftAktif', 'statusAbsen'));
   }
 }
