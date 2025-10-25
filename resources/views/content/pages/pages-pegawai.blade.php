@@ -74,7 +74,7 @@
                                         <label for="btnDownload" class="form-label mt-3">&nbsp;</label>
                                         <button class="btn btn-primary w-100" id="btnDownload"><i
                                                 class="bx bxs-download"></i>
-                                            Download</button>
+                                            <span id="lblDownload">Download</span></button>
                                     </div>
                                 </div>
                             </div>
@@ -232,6 +232,8 @@
             if (btnDownload) {
 
                 btnDownload.addEventListener('click', function() {
+                    var lblDownload = document.getElementById('lblDownload');
+                    lblDownload.innerHTML = 'Processing...';
                     const formData = new FormData();
                     formData.append('filterDepartemen', document.getElementById('filterDepartemen').value);
                     formData.append('_token', '{{ csrf_token() }}'); // CSRF token untuk Laravel
@@ -244,6 +246,7 @@
                             if (response.ok) {
                                 return response.blob(); // Mendapatkan file sebagai blob
                             } else {
+                                lblDownload.innerHTML = 'Download';
                                 throw new Error('Export gagal');
                             }
                         })
@@ -252,15 +255,19 @@
                             const url = window.URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
-                            a.download = 'attendance_' + new Date().toISOString().slice(0, 19).replace(
-                                /:/g,
-                                '-') + '.xlsx';
+                            a.download = 'data_pegawai_' + new Date().toISOString().slice(0, 19)
+                                .replace(
+                                    /:/g,
+                                    '-') + '.xlsx';
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
+                            lblDownload.innerHTML = 'Download';
+
                             window.URL.revokeObjectURL(url);
                         })
                         .catch(error => {
+                            lblDownload.innerHTML = 'Download';
                             alert('Terjadi kesalahan: ' + error.message);
                         });
                 });

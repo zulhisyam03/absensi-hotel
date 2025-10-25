@@ -8,10 +8,15 @@ use App\Models\Pegawai;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles; // Tambahkan ini
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet; // Untuk WithStyles
 
-class AttendanceExport implements FromQuery, WithHeadings, WithMapping
+class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithEvents
 {
   protected $request;
 
@@ -55,21 +60,56 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping
       'WAKTU SHIFT',
       'CHECK IN',
       'CHECK OUT', // Sesuaikan dengan kolom yang ada di tabel Anda
+      'KETERANGAN', // Sesuaikan dengan kolom yang ada di tabel Anda
       'TOTAL HARI KERJA', // Sesuaikan dengan kolom yang ada di tabel Anda
     ];
   }
 
   public function map($attendance): array
   {
+    // Modifikasi keterangan: jika 'tco', ubah menjadi 'TIDAK CHECKOUT'
+    $keterangan = $attendance->keterangan;
+    if (strtolower($keterangan) == 'tco') { // Case-insensitive, tapi asumsikan lowercase
+      $keterangan = 'TIDAK CHECKOUT';
+    }
     return [
       $attendance->no_pegawai,
-      $attendance->nama_pegawai,
-      $attendance->departemen,
-      $attendance->shift,
+      strtoupper($attendance->nama_pegawai),
+      strtoupper($attendance->departemen),
+      strtoupper($attendance->shift),
       $attendance->waktu_shift,
       $attendance->check_in,
       $attendance->check_out,
+      strtoupper($keterangan),
       $attendance->total_hari_kerja,
+    ];
+  }
+  // Tambahkan method styles() untuk conditional styling per row
+  public function styles(Worksheet $sheet)
+  {
+    $styles = [];
+    $rows = $sheet->getHighestRow();
+    for ($row = 2; $row <= $rows; $row++) {
+      $keterangan = $sheet->getCell('H' . $row)->getValue();
+      if (!empty($keterangan)) {
+        $styles[$row] = [
+          'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'startColor' => ['argb' => 'FFFF0000'], // Merah
+          ],
+        ];
+      }
+    }
+    return $styles;
+  }
+  // Event AfterSheet tetap ada jika perlu styling tambahan (misalnya, header)
+  public function registerEvents(): array
+  {
+    return [
+      AfterSheet::class => function (AfterSheet $event) {
+        // Opsional: Styling header atau lainnya
+        $event->sheet->getStyle('A1:I1')->getFont()->setBold(true); // Header bold
+      },
     ];
   }
 }

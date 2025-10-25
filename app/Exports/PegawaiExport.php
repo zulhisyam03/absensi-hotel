@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 
-class PegawaiExport implements FromQuery, WithHeadings, WithMapping
+class PegawaiExport implements FromQuery, WithHeadings, WithMapping, WithColumnFormatting
 {
   protected $request;
 
@@ -63,7 +63,7 @@ class PegawaiExport implements FromQuery, WithHeadings, WithMapping
       $attendance->departemen,
       $attendance->no_hp,
       $attendance->emergency_number,
-      $attendance->tanggal_join,
+      $attendance->tgl_join,
       $attendance->alamat,
       $attendance->jabatan,
       $attendance->status_pegawai,
@@ -74,10 +74,12 @@ class PegawaiExport implements FromQuery, WithHeadings, WithMapping
   public function columnFormats(): array
   {
     return [
-      'C' => NumberFormat::FORMAT_TEXT,
+      'C' => NumberFormat::FORMAT_NUMBER,
       'D' => NumberFormat::FORMAT_TEXT,
       'E' => NumberFormat::FORMAT_TEXT,
-      'M' => NumberFormat::FORMAT_NUMBER_00,
+      'G' => NumberFormat::FORMAT_TEXT,
+      'H' => NumberFormat::FORMAT_TEXT,
+      'M' => '"Rp."#,##0',
     ];
   }
 }

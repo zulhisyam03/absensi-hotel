@@ -62,7 +62,7 @@
                                         <label for="btnDownload" class="form-label mt-3">&nbsp;</label>
                                         <button class="btn btn-primary w-100" id="btnDownload"><i
                                                 class="bx bxs-download"></i>
-                                            Download</button>
+                                            <span id="lblDownload">Download</span></button>
                                     </div>
                                 </div>
                             </div>
@@ -221,11 +221,14 @@
 
             if (btnDownload) {
                 btnDownload.addEventListener('click', function() {
+                    var lblDownload = document.getElementById('lblDownload');
+                    lblDownload.innerHTML = "Processing...";
                     var startDate = document.getElementById('filterDateStart').value;
                     var endDate = document.getElementById('filterDateEnd').value;
 
                     if (startDate === '' || endDate === '') {
                         alert('Tanggal Awal dan Tanggal Akhir harus di isi');
+                        lblDownload.innerHTML = "Download"; // Kembali ke Download jika validasi gagal
                         return;
                     }
                     const formData = new FormData();
@@ -242,6 +245,7 @@
                             if (response.ok) {
                                 return response.blob(); // Mendapatkan file sebagai blob
                             } else {
+                                lblDownload.innerHTML = 'Download';
                                 throw new Error('Export gagal');
                             }
                         })
@@ -256,11 +260,16 @@
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
+                            // Set kembali ke Download jika error
+                            lblDownload.innerHTML = "Download";
                             window.URL.revokeObjectURL(url);
                         })
                         .catch(error => {
+                            // Set kembali ke Download jika error
+                            lblDownload.innerHTML = "Download";
                             alert('Terjadi kesalahan: ' + error.message);
                         });
+
                 });
             }
             // End Export Function
