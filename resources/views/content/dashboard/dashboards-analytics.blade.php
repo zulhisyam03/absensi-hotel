@@ -163,12 +163,12 @@
                 </div>
                 <!-- Panel Informasi (Putih di bawah video) -->
                 <div class="position-absolute bottom-0 w-100 bg-white text-center py-3 shadow-lg" style="opacity: 0.95;">
-                    <input type="hidden" name="shiftAktif" value="{{ isset($shiftAktif) ? strtolower($shiftAktif) : '' }}">
                     <input type="hidden" name="Baselatitude" id="Baselatitude">
                     <input type="hidden" name="Baselongitude" id="Baselongitude"><br>
                     <input type="hidden" name="Baseradius" id="Baseradius"><br>
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
+                    <span id="lblRadius"></span>
                     <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama) }}</h6>
                     <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
                     <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
@@ -326,9 +326,15 @@
 
                     if (dalamRadius) {
                         btnSaveAbsensi.disabled = false;
+                        document.getElementById('lblRadius').innerHTML =
+                            '✅' + @json($statusAbsen) + ' Ready !';
+                        $('#lblRadius').addClass('text-success');
                         console.log('✅ Anda berada dalam radius lokasi yang diizinkan');
                     } else {
                         btnSaveAbsensi.disabled = true;
+                        document.getElementById('lblRadius').innerHTML =
+                            '❌ Anda Diluar Radius Absen !';
+                        $('#lblRadius').addClass('text-danger');
                         console.log('❌ Anda berada di luar radius lokasi');
                     }
                 }, function(error) {
@@ -516,6 +522,8 @@
                         const Baseradius = document.getElementById('Baseradius').value;
                         const Baselatitude = document.getElementById('Baselatitude').value;
                         const Baselongitude = document.getElementById('Baselongitude').value;
+                        const shiftAktif = @json(isset($shiftAktif) ? strtolower($shiftAktif) : '');
+                        const waktuShiftAktif = @json(isset($waktuShiftAktif) ? strtolower($waktuShiftAktif) : '');
 
                         // 4️⃣ Siapkan data form
                         const formData = new FormData();
@@ -525,6 +533,8 @@
                         formData.append('Baseradius', Baseradius);
                         formData.append('Baselatitude', Baselatitude);
                         formData.append('Baselongitude', Baselongitude);
+                        formData.append('shiftAktif', shiftAktif);
+                        formData.append('waktuShiftAktif', waktuShiftAktif);
                         formData.append('foto_absensi', file);
 
                         console.log('File : ', file);
@@ -542,12 +552,24 @@
                                     'meta[name="csrf-token"]').content
                             }
                         });
+                        // 🔍 Debugging: Log status dan isi respons
+                        console.log('Response status:', response.status);
+                        const responseText = await response.text(); // Ambil sebagai teks dulu
+                        console.log('Response text:', responseText);
+                        // Jika respons bukan JSON, tampilkan error
+                        if (!response.ok) {
+                            alert('⚠️ Server error: ' +
+                                responseText); // Tampilkan teks respons sebagai error
+                            return;
+                        }
 
-                        const result = await response.json();
+                        // Jika OK, parse sebagai JSON
+                        const result = JSON.parse(
+                            responseText); // Atau gunakan response.json() jika yakin JSON
                         console.log('✅ Respon server:', result);
-
                         if (response.ok) {
                             alert('✅ Absensi berhasil disimpan!');
+                            window.location.href = '/dashboard';
                         } else {
                             alert('⚠️ Terjadi kesalahan: ' + (result.message || 'Server error.'));
                         }
@@ -740,7 +762,7 @@
         @media (min-width: 576px) {
             #videoKamera {
                 height: auto;
-                max-height: 80vh;
+                max-height: 70vh;
             }
         }
 

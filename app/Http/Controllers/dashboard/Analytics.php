@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\Absen;
 use App\Models\ShiftKerja;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class Analytics extends Controller
 {
@@ -85,7 +86,9 @@ class Analytics extends Controller
 
           // Update info status
           $shiftAktif = $shiftBerikutnya->shift;
+          Log::channel('shift')->info('Shift Aktif 1 :' . $shiftAktif); // Untuk melihat semua atribut
           $waktuShiftAktif = ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
+          Log::channel('shift')->info('Waktu Shift 1 :' . $waktuShiftAktif); // Untuk melihat semua atribut
         } else {
           // Jika ada shift aktif, periksa apakah sudah ada checkin dalam 2 jam dari waktu_masuk
           $waktuMasukCarbon = Carbon::parse($shiftAktif->waktu_masuk);
@@ -97,6 +100,8 @@ class Analytics extends Controller
             ->whereDate('check_in', today())
             ->where('check_in', '<=', $batasWaktuCheckin)
             ->exists();
+
+          Log::channel('shift')->info('Data :', $shiftAktif->toArray());
 
           // Jika sudah lebih dari 2 jam dari waktu_masuk dan belum ada checkin, anggap shift tidak aktif, lanjut ke berikutnya
           if ($nowCarbon->greaterThan($batasWaktuCheckin) && !$hasCheckin) {
@@ -111,11 +116,20 @@ class Analytics extends Controller
 
             // Update info status
             $shiftAktif = $shiftBerikutnya->shift;
+            Log::channel('shift')->info('Shift Aktif 2 :' . $shiftAktif); // Untuk melihat semua atribut
             $waktuShiftAktif = ' ( ' . Carbon::parse($shiftBerikutnya->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftBerikutnya->waktu_pulang)->format('H:i') . ' )';
+            Log::channel('shift')->info('Waktu Shift 2 :' . $waktuShiftAktif); // Untuk melihat semua atribut
           } else {
             // Jika ada shift aktif dan kondisi checkin terpenuhi
-            $shiftAktif = $shiftAktif->shift;
-            $waktuShiftAktif = ' ( ' . Carbon::parse($shiftAktif->waktu_masuk)->format('H:i') . ' - ' . Carbon::parse($shiftAktif->waktu_pulang)->format('H:i') . ' )';
+            $shiftAktifObj = $shiftAktif; // simpan objek
+            $shiftAktif = $shiftAktifObj->shift; // ambil nama shift-nya
+            Log::channel('shift')->info('Shift Aktif 3 :', $shiftAktifObj->toArray());
+
+            $waktuShiftAktif = ' ( ' .
+              Carbon::parse($shiftAktifObj->waktu_masuk)->format('H:i') .
+              ' - ' .
+              Carbon::parse($shiftAktifObj->waktu_pulang)->format('H:i') .
+              ' )';
           }
         }
       }

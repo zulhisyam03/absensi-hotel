@@ -11,10 +11,15 @@ class Absen extends Model
 
   protected $fillable = [
     'no_pegawai',
+    'check_in',
+    'check_out',
+    'pict_in', // Pastikan nama konsisten (atau 'pict_in' jika itu nama DB)
+    'pict_out',
     'shift',
-    'pict',
+    'shift_masuk', // Tambahkan ini
+    'shift_pulang', // Tambahkan ini
     'status',
-    'keterangan',
+    'keterangan', // Jika ada
   ];
 
   protected $casts = [

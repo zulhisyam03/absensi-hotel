@@ -27,6 +27,9 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
   Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
 
+  // Absen
+  Route::post('/absen/store', [AbsenController::class, 'store'])->middleware(['role:hr,supervisor,staff'])->name('absen.store');
+
   // Export Absen History
   Route::post('/attendance/export', [AbsenController::class, 'export'])->middleware(['role:hr,supervisor'])->name('attendance.export');
 
@@ -63,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
 
   // Lokasi
   Route::get('config/lokasi', [MapController::class, 'index'])->middleware(['role:hr'])->name('config-lokasi');
-  Route::get('config/lokasi/{id}', [MapController::class, 'show'])->middleware(['role:hr'])->name('config-lokasi.show');
+  Route::get('config/lokasi/{id}', [MapController::class, 'show'])->middleware(['role:hr,staff,supervisor'])->name('config-lokasi.show');
   Route::put('config/lokasi/updated/{id}', [MapController::class, 'update'])->middleware(['role:hr'])->name('config-lokasi.update');
 
   // user
