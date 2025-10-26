@@ -99,3 +99,9 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('login');
 Route::post('/auth/login-basic', [LoginBasic::class, 'login'])->name('auth-login');
 Route::get('/auth/forgot-password-basic', [ForgotPasswordBasic::class, 'index'])->name('auth-reset-password-basic');
+// Route untuk submit forgot password (via AJAX)
+Route::post('/forgot-password', [ForgotPasswordBasic::class, 'sendResetLinkEmail'])->name('password.email');
+// Route untuk halaman reset password (dari link email)
+Route::get('/reset-password/{token}', [ForgotPasswordBasic::class, 'showResetForm'])->name('password.reset');
+// Route untuk submit reset password
+Route::post('/reset-password', [ForgotPasswordBasic::class, 'reset'])->name('password.update');

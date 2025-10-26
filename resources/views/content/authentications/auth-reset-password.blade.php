@@ -1,6 +1,6 @@
 @extends('layouts/blankLayout')
 
-@section('title', 'Forgot Password - Pages')
+@section('title', 'Reset Password - Pages')
 
 @section('page-style')
     @vite(['resources/assets/vendor/scss/pages/page-auth.scss'])
@@ -10,8 +10,7 @@
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner">
-
-                <!-- Forgot Password -->
+                <!-- Reset Password -->
                 <div class="card px-sm-6 px-0">
                     <div class="card-body">
                         <!-- Logo -->
@@ -26,21 +25,27 @@
                             </a>
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-1">Forgot Password? 🔒</h4>
-                        <p class="mb-6">Enter your email and we'll send you instructions to reset your password</p>
-                        <form id="forgotPasswordForm">
+                        <h4 class="mb-1">Reset Password 🔒</h4>
+                        <p class="mb-6">Masukkan password baru Anda</p>
+                        <form id="resetPasswordForm">
                             @csrf
+                            <input type="hidden" name="token" value="{{ request('token') }}">
+                            <input type="hidden" name="email" value="{{ request('email') }}">
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <label for="password" class="form-label">Password Baru</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <button id="btnReset" class="btn btn-primary">Kirim Link Reset</button>
+                            <div class="mb-3">
+                                <label for="password_confirmation" class="form-label">Ulangi Password Baru</label>
+                                <input type="password" class="form-control" id="password_confirmation"
+                                    name="password_confirmation" required>
+                            </div>
+                            <button id="btnReset" class="btn btn-primary">Update Password</button>
                         </form>
                         <!-- Alert untuk sukses (ditampilkan via JavaScript) -->
                         <div id="alertSuccess" class="alert alert-success mt-3" style="display: none;">
-                            Link reset password telah dikirim ke email Anda.
+                            Password berhasil diupdate. Anda akan diarahkan ke login.
                         </div>
-                        <!-- Alert untuk error (ditampilkan via JavaScript) -->
                         <div id="alertError" class="alert alert-danger mt-3" style="display: none;"></div>
                         <div class="text-center mt-4">
                             <a href="{{ url('auth/login-basic') }}" class="d-flex justify-content-center">
@@ -50,7 +55,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- /Forgot Password -->
+                <!-- /Reset Password -->
             </div>
         </div>
     </div>
@@ -60,43 +65,39 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const btnReset = document.getElementById('btnReset');
-            const form = document.getElementById('forgotPasswordForm');
+            const form = document.getElementById('resetPasswordForm');
             const alertSuccess = document.getElementById('alertSuccess');
             const alertError = document.getElementById('alertError');
             const csrfToken = document.querySelector('meta[name="csrf-token"]');
 
             if (btnReset) {
                 btnReset.addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent default form submission
-                    console.log('Submit clicked - using AJAX');
+                    e.preventDefault();
+                    console.log('Reset password clicked - using AJAX');
 
-                    // Hide previous alerts
                     alertSuccess.style.display = 'none';
                     alertError.style.display = 'none';
 
                     const formData = new FormData();
-                    formData.append('email', document.getElementById('email').value);
+                    formData.append('token', document.querySelector('input[name="token"]').value);
+                    formData.append('email', document.querySelector('input[name="email"]').value);
+                    formData.append('password', document.getElementById('password').value);
+                    formData.append('password_confirmation', document.getElementById(
+                        'password_confirmation').value);
                     formData.append('_token', csrfToken ? csrfToken.getAttribute('content') : '');
 
-                    // Disable button to prevent double-clicks
                     btnReset.disabled = true;
-                    btnReset.textContent = 'Sending...';
+                    btnReset.textContent = 'Updating...';
 
-                    // Kirim via AJAX
-                    fetch('{{ route('password.email') }}', {
+                    fetch('{{ route('password.update') }}', {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': csrfToken ? csrfToken.getAttribute('content') : '',
-                                // Remove Content-Type for FormData
                             },
                             body: formData
                         })
                         .then(response => {
                             console.log('Response status:', response.status);
-                            console.log('Response headers:', response.headers.get(
-                                'content-type')); // Debug header
-
-                            // Check if response is JSON
                             const contentType = response.headers.get('content-type');
                             if (contentType && contentType.includes('application/json')) {
                                 return response.json().then(data => ({
@@ -118,29 +119,21 @@
                             isJson
                         }) => {
                             if (status === 200 && isJson && data.success) {
-                                // Tampilkan alert sukses
-                                alertSuccess.textContent = data.message;
                                 alertSuccess.style.display = 'block';
-                                // Reset form
-                                form.reset();
+                                setTimeout(() => {
+                                    window.location.href = '{{ url('auth/login-basic') }}';
+                                }, 2000);
                             } else {
-                                // Handle errors (JSON or non-JSON)
                                 let errorMsg = 'Terjadi kesalahan.';
                                 if (isJson) {
-                                    errorMsg = data.message || (data.errors && data.errors.email ? data
-                                        .errors.email[0] : 'Terjadi kesalahan.');
+                                    errorMsg = data.message || 'Terjadi kesalahan.';
                                 } else {
-                                    // Non-JSON response (e.g., HTML error page)
                                     if (status === 419) {
-                                        errorMsg =
-                                            'CSRF token tidak valid. Silakan refresh halaman dan coba lagi.';
-                                    } else if (status === 404) {
-                                        errorMsg = 'Route tidak ditemukan. Periksa konfigurasi.';
+                                        errorMsg = 'CSRF token tidak valid. Silakan refresh halaman.';
                                     } else if (status >= 500) {
-                                        errorMsg = 'Kesalahan server internal. Coba lagi nanti.';
+                                        errorMsg = 'Kesalahan server internal.';
                                     } else {
-                                        errorMsg =
-                                            `Kesalahan HTTP ${status}: ${data.substring(0, 200)}...`; // Truncate HTML for display
+                                        errorMsg = `Kesalahan HTTP ${status}.`;
                                     }
                                 }
                                 alertError.textContent = errorMsg;
@@ -154,9 +147,8 @@
                             alertError.style.display = 'block';
                         })
                         .finally(() => {
-                            // Re-enable button
                             btnReset.disabled = false;
-                            btnReset.textContent = 'Kirim Link Reset';
+                            btnReset.textContent = 'Update Password';
                         });
                 });
             }
