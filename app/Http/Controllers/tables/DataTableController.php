@@ -49,8 +49,18 @@ class DataTableController extends Controller
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addIndexColumn()
         ->addColumn('nama_pegawai', function ($row) {
-          return $row->pegawai ? $row->pegawai->nama_pegawai : 'N/A';
-        })
+    $nama = e($row->pegawai ? $row->pegawai->nama_pegawai : 'N/A');
+    $pictIn = $row->pict_in ? asset('storage/'.$row->pict_in) : '';
+    $pictOut = $row->pict_out ? asset('storage/'.$row->pict_out) : '';
+
+    return '<a href="#"
+                class="btn-show-foto"
+                data-id="'.$row->id.'"
+                data-nama="'.strtoupper($nama).'"
+                data-pict-in="'.$pictIn.'"
+                data-pict-out="'.$pictOut.'"
+            >'.$nama.'</a>';
+})
         ->addColumn('departemen', function ($row) {
           return $row->pegawai ? $row->pegawai->departemen : 'N/A';
         })
@@ -126,6 +136,7 @@ class DataTableController extends Controller
             });
           }
         })
+        ->rawColumns(['nama_pegawai'])
         ->make(true);
     }
     return view('history-absen.index');

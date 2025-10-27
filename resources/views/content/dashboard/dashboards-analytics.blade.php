@@ -182,11 +182,53 @@
             </form>
         </div>
     </div>
+
+    {{-- Modal Foto Absen --}}
+    <div class="modal fade" id="modalFoto" tabindex="-1" aria-labelledby="modalFotoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalFotoLabel">Foto Pegawai</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h5 id="namaPegawaiModal"></h5>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p><b>Check In</b></p>
+                            <img id="pictIn" src="" alt="Pict In" class="img-fluid rounded shadow">
+                        </div>
+                        <div class="col-md-6">
+                            <p><b>Check Out</b></p>
+                            <img id="pictOut" src="" alt="Pict Out" class="img-fluid rounded shadow">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- END Modal Foto Absen --}}
+
 @endsection
 
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+            // Script Modal Foto
+            $(document).on('click', '.btn-show-foto', function(e) {
+                e.preventDefault();
+
+                const nama = $(this).data('nama');
+                const pictIn = $(this).data('pict-in');
+                const pictOut = $(this).data('pict-out');
+
+                $('#namaPegawaiModal').text(nama);
+                $('#pictIn').attr('src', pictIn || 'https://via.placeholder.com/300x300?text=No+Image');
+                $('#pictOut').attr('src', pictOut || 'https://via.placeholder.com/300x300?text=No+Image');
+
+                $('#modalFoto').modal('show');
+            });
+            // END Script Modal Foto
 
             const btnSaveAbsensi = document.getElementById('btnSaveAbsensi');
             const formAbsen = document.getElementById('formAbsen');
