@@ -18,16 +18,16 @@ class DatabaseSeeder extends Seeder
   public function run(): void
   {
     // User::factory(10)->create();
-    Absen::factory()->create([
-      'no_pegawai' => 'SB001',
-      'shift' => 'pagi',
-    ]);
-    Absen::factory()->create([
-      'no_pegawai' => 'SB001',
-      'shift' => 'pagi',
-    ]);
+    // Absen::factory()->create([
+    //   'no_pegawai' => 'SB001',
+    //   'shift' => 'pagi',
+    // ]);
+    // Absen::factory()->create([
+    //   'no_pegawai' => 'SB001',
+    //   'shift' => 'pagi',
+    // ]);
 
-    ShiftKerja::factory()->create([]);
+    // ShiftKerja::factory()->create([]);
 
     // param
     Param::factory()->create([]);
