@@ -49,18 +49,18 @@ class DataTableController extends Controller
         // ⭐️ Tambahkan ini untuk membuat kolom penomoran otomatis
         ->addIndexColumn()
         ->addColumn('nama_pegawai', function ($row) {
-    $nama = e($row->pegawai ? $row->pegawai->nama_pegawai : 'N/A');
-    $pictIn = $row->pict_in ? asset('storage/'.$row->pict_in) : '';
-    $pictOut = $row->pict_out ? asset('storage/'.$row->pict_out) : '';
+          $nama = e($row->pegawai ? $row->pegawai->nama_pegawai : 'N/A');
+          $pictIn = $row->pict_in ? asset('storage/' . $row->pict_in) : '';
+          $pictOut = $row->pict_out ? asset('storage/' . $row->pict_out) : '';
 
-    return '<a href="#"
+          return '<a href="#"
                 class="btn-show-foto"
-                data-id="'.$row->id.'"
-                data-nama="'.strtoupper($nama).'"
-                data-pict-in="'.$pictIn.'"
-                data-pict-out="'.$pictOut.'"
-            >'.$nama.'</a>';
-})
+                data-id="' . $row->id . '"
+                data-nama="' . strtoupper($nama) . '"
+                data-pict-in="' . $pictIn . '"
+                data-pict-out="' . $pictOut . '"
+            >' . $nama . '</a>';
+        })
         ->addColumn('departemen', function ($row) {
           return $row->pegawai ? $row->pegawai->departemen : 'N/A';
         })
@@ -77,10 +77,10 @@ class DataTableController extends Controller
           $checkOut = $row->check_out != null ? Carbon::parse($row->check_out)->format('Y-m-d H:i:s') : '';
           return $checkOut;
         })
-        ->editColumn('waktu_shift', function ($row) {
-          // Menggunakan Carbon untuk memformat created_at
-          return Carbon::parse($row->shift_masuk)->format('H:i') . ' - ' . Carbon::parse($row->shift_pulang)->format('H:i');
-        })
+        // ->editColumn('waktu_shift', function ($row) {
+        //   // Menggunakan Carbon untuk memformat created_at
+        //   return $row->shift_masuk . ' - ' . $row->shift_pulang;
+        // })
         ->editColumn('keterangan', function ($row) {
           $keterangan = $row->keterangan == 'tco' ? 'Tidak Check Out' : $row->keterangan;
           return $keterangan;
@@ -93,7 +93,7 @@ class DataTableController extends Controller
           // Buat object waktu
           // shift_pulang hanya jam -> pakai tanggal dari check_out agar konsisten
           $checkOut = Carbon::parse($row->check_out);
-          $shiftPulang = Carbon::parse($checkOut->format('Y-m-d') . ' ' . $row->shift_pulang);
+          $shiftPulang = Carbon::parse($row->shift_pulang);
 
           // Jika jam checkout < jam shift pulang
           if ($checkOut->lt($shiftPulang)) {
@@ -111,7 +111,7 @@ class DataTableController extends Controller
         })
         // 🔥 Tambahkan kolom is_late untuk flag pewarnaan (tidak ditampilkan di tabel)
         ->addColumn('is_late', function ($row) {
-          $shiftMasuk = $row->shift_masuk ? Carbon::parse($row->shift_masuk) : null;
+          $shiftMasuk = Carbon::parse($row->shift_masuk);
           $checkIn = $row->check_in ? Carbon::parse($row->check_in) : null;
           // Jika keduanya ada, bandingkan waktu saja (abaikan tanggal)
           if ($checkIn && $shiftMasuk) {

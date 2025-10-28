@@ -45,15 +45,34 @@ class AbsenController extends Controller
 
       // Hapus karakter yang tidak perlu
       $clean = trim($str, '() ');
-      // Pisahkan berdasarkan tanda '-'
       list($waktu_masuk, $waktu_pulang) = array_map('trim', explode('-', $clean));
       $waktu_masuk = Carbon::parse($waktu_masuk)->format('H:i:s');
       $waktu_pulang = Carbon::parse($waktu_pulang)->format('H:i:s');
 
+      // ✅ Tentukan tanggal lengkap untuk shift lintas hari
+      $tanggalShift = $checkIn->copy()->startOfDay();
+
+      // Jika shift pulang lebih kecil dari masuk, berarti lintas hari
+      if (Carbon::parse($waktu_masuk)->gt(Carbon::parse($waktu_pulang))) {
+        if ($checkIn->format('H:i:s') < $waktu_pulang) {
+          // Check-in lewat tengah malam, berarti shift dimulai kemarin
+          $tanggalShift->subDay();
+        }
+      }
+
+      // Bentuk waktu shift lengkap
+      $shiftStart = $tanggalShift->copy()->setTimeFromTimeString($waktu_masuk);
+      $shiftEnd = $shiftStart->copy();
+      if ($waktu_masuk > $waktu_pulang) {
+        $shiftEnd->addDay()->setTimeFromTimeString($waktu_pulang);
+      } else {
+        $shiftEnd->setTimeFromTimeString($waktu_pulang);
+      }
+
       // Validasi manual untuk return JSON jika gagal
       $validator = Validator::make($request->all(), [
         'shiftAktif' => 'required',
-        'waktuShiftAktif' => 'required', // Tambahkan jika diperlukan
+        'waktuShiftAktif' => 'required',
         'foto_absensi' => 'required|image|max:2048',
       ]);
 
@@ -65,7 +84,7 @@ class AbsenController extends Controller
         ], 422);
       }
 
-      // Cek Absen
+      // Cek Absen aktif (belum check-out)
       $cekAbsen = Absen::where('no_pegawai', $noPegawai)
         ->whereNotNull('check_in')
         ->whereNull('check_out')
@@ -73,24 +92,24 @@ class AbsenController extends Controller
         ->latest()
         ->first();
 
-      // Jika Ada, maka update Data tersebut untuk Check Out
+      // ======================================================
+      // CHECK OUT
+      // ======================================================
       if ($cekAbsen) {
         $checkOut = Carbon::now();
-
-        // Simpan gambar untuk check-out
         $path = null;
+
         if ($request->hasFile('foto_absensi')) {
           $file = $request->file('foto_absensi');
           $filename = 'checkout_' . $noPegawai . '_' . time() . '.' . $file->getClientOriginalExtension();
           $path = $file->storeAs('check-out', $filename, 'public');
         }
 
-        $cepatPulang = $this->isCepatPulang($checkOut, $waktu_masuk, $waktu_pulang);
+        $cepatPulang = $this->isCepatPulang($checkOut, $shiftStart, $shiftEnd);
         if ($cepatPulang) {
           $keterangan = 'cepat pulang';
         }
 
-        // Update record absen
         $cekAbsen->update([
           'check_out' => $checkOut,
           'pict_out' => $path,
@@ -98,41 +117,44 @@ class AbsenController extends Controller
           'keterangan' => $keterangan
         ]);
 
-        Log::channel('shift')->info('Absen Check Out:', $cekAbsen->toArray()); // Untuk melihat semua atribut
+        Log::channel('shift')->info('Absen Check Out:', $cekAbsen->toArray());
 
         return response()->json([
           'success' => true,
           'message' => 'Check-out berhasil disimpan.',
           'data' => $cekAbsen
         ]);
+      }
 
-      } else {
-        // Jika Tidak ada data, maka akan buat record baru untuk absen Check In
-        // Simpan gambar untuk check-in
+      // ======================================================
+      // CHECK IN
+      // ======================================================
+      else {
         $path = null;
+
         if ($request->hasFile('foto_absensi')) {
           $file = $request->file('foto_absensi');
           $filename = 'checkin_' . $noPegawai . '_' . time() . '.' . $file->getClientOriginalExtension();
           $path = $file->storeAs('check-in', $filename, 'public');
         }
 
-        $telat = $this->isTerlambat($checkIn, $waktu_masuk, $waktu_pulang);
+        $telat = $this->isTerlambat($checkIn, $shiftStart, $shiftEnd);
         if ($telat) {
           $keterangan = 'telat';
         }
 
-        // Buat record baru
         $absen = Absen::create([
           'no_pegawai' => $noPegawai,
           'check_in' => $checkIn,
           'pict_in' => $path,
           'shift' => $shift,
-          'shift_masuk' => $waktu_masuk,
-          'shift_pulang' => $waktu_pulang,
+          'shift_masuk' => $shiftStart,  // Sudah pakai tanggal lengkap
+          'shift_pulang' => $shiftEnd,   // Sudah pakai tanggal lengkap
           'status' => 'check in',
           'keterangan' => $keterangan
         ]);
-        Log::channel('shift')->info('Absen Check In:', $absen->toArray()); // Untuk melihat semua atribut
+
+        Log::channel('shift')->info('Absen Check In:', $absen->toArray());
 
         return response()->json([
           'success' => true,
@@ -142,12 +164,12 @@ class AbsenController extends Controller
       }
 
     } catch (\Exception $e) {
-      // Tangkap semua exception dan return JSON error
       return response()->json([
         'success' => false,
         'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
       ], 500);
     }
+
   }
 
 
@@ -196,48 +218,43 @@ class AbsenController extends Controller
     return Excel::download(new AttendanceExport($request), $filename);
   }
 
-  private function isTerlambat($checkIn, $waktuMasuk, $waktuPulang)
+  private function isTerlambat($checkIn, $shiftStart, $shiftEnd)
   {
-    $checkIn = Carbon::parse($checkIn);
-    $tanggal = $checkIn->copy()->startOfDay();
+    try {
+      $checkIn = Carbon::parse($checkIn);
+      $shiftStart = Carbon::parse($shiftStart);
+      $shiftEnd = Carbon::parse($shiftEnd);
 
-    $masuk = $tanggal->copy()->setTimeFromTimeString($waktuMasuk);
-    $pulang = $tanggal->copy()->setTimeFromTimeString($waktuPulang);
+      Log::channel('shift')->info('isTerlambat() - CheckIn: ' . $checkIn);
+      Log::channel('shift')->info('isTerlambat() - ShiftStart: ' . $shiftStart);
+      Log::channel('shift')->info('isTerlambat() - ShiftEnd: ' . $shiftEnd);
 
-    // Jika waktu pulang lebih kecil dari masuk → shift lintas hari
-    if ($pulang->lt($masuk)) {
-      $pulang->addDay(); // pulang besok
+      // Jika check-in lewat dari waktu shift masuk → telat
+      return $checkIn->gt($shiftStart);
+    } catch (\Exception $e) {
+      Log::channel('shift')->error('Error di isTerlambat(): ' . $e->getMessage());
+      return false;
     }
-
-    // Jika shift malam (lintas hari) dan checkin sebelum jam masuk (misal 00:30 tapi shift 22:00-05:00)
-    if ($checkIn->lt($masuk) && $checkIn->isSameDay($pulang)) {
-      // artinya dia absen di hari berikutnya tapi shift sudah mulai
-      $masuk->subDay(); // ubah jam masuk ke hari sebelumnya
-    }
-
-    // Bandingkan
-    return $checkIn->gt($masuk); // true = telat, false = tepat waktu
   }
 
-  private function isCepatPulang($checkOut, $waktuMasuk, $waktuPulang)
+
+  private function isCepatPulang($checkOut, $shiftStart, $shiftEnd)
   {
-    $checkOut = Carbon::parse($checkOut);
-    $tanggal = $checkOut->copy()->startOfDay();
+    try {
+      $checkOut = Carbon::parse($checkOut);
+      $shiftStart = Carbon::parse($shiftStart);
+      $shiftEnd = Carbon::parse($shiftEnd);
 
-    $masuk = $tanggal->copy()->setTimeFromTimeString($waktuMasuk);
-    $pulang = $tanggal->copy()->setTimeFromTimeString($waktuPulang);
+      Log::channel('shift')->info('isCepatPulang() - CheckOut: ' . $checkOut);
+      Log::channel('shift')->info('isCepatPulang() - ShiftStart: ' . $shiftStart);
+      Log::channel('shift')->info('isCepatPulang() - ShiftEnd: ' . $shiftEnd);
 
-    // 🔹 Jika shift lintas hari (contoh 20:00 - 02:00)
-    if ($pulang->lt($masuk)) {
-      $pulang->addDay();
+      // Jika check-out lebih awal dari jam pulang → cepat pulang
+      return $checkOut->lt($shiftEnd);
+    } catch (\Exception $e) {
+      Log::channel('shift')->error('Error di isCepatPulang(): ' . $e->getMessage());
+      return false;
     }
-
-    // 🔹 Jika checkout sebelum jam masuk tapi masih di hari pulang (lintas hari)
-    if ($checkOut->lt($masuk) && $checkOut->isSameDay($pulang)) {
-      $checkOut->addDay();
-    }
-
-    // 🔹 Cek apakah checkout lebih awal dari waktu pulang
-    return $checkOut->lt($pulang);
   }
+
 }
