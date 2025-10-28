@@ -171,7 +171,7 @@ class Analytics extends Controller
               // Bandingkan dengan Carbon
               $isGreater = $waktuMasukCarbon->greaterThan($nowCarbon);
 
-              Log::channel('shift')->info('Waktu Masuk Shift : ' . $shift->shift .' - '.$waktuMasukCarbon . ' NOW : ' . $nowCarbon . ' > : ' . ($isGreater ? 'true' : 'false'));
+              Log::channel('shift')->info('Waktu Masuk Shift : ' . $shift->shift . ' - ' . $waktuMasukCarbon . ' NOW : ' . $nowCarbon . ' > : ' . ($isGreater ? 'true' : 'false'));
 
               return $isGreater;
             });

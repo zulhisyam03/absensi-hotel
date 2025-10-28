@@ -57,7 +57,8 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyl
       'NAMA PEGAWAI',
       'DEPARTEMEN',
       'SHIFT',
-      'WAKTU SHIFT',
+      'SHIFT MASUK',
+      'SHIFT PULANG',
       'CHECK IN',
       'CHECK OUT', // Sesuaikan dengan kolom yang ada di tabel Anda
       'KETERANGAN', // Sesuaikan dengan kolom yang ada di tabel Anda
@@ -77,7 +78,8 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyl
       strtoupper($attendance->nama_pegawai),
       strtoupper($attendance->departemen),
       strtoupper($attendance->shift),
-      $attendance->waktu_shift,
+      $attendance->shift_masuk,
+      $attendance->shift_pulang,
       $attendance->check_in,
       $attendance->check_out,
       strtoupper($keterangan),
@@ -90,7 +92,7 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyl
     $styles = [];
     $rows = $sheet->getHighestRow();
     for ($row = 2; $row <= $rows; $row++) {
-      $keterangan = $sheet->getCell('H' . $row)->getValue();
+      $keterangan = $sheet->getCell('I' . $row)->getValue();
       if (!empty($keterangan)) {
         $styles[$row] = [
           'fill' => [

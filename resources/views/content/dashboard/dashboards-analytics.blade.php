@@ -77,7 +77,8 @@
                                     <th>Nama Pegawai</th>
                                     <th>Departemen</th>
                                     <th>Shift</th>
-                                    <th>Waktu Shift</th>
+                                    <th>Shift Masuk</th>
+                                    <th>Shift Pulang</th>
                                     <th>Check In</th>
                                     <th>Check Out</th>
                                     <th>Status</th>
@@ -674,8 +675,12 @@
                         name: 'shift'
                     },
                     {
-                        data: 'waktu_shift',
-                        name: 'waktu_shift'
+                        data: 'shift_masuk',
+                        name: 'shift_masuk'
+                    },
+                    {
+                        data: 'shift_pulang',
+                        name: 'shift_pulang'
                     },
                     {
                         data: 'check_in',
