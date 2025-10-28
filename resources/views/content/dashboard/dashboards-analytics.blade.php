@@ -558,6 +558,15 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+                        // 🔸 Pause kamera sementara (preview mode)
+                        video.pause(); // Hentikan tampilan video agar terlihat “pause”
+                        const stream = video.srcObject;
+                        if (stream) {
+                            const tracks = stream.getTracks();
+                            tracks.forEach(track => track.enabled =
+                                false); // Nonaktifkan kamera sementara
+                        }
+
                         // 2️⃣ Konversi ke blob (file)
                         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                         if (!blob) {
