@@ -18,8 +18,8 @@ return new class extends Migration {
       $table->string('shift');
       $table->timestamp('check_in')->nullable();
       $table->timestamp('check_out')->nullable();
-      $table->time('shift_masuk')->nullable();
-      $table->time('shift_pulang')->nullable();
+      $table->dateTime('shift_masuk')->nullable();
+      $table->dateTime('shift_pulang')->nullable();
       $table->string('status')->nullable();
       $table->string('pict')->nullable();
       $table->string('keterangan')->nullable();
