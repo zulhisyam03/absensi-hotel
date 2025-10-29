@@ -51,19 +51,23 @@ class AbsenController extends Controller
 
       // ✅ Tentukan tanggal lengkap untuk shift lintas hari
       $tanggalShift = $checkIn->copy()->startOfDay();
-
-      // Jika shift pulang lebih kecil dari masuk, berarti lintas hari
+      // Jika shift pulang lebih kecil dari masuk, berarti lintas hari (tetap seperti asli, tapi opsional jika ingin digabungkan)
       if (Carbon::parse($waktu_masuk)->gt(Carbon::parse($waktu_pulang))) {
         if ($checkIn->format('H:i:s') < $waktu_pulang) {
           // Check-in lewat tengah malam, berarti shift dimulai kemarin
           $tanggalShift->subDay();
         }
       }
-
+      // Kondisi baru: Jika shift_masuk <= 03:00 dan check_in antara 21:00 - 23:59:59, addDay
+      $checkInTime = $checkIn->format('H:i:s');
+      if ($waktu_masuk <= '03:00:00' && $checkInTime >= '21:00:00' && $checkInTime <= '23:59:59') {
+        $tanggalShift->addDay();
+      }
       // Bentuk waktu shift lengkap
       $shiftStart = $tanggalShift->copy()->setTimeFromTimeString($waktu_masuk);
       $shiftEnd = $shiftStart->copy();
-      if ($waktu_masuk > $waktu_pulang) {
+      // Perbaikan: Tambahkan kondisi untuk shift yang dimulai pukul 00:00 atau lintas hari (seperti sebelumnya, jika masih diperlukan)
+      if (Carbon::parse($waktu_masuk)->gt(Carbon::parse($waktu_pulang)) || $waktu_masuk == '00:00:00') {
         $shiftEnd->addDay()->setTimeFromTimeString($waktu_pulang);
       } else {
         $shiftEnd->setTimeFromTimeString($waktu_pulang);
