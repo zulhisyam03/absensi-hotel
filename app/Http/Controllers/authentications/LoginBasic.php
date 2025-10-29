@@ -21,8 +21,10 @@ class LoginBasic extends Controller
   public function login(Request $request)
   {
     $credentials = $request->only('email', 'password');
+    $remember = $request->has('remember'); // true jika dicentang
 
-    if (Auth::attempt($credentials)) {
+
+    if (Auth::attempt($credentials, $remember)) {
       // Authentication passed...
       return redirect()->intended('/dashboard');
     }
