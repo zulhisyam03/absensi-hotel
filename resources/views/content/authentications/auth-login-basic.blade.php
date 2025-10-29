@@ -37,8 +37,7 @@
                         @endif
 
                         {{-- Form Login --}}
-                        <form id="formAuthentication" class="mb-6" action="{{ route(name: 'auth-login') }}"
-                            method="POST">
+                        <form id="formAuthentication" class="mb-6" action="{{ route('auth-login') }}" method="POST">
                             @csrf
                             <div class="mb-6">
                                 <label for="email" class="form-label">Email or Username</label>
@@ -57,7 +56,7 @@
                             <div class="mb-8">
                                 <div class="d-flex justify-content-between mt-8">
                                     <div class="form-check mb-0 ms-2">
-                                        <input class="form-check-input" type="checkbox" id="remember-me">
+                                        <input class="form-check-input" type="checkbox" id="remember-me" name="remember">
                                         <label class="form-check-label" for="remember-me">
                                             Remember Me
                                         </label>
