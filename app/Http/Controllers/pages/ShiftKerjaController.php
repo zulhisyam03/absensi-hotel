@@ -273,6 +273,9 @@ class ShiftKerjaController extends Controller
 
     $validated = $validator->validated();
 
+    if ($validated['waktu_masuk'] == '00:00' || $validated['waktu_pulang']) {
+      return redirect()->back()->withInput()->with('error', 'Waktu Masuk atau Waktu Pulang tidak bisa 00:00 , silahkan gunakan 23:59.');
+    }
     try {
       // Ambil data param shift
       $param = Param::where('value', 'shift')->firstOrFail();
