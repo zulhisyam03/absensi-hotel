@@ -116,9 +116,9 @@ class DataTableController extends Controller
           // Jika keduanya ada, bandingkan waktu saja (abaikan tanggal)
           if ($checkIn && $shiftMasuk) {
             // Ekstrak waktu dari check_in dan bandingkan
-            $checkInTime = $checkIn->format('H:i:s');
-            $shiftMasukTime = $shiftMasuk->format('H:i:s');
-            return $checkInTime > $shiftMasukTime ? true : false;
+            // $checkInTime = $checkIn->format('H:i:s');
+            // $shiftMasukTime = $shiftMasuk->format('H:i:s');
+            return $checkIn > $shiftMasuk ? true : false;
           }
           return false; // Jika salah satu null, tidak kuning
         })
