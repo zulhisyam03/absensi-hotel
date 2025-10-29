@@ -29,7 +29,7 @@ class CekShiftCommand extends Command
         $shiftPulang = Carbon::parse($absen->shift_pulang);
 
         // Hitung batas waktu (shift_pulang + 5 jam)
-        $batasWaktu = $shiftPulang->copy()->addHours(1);
+        $batasWaktu = $shiftPulang->copy()->addHours(5);
 
         Log::channel('shift')->info("CekShift - ID: {$absen->id}, Pegawai: {$absen->no_pegawai}");
         Log::channel('shift')->info("Shift Pulang: {$shiftPulang}, Batas Waktu: {$batasWaktu}, Sekarang: {$now}");
