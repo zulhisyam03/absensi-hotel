@@ -229,7 +229,7 @@ class ShiftKerjaController extends Controller
     $validated = $validator->validated();
     $shiftLower = strtolower($validated['shift']);
 
-    if ($validated['waktu_masuk'] == '00:00' || $validated['waktu_pulang']) {
+    if ($validated['waktu_masuk'] == '00:00' || $validated['waktu_pulang'] == '00:00') {
       return redirect()->back()->withInput()->with('error', 'Waktu Masuk atau Waktu Pulang tidak bisa 00:00 , silahkan gunakan 23:59.');
     }
 
@@ -273,7 +273,7 @@ class ShiftKerjaController extends Controller
 
     $validated = $validator->validated();
 
-    if ($validated['waktu_masuk'] == '00:00' || $validated['waktu_pulang']) {
+    if ($validated['waktu_masuk'] == '00:00' || $validated['waktu_pulang'] == '00:00') {
       return redirect()->back()->withInput()->with('error', 'Waktu Masuk atau Waktu Pulang tidak bisa 00:00 , silahkan gunakan 23:59.');
     }
     try {
