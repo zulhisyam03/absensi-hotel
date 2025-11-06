@@ -136,14 +136,24 @@
                                 <span id ='nik'></span>
                             </div>
                             <div class="mb-4">
+                                <label for="no-kk" class="form-label fs-6 col-md-4">NO. KK</label>
+                                <span class="col-md-1">:</span>
+                                <span id ='no-kk'></span>
+                            </div>
+                            <div class="mb-4">
                                 <label for="npwp" class="form-label fs-6 col-md-4">NPWP</label>
                                 <span class="col-md-1">:</span>
                                 <span id="npwp"></span>
                             </div>
                             <div class="mb-4">
-                                <label for="bpjs" class="form-label fs-6 col-md-4">BPJS</label>
+                                <label for="bpjs" class="form-label fs-6 col-md-4">BPJS KESEHATAN</label>
                                 <span class="col-md-1">:</span>
                                 <span id="bpjs"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label for="bpjs-tk" class="form-label fs-6 col-md-4">BPJS TENAGA KERJA</label>
+                                <span class="col-md-1">:</span>
+                                <span id="bpjs-tk"></span>
                             </div>
                             <div class="mb-4">
                                 <label for="no-pegawai" class="form-label fs-6 col-md-4">NOMOR PEGAWAI</label>
@@ -196,7 +206,7 @@
                                 <span id="jabatan"></span>
                             </div>
                             <div class="mb-4">
-                                <label for="departemen" class="form-label fs-6 col-md-4">DEPARTEMEN</label>
+                                <label for="departemen" class="form-label fs-6 col-md-4">DEPARTMENT</label>
                                 <span class="col-md-1">:</span>
                                 <span id="departemen"></span>
                             </div>
@@ -206,7 +216,7 @@
                                 <span id="status-pegawai"></span>
                             </div>
                             <div class="mb-4">
-                                <label for="last-salary" class="form-label fs-6 col-md-4">LAST SALARY</label>
+                                <label for="last-salary" class="form-label fs-6 col-md-4">BASIC SALARY</label>
                                 <span class="col-md-1">:</span>
                                 <span id="last-salary"></span>
                             </div>
@@ -439,8 +449,10 @@
                         $('#foto-pegawai').attr('src', data.foto);
                         $('#nama-pegawai').text(data.nama_pegawai);
                         $('#nik').text(data.nik);
+                        $('#no-kk').text(data.no_kk);
                         $('#npwp').text(data.npwp);
                         $('#bpjs').text(data.bpjs);
+                        $('#bpjs-tk').text(data.bpjs_tk);
                         $('#no-pegawai').text(data.no_pegawai);
                         $('#email').text(data.email);
                         $('#no-handphone').text(data.no_hp);

@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PegawaiController extends Controller
 {
@@ -56,8 +57,10 @@ class PegawaiController extends Controller
       'status_pegawai' => 'required|string|max:20',
       'emergency_number' => 'required|string|max:14',
       'nik' => 'required|string|max:20',
-      'npwp' => 'required|string|max:20',
-      'bpjs' => 'required|string|max:20',
+      'no_kk' => 'required|string|max:20',
+      'npwp' => 'string|max:20',
+      'bpjs' => 'string|max:20',
+      'bpjs_tk' => 'string|max:20',
       'last_salary' => 'required|integer|between:1,9999999999'
     ]);
     try {
@@ -79,8 +82,10 @@ class PegawaiController extends Controller
       $pegawai->status_pegawai = $validated['status_pegawai'];
       $pegawai->emergency_number = $validated['emergency_number'];
       $pegawai->nik = $validated['nik'];
+      $pegawai->no_kk = $validated['no_kk'];
       $pegawai->npwp = $validated['npwp'];
       $pegawai->bpjs = $validated['bpjs'];
+      $pegawai->bpjs_tk = $validated['bpjs_tk'];
       $pegawai->last_salary = $validated['last_salary'];
       $pegawai->save();
 
@@ -161,8 +166,10 @@ class PegawaiController extends Controller
       'status_pegawai' => 'required|string|max:20',
       'emergency_number' => 'required|string|max:14',
       'nik' => 'required|string|max:20',
-      'npwp' => 'required|string|max:20',
-      'bpjs' => 'required|string|max:20',
+      'no_kk' => 'required|string|max:20',
+      'npwp' => 'string|max:20',
+      'bpjs' => 'string|max:20',
+      'bpjs_tk' => 'string|max:20',
       'last_salary' => 'required|integer|between:1,9999999999'
     ]);
     if ($validator->fails()) {
@@ -191,8 +198,10 @@ class PegawaiController extends Controller
       $pegawai->status_pegawai = $validated['status_pegawai'];
       $pegawai->emergency_number = $validated['emergency_number'];
       $pegawai->nik = $validated['nik'];
+      $pegawai->no_kk = $validated['no_kk'];
       $pegawai->npwp = $validated['npwp'];
       $pegawai->bpjs = $validated['bpjs'];
+      $pegawai->bpjs_tk = $validated['bpjs_tk'];
       $pegawai->last_salary = $validated['last_salary'];
       // Simpan perubahan
       $pegawai->save();
@@ -220,6 +229,17 @@ class PegawaiController extends Controller
 
       // Cari pegawai, throws ModelNotFoundException jika tidak ada
       $pegawai = Pegawai::findOrFail($id);
+
+      // Hapus foto lama jika ada
+      if ($pegawai->foto && Storage::disk('public')->exists('foto_pegawai/' . $pegawai->foto)) {
+        try {
+          Storage::disk('public')->delete('foto_pegawai/' . $pegawai->foto);
+        } catch (\Exception $e) {
+          // Opsional: Log error jika penghapusan file gagal, tapi jangan rollback transaksi
+          // Misalnya: \Log::error('Gagal menghapus foto pegawai: ' . $e->getMessage());
+          // Lanjutkan penghapusan data meskipun file gagal dihapus
+        }
+      }
 
       // Hapus pegawai
       $pegawai->delete();
