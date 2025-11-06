@@ -64,6 +64,18 @@
                                     @enderror
                                 </div>
                                 <div class="mb-4">
+                                    <label for="no-kk" class="form-label fs-5">NO. KK</label>
+                                    <input type="text" class="form-control" id="no-kk"
+                                        placeholder="NO Kartu Keluarga"
+                                        value="{{ old('no_kk', isset($data) ? $data->no_kk : '') }}" name="no_kk"
+                                        autocomplete="off" />
+                                    @error('no_kk')
+                                        <div class="text-danger mt-2">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-4">
                                     <label for="npwp" class="form-label fs-5">NPWP</label>
                                     <input type="text" class="form-control" id="npwp" placeholder="NPWP"
                                         value="{{ old('npwp', isset($data) ? $data->npwp : '') }}" name="npwp"
@@ -75,11 +87,23 @@
                                     @enderror
                                 </div>
                                 <div class="mb-4">
-                                    <label for="bpjs" class="form-label fs-5">BPJS</label>
+                                    <label for="bpjs" class="form-label fs-5">BPJS Kesehatan</label>
                                     <input type="text" class="form-control" id="bpjs" placeholder="BPJS"
                                         value="{{ old('bpjs', isset($data) ? $data->bpjs : '') }}" name="bpjs"
                                         autocomplete="off" />
                                     @error('bpjs')
+                                        <div class="text-danger mt-2">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-4">
+                                    <label for="bpjs-tk" class="form-label fs-5">BPJS Tenaga Kerja</label>
+                                    <input type="text" class="form-control" id="bpjs-tk"
+                                        placeholder="BPJS Tenaga Kerja"
+                                        value="{{ old('bpjs_tk', isset($data) ? $data->bpjs_tk : '') }}" name="bpjs_tk"
+                                        autocomplete="off" />
+                                    @error('bpjs_tk')
                                         <div class="text-danger mt-2">
                                             {{ $message }}
                                         </div>
@@ -110,7 +134,8 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="no-handphone" class="form-label fs-5">No. Handphone</label>
-                                    <input type="text" class="form-control" id="no-handphone" placeholder="0812xxxxxxxx"
+                                    <input type="text" class="form-control" id="no-handphone"
+                                        placeholder="0812xxxxxxxx"
                                         value="{{ old('no_handphone', isset($data) ? $data->no_hp : '') }}"
                                         name="no_handphone" autocomplete="off" />
                                     @error('no_handphone')
@@ -120,7 +145,7 @@
                                     @enderror
                                 </div>
                                 <div class="mb-4">
-                                    <label for="emergency-number" class="form-label fs-5">Emergency Numbe</label>
+                                    <label for="emergency-number" class="form-label fs-5">Emergency Number</label>
                                     <input type="text" class="form-control" id="emergency-number"
                                         placeholder="0812xxxxxxxx"
                                         value="{{ old('emergency_number', isset($data) ? $data->emergency_number : '') }}"
@@ -131,6 +156,11 @@
                                         </div>
                                     @enderror
                                 </div>
+                            </div>
+                            {{-- END LEF COLUMN --}}
+
+                            {{-- RIGHT COLUMN --}}
+                            <div class="col-md-6 ps-2">
                                 <div class="mb-4">
                                     <label for="tempat-lahir" class="form-label fs-5">Tempat Lahir</label>
                                     <input type="text" class="form-control" id="tempat-lahir"
@@ -143,11 +173,6 @@
                                         </div>
                                     @enderror
                                 </div>
-                            </div>
-                            {{-- END LEF COLUMN --}}
-
-                            {{-- RIGHT COLUMN --}}
-                            <div class="col-md-6 ps-2">
                                 <div class="mb-4">
                                     <label for="tanggal-lahir" class="form-label fs-5">Tanggal Lahir</label>
                                     <div class="col-md-12">
@@ -217,9 +242,9 @@
                                     @enderror
                                 </div>
                                 <div class="mb-4">
-                                    <label for="departemen" class="form-label fs-5">Departemen</label>
+                                    <label for="departemen" class="form-label fs-5">Department</label>
                                     <select id="departemen" class="form-select" name="departemen">
-                                        <option hidden value="">-- Departemen --</option>
+                                        <option hidden value="">-- Department --</option>
                                         <option @selected(old('departemen', $data->departemen ?? '') == 'A&G') value="A&G">
                                             A&G</option>
                                         <option @selected(old('departemen', $data->departemen ?? '') == 'ACCOUNTING') value="ACCOUNTING">
@@ -263,7 +288,7 @@
                                     @enderror
                                 </div>
                                 <div class="mb-4">
-                                    <label for="last-salary" class="form-label fs-5">Last Salary</label>
+                                    <label for="last-salary" class="form-label fs-5">Basic Salary</label>
                                     {{-- <input type="text" class="form-control" id="last-salary" placeholder="1.000.000"
                                         name="last_salary"
                                         value="{{ old('last_salary', isset($data) ? $data->last_salary : '') }}"
