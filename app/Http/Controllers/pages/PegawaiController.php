@@ -55,12 +55,12 @@ class PegawaiController extends Controller
       'jenis_kelamin' => 'required|string|max:10',
       'departemen' => 'required|string|max:50', // sesuai form name
       'status_pegawai' => 'required|string|max:20',
-      'emergency_number' => 'string|max:14',
-      'nik' => 'string|max:20',
-      'no_kk' => 'string|max:20',
-      'npwp' => 'string|max:20',
-      'bpjs' => 'string|max:20',
-      'bpjs_tk' => 'string|max:20',
+      'emergency_number' => 'nullable|string|max:14',
+      'nik' => 'nullable|string|max:20',
+      'no_kk' => 'nullable|string|max:20',
+      'npwp' => 'nullable|string|max:20',
+      'bpjs' => 'nullable|string|max:20',
+      'bpjs_tk' => 'nullable|string|max:20',
       'last_salary' => 'required|integer|between:1,9999999999'
     ]);
     try {
@@ -164,12 +164,12 @@ class PegawaiController extends Controller
       'jenis_kelamin' => 'required|string|max:10',
       'departemen' => 'required|string|max:50', // sesuai form name
       'status_pegawai' => 'required|string|max:20',
-      'emergency_number' => 'string|max:14',
-      'nik' => 'string|max:20',
-      'no_kk' => 'string|max:20',
-      'npwp' => 'string|max:20',
-      'bpjs' => 'string|max:20',
-      'bpjs_tk' => 'string|max:20',
+      'emergency_number' => 'nullable|string|max:14',
+      'nik' => 'nullable|string|max:20',
+      'no_kk' => 'nullable|string|max:20',
+      'npwp' => 'nullable|string|max:20',
+      'bpjs' => 'nullable|string|max:20',
+      'bpjs_tk' => 'nullable|string|max:20',
       'last_salary' => 'required|integer|between:1,9999999999'
     ]);
     if ($validator->fails()) {
