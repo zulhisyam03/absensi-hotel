@@ -44,4 +44,10 @@ class User extends Authenticatable
       'password' => 'hashed',
     ];
   }
+
+  public function pegawai()
+  {
+    return $this->belongsTo(Pegawai::class, 'email', 'email');
+    // Syntaks: belongsTo(Model, foreign_key_di_ShiftKerja, owner_key_di_Pegawai)
+  }
 }

@@ -4,11 +4,7 @@
       "url": "/",
       "name": "Dashboards",
       "icon": "menu-icon tf-icons bx bx-home-smile",
-      "slug": "dashboard",
-      "badge": [
-        "danger",
-        "5"
-      ]
+      "slug": "dashboard-analytics"
     },
     {
       "menuHeader": "Apps & Pages"
@@ -16,11 +12,15 @@
     {
       "url": "pages/daftar-pegawai",
       "name": "Daftar Pegawai",
-      "icon": "menu-icon tf-icons bx bx-list-ul",
-      "slug": "daftar-pegawai",
+      "icon": "menu-icon tf-icons bx bxs-user-account",
+      "slug": [
+        "pages-pegawai",
+        "pegawai.create",
+        "pegawai.edit"
+      ],
       "visibleTo": [
         "hr",
-        "admin"
+        "supervisor"
       ]
     },
     {
@@ -28,27 +28,32 @@
       "name": "Training",
       "icon": "menu-icon tf-icons bx bx-list-ul",
       "slug": "training-pegawai",
+      "hidden": true,
       "visibleTo": [
         "hr",
         "admin"
       ]
     },
     {
-      "url": "pages/jadwal-shift",
+      "url": "pages/shift-kerja",
       "name": "Shift Kerja",
       "icon": "menu-icon tf-icons bx bx-timer",
-      "slug": "shift-kerja",
+      "slug": [
+        "pages-shift-kerja",
+        "pages-shit-kerja.create"
+      ],
       "visibleTo": [
         "staff",
         "hr",
-        "admin"
+        "supervisor"
       ]
     },
     {
       "url": "pages/payroll",
       "name": "Payroll",
       "icon": "menu-icon tf-icons bx bx-dollar-circle",
-      "slug": "payroll",
+      "slug": "pages-payroll",
+      "hidden": true,
       "visibleTo": [
         "hr",
         "admin"
@@ -77,146 +82,23 @@
     {
       "name": "Manajemen",
       "icon": "menu-icon tf-icons bx bx-cog",
-      "slug": "ui",
+      "slug": "config",
       "hidden": false,
+      "visibleTo": [
+        "hr"
+      ],
       "submenu": [
         {
-          "url": "ui/accordion",
-          "name": "Accordion",
-          "slug": "ui-accordion"
+          "url": "config/lokasi",
+          "name": "Lokasi",
+          "slug": "config-lokasi"
         },
         {
-          "url": "ui/alerts",
-          "name": "Alerts",
-          "slug": "ui-alerts"
-        },
-        {
-          "url": "ui/badges",
-          "name": "Badges",
-          "slug": "ui-badges"
-        },
-        {
-          "url": "ui/buttons",
-          "name": "Buttons",
-          "slug": "ui-buttons"
-        },
-        {
-          "url": "ui/carousel",
-          "name": "Carousel",
-          "slug": "ui-carousel"
-        },
-        {
-          "url": "ui/collapse",
-          "name": "Collapse",
-          "slug": "ui-collapse"
-        },
-        {
-          "url": "ui/dropdowns",
-          "name": "Dropdowns",
-          "slug": "ui-dropdowns"
-        },
-        {
-          "url": "ui/footer",
-          "name": "Footer",
-          "slug": "ui-footer"
-        },
-        {
-          "url": "ui/list-groups",
-          "name": "List Groups",
-          "slug": "ui-list-groups"
-        },
-        {
-          "url": "ui/modals",
-          "name": "Modals",
-          "slug": "ui-modals"
-        },
-        {
-          "url": "ui/navbar",
-          "name": "Navbar",
-          "slug": "ui-navbar"
-        },
-        {
-          "url": "ui/offcanvas",
-          "name": "Offcanvas",
-          "slug": "ui-offcanvas"
-        },
-        {
-          "url": "ui/pagination-breadcrumbs",
-          "name": "Pagination & Breadcrumbs",
-          "slug": "ui-pagination-breadcrumbs"
-        },
-        {
-          "url": "ui/progress",
-          "name": "Progress",
-          "slug": "ui-progress"
-        },
-        {
-          "url": "ui/spinners",
-          "name": "Spinners",
-          "slug": "ui-spinners"
-        },
-        {
-          "url": "ui/tabs-pills",
-          "name": "Tabs & Pills",
-          "slug": "ui-tabs-pills"
-        },
-        {
-          "url": "ui/toasts",
-          "name": "Toasts",
-          "slug": "ui-toasts"
-        },
-        {
-          "url": "ui/tooltips-popovers",
-          "name": "Tooltips & Popovers",
-          "slug": "ui-tooltips-popovers"
-        },
-        {
-          "url": "ui/typography",
-          "name": "Typography",
-          "slug": "ui-typography"
+          "url": "config/shift-kerja",
+          "name": "Shift",
+          "slug": "config-shift-kerja"
         }
       ]
-    },
-    {
-      "name": "Form Elements",
-      "icon": "menu-icon tf-icons bx bx-detail",
-      "slug": "forms",
-      "hidden": true,
-      "submenu": [
-        {
-          "url": "forms/basic-inputs",
-          "name": "Basic Inputs",
-          "slug": "forms-basic-inputs"
-        },
-        {
-          "url": "forms/input-groups",
-          "name": "Input groups",
-          "slug": "forms-input-groups"
-        }
-      ]
-    },
-    {
-      "name": "Form Layouts",
-      "icon": "menu-icon tf-icons bx bx-detail",
-      "slug": "form-layouts",
-      "submenu": [
-        {
-          "url": "form/layouts-vertical",
-          "name": "Vertical Form",
-          "slug": "form-layouts-vertical"
-        },
-        {
-          "url": "form/layouts-horizontal",
-          "name": "Horizontal Form",
-          "slug": "form-layouts-horizontal"
-        }
-      ]
-    },
-    {
-      "url": "tables/basic",
-      "icon": "menu-icon tf-icons bx bx-table",
-      "name": "Tables",
-      "slug": "tables-basic"
     }
   ]
 }

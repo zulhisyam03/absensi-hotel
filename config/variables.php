@@ -3,7 +3,7 @@
 return [
   "creatorName" => "Zul Hisyam",
   "creatorUrl" => "https://www.linkedin.com/in/zul-hisyam-2783b4222/",
-  "templateName" => "Swiss-Belexpress",
+  "templateName" => "Swiss-Belexpress Palu",
   "templateSuffix" => "Bootstrap Dashboard FREE",
   "templateVersion" => "2.0.0",
   "templateFree" => true,
