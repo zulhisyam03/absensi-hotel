@@ -35,7 +35,7 @@ class DataTableController extends Controller
         ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
 
       // 🔥 Logika Filter Berdasarkan Jabatan dan Departemen
-      if ((strtolower($role) != 'hr') || strtolower($role) != 'hotel manager') {
+      if ((strtolower($role) != 'hr') && strtolower($role) != 'hotel manager') {
         if ((strtolower($role) == 'supervisor') || (strtolower($role) == 'dept head b')) {
           // Jika Supervisor → tampilkan semua dalam departemen yang sama
           $absensi->where('pegawais.departemen', $departemen);
@@ -162,7 +162,7 @@ class DataTableController extends Controller
         ->with('pegawai'); // Pertahankan Eager Loading untuk kolom data
 
       // 🔥 Logika Filter Berdasarkan Jabatan dan Departemen
-      if ((strtolower($role) != 'hr') || (strtolower($role) != 'hotel manager')) {
+      if ((strtolower($role) != 'hr') && (strtolower($role) != 'hotel manager')) {
         if ((strtolower($role) == 'supervisor') || (strtolower($role) == 'dept head b')) {
           // Jika Supervisor → tampilkan semua dalam departemen yang sama
           $shiftKerja->where('pegawais.departemen', $departemen);
@@ -190,7 +190,7 @@ class DataTableController extends Controller
           $editBtn = '<a href="/pages/shift-kerja/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
 
-          if (strtolower($role) == 'hr' || strtolower($role) == 'supervisor') {
+          if (strtolower($role) == 'hr' || strtolower($role) == 'supervisor' || strtolower($role) == 'hotel manager' || strtolower($role) == 'dept head b') {
             return $editBtn . ' ' . $deleteBtn;
           }
         })
@@ -225,7 +225,7 @@ class DataTableController extends Controller
         ->orderBy('nama_pegawai', 'ASC');
 
       // 🔥 Logika Filter Berdasarkan Jabatan dan Departemen
-      if ((strtolower($role) != 'hr') || (strtolower($role) != 'hotel manager')) {
+      if ((strtolower($role) != 'hr') && (strtolower($role) != 'hotel manager')) {
         if ((strtolower($role) == 'supervisor') || (strtolower($role) == 'dept head b')) {
           // Jika Supervisor → tampilkan semua dalam departemen yang sama
           $pegawai->where('pegawais.departemen', $departemen);
@@ -248,7 +248,7 @@ class DataTableController extends Controller
         ->addColumn('action', function ($row) use ($role) {
           $editBtn = '<a href="/pages/pegawai/' . $row->id . '/edit" class="btn btn-sm btn-primary">Edit</a>';
           $deleteBtn = '<button class="btn btn-sm btn-danger delete-btn" data-id="' . $row->id . '">Delete</button>';
-          if (strtolower($role) == 'hr') {
+          if (strtolower($role) == 'hr' || strtolower($role) == 'hotel manager') {
             return $editBtn . ' ' . $deleteBtn;
           }
         })
