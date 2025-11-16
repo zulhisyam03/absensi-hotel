@@ -22,7 +22,8 @@ class Pegawai extends Model
     'alamat',
     'tanggal_join',
     'status_karyawan',
-    'foto', // 🔹 Tambahkan ini
+    'foto',
+    'foto_version', // 🔹 Tambahkan ini
   ];
 
   public function absens()
