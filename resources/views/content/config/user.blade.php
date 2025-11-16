@@ -87,6 +87,19 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            // Fungsi helper untuk format ke Rupiah
+            function formatRupiah(angka) {
+                if (!angka) return '-';
+                return 'Rp. ' + parseInt(angka)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+            
+            const input = document.getElementById('last_salary');
+            const nilaiAwal = input.value;
+            input.value = formatRupiah(nilaiAwal);
+
             // Ambil elemen-elemen yang diperlukan
             const form = document.getElementById('formUser');
             const btnGantiPassword = document.getElementById('btnGantiPassword');
