@@ -25,7 +25,9 @@
                                     <div class="mb-3 text-center">
                                         <div class="d-flex justify-content-center">
                                             <img id="preview-image"
-                                                src="{{ Auth::user()->pegawai->foto ? '/storage/foto_pegawai/' . Auth::user()->pegawai->foto : '/assets/img/avatars/user.png' }}"
+                                                src="{{ Auth::user()->pegawai->foto
+                                                    ? '/storage/foto_pegawai/' . Auth::user()->pegawai->foto . '?v=' . Auth::user()->pegawai->foto_version
+                                                    : '/assets/img/avatars/user.png' }}"
                                                 alt="Preview Foto" class="img-thumbnail rounded"
                                                 style="width: 200px; height: 200px; object-fit: cover;">
                                         </div>
@@ -95,7 +97,7 @@
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             }
-            
+
             const input = document.getElementById('last_salary');
             const nilaiAwal = input.value;
             input.value = formatRupiah(nilaiAwal);
