@@ -49,7 +49,7 @@
                             </div>
                         @endif
 
-                        @if (strtolower(Auth::user()->pegawai->jabatan) == 'hr')
+                        @if ((strtolower(Auth::user()->pegawai->jabatan) == 'hr') || (strtolower(Auth::user()->pegawai->jabatan) == 'hotel manager'))
                             {{-- Button Export Excel --}}
                             <div class="card-body px-4">
                                 <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
@@ -62,6 +62,7 @@
                                             <option value="">Semua Departemen</option>
                                             <option value="A&G">A&G</option>
                                             <option value="ACCOUNTING">ACCOUNTING</option>
+                                            <option value="ENGINEERING">ENGINEERING</option>
                                             <option value="FB PRODUCT">FB PRODUCT</option>
                                             <option value="FB SERVICE">FB SERVICE</option>
                                             <option value="FRONT OFFICE">FRONT OFFICE</option>
@@ -215,7 +216,7 @@
                                 <span class="col-md-1">:</span>
                                 <span id="status-pegawai"></span>
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-4 {{ in_array(strtolower(Auth::user()->pegawai->jabatan), ['hr', 'hotel manager']) ? '' : 'd-none' }}">
                                 <label for="last-salary" class="form-label fs-6 col-md-4">BASIC SALARY</label>
                                 <span class="col-md-1">:</span>
                                 <span id="last-salary"></span>

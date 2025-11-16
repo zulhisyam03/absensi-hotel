@@ -51,6 +51,11 @@
                                     <input class="form-control bg-secondary bg-opacity-25" type="text" id="email"
                                         name="email" value="{{ Auth::user()->pegawai->email }}" readonly />
                                 </div>
+                                <div class="mb-4">
+                                    <label for="last_salary" class="form-label fs-5">Gaji</label>
+                                    <input class="form-control bg-secondary bg-opacity-25" type="text" id="last_salary"
+                                        name="last_salary" value="{{ Auth::user()->pegawai->last_salary }}" readonly />
+                                </div>
 
                                 <hr class="my-6">
 
