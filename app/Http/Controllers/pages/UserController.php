@@ -84,39 +84,44 @@ class UserController extends Controller
 
   public function updateFoto(Request $request)
   {
-    $request->validate([
-      'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+      $request->validate([
+          'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+      ]);
 
-    $user = Auth::user();
-    $pegawai = $user->pegawai;
+      $user = Auth::user();
+      $pegawai = $user->pegawai;
 
-    if (!$pegawai) {
+      if (!$pegawai) {
+          return response()->json([
+              'success' => false,
+              'message' => 'Data pegawai tidak ditemukan.'
+          ], 404);
+      }
+
+      $namaFile = str_replace(' ', '_', strtolower($pegawai->nama_pegawai)) . '_' . $pegawai->no_pegawai . '.jpg';
+
+      // Hapus foto lama jika ada
+      if ($pegawai->foto && Storage::disk('public')->exists('foto_pegawai/' . $pegawai->foto)) {
+          Storage::disk('public')->delete('foto_pegawai/' . $pegawai->foto);
+      }
+
+      // Simpan file baru
+      $request->file('foto')->storeAs('foto_pegawai', $namaFile, 'public');
+
+      // Update kolom foto dan versi (gunakan timestamp untuk versi)
+      $pegawai->update([
+          'foto' => $namaFile,
+          'foto_version' => now(), // Atau time() jika BIGINT
+      ]);
+
+      // Buat URL dengan versioning
+      $fotoUrl = asset('storage/foto_pegawai/' . $namaFile) . '?v=' . $pegawai->foto_version->timestamp; // Jika Carbon, gunakan ->timestamp
+
       return response()->json([
-        'success' => false,
-        'message' => 'Data pegawai tidak ditemukan.'
-      ], 404);
-    }
-
-    $namaFile = str_replace(' ', '_', strtolower($pegawai->nama_pegawai)) . '_' . $pegawai->no_pegawai . '.jpg';
-
-    // Hapus foto lama jika ada
-    if ($pegawai->foto && Storage::disk('public')->exists('foto_pegawai/' . $pegawai->foto)) {
-      Storage::disk('public')->delete('foto_pegawai/' . $pegawai->foto);
-    }
-
-    // Simpan file baru
-    $request->file('foto')->storeAs('foto_pegawai', $namaFile, 'public');
-
-    // Update kolom foto
-    $pegawai->update([
-      'foto' => $namaFile,
-    ]);
-
-    return response()->json([
-      'success' => true,
-      'message' => 'Foto pegawai berhasil diperbarui!',
-      'foto_url' => asset('storage/foto_pegawai/' . $namaFile),
-    ]);
+          'success' => true,
+          'message' => 'Foto pegawai berhasil diperbarui!',
+          'foto_url' => $fotoUrl,
+      ]);
   }
+
 }

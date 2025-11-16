@@ -28,46 +28,46 @@ Route::middleware(['auth'])->group(function () {
   Route::get('/dashboard', [Analytics::class, 'index'])->name('dashboard-analytics');
 
   // Absen
-  Route::post('/absen/store', [AbsenController::class, 'store'])->middleware(['role:hr,supervisor,staff'])->name('absen.store');
+  Route::post('/absen/store', [AbsenController::class, 'store'])->middleware(['role:hr,hotel manager,supervisor,dept head b,staff'])->name('absen.store');
 
   // Export Absen History
-  Route::post('/attendance/export', [AbsenController::class, 'export'])->middleware(['role:hr,supervisor'])->name('attendance.export');
+  Route::post('/attendance/export', [AbsenController::class, 'export'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('attendance.export');
 
   // Pegawai
-  Route::get('/pages/daftar-pegawai', [PegawaiController::class, 'index'])->middleware(['role:hr,supervisor'])->name('pages-pegawai');
-  Route::get('/pages/pegawai/create', [PegawaiController::class, 'create'])->middleware(['role:hr'])->name('pegawai.create');
-  Route::post('/pages/pegawai/store', [PegawaiController::class, 'store'])->middleware(['role:hr'])->name('pegawai.store');
-  Route::get('/pages/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->middleware(['role:hr'])->name('pegawai.edit');
-  Route::put('/pages/pegawai/{id}', [PegawaiController::class, 'update'])->middleware(['role:hr'])->name('pegawai.update');
-  Route::delete('/pages/pegawai/delete/{id}', [PegawaiController::class, 'destroy'])->middleware(['role:hr'])->name('pegawai.delete');
-  Route::get('/pegawai/{id}/detail', [PegawaiController::class, 'show'])->middleware(['role:hr,supervisor'])->name('pegawai.show');
+  Route::get('/pages/daftar-pegawai', [PegawaiController::class, 'index'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pages-pegawai');
+  Route::get('/pages/pegawai/create', [PegawaiController::class, 'create'])->middleware(['role:hr,hotel manager'])->name('pegawai.create');
+  Route::post('/pages/pegawai/store', [PegawaiController::class, 'store'])->middleware(['role:hr,hotel manager'])->name('pegawai.store');
+  Route::get('/pages/pegawai/{id}/edit', [PegawaiController::class, 'edit'])->middleware(['role:hr,hotel manager'])->name('pegawai.edit');
+  Route::put('/pages/pegawai/{id}', [PegawaiController::class, 'update'])->middleware(['role:hr,hotel manager'])->name('pegawai.update');
+  Route::delete('/pages/pegawai/delete/{id}', [PegawaiController::class, 'destroy'])->middleware(['role:hr,hotel manager'])->name('pegawai.delete');
+  Route::get('/pegawai/{id}/detail', [PegawaiController::class, 'show'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pegawai.show');
   // Route baru: Search nama pegawai untuk autocomplete (GET)
   Route::get('/pegawai/search', [PegawaiController::class, 'searchPegawai'])->name('pegawai.search');
   // Export Pegawai
   Route::post('/pegawai/export', [PegawaiController::class, 'export'])->name('pegawai.export');
 
   // Shift Kerja
-  Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->middleware(['role:hr,supervisor,staff'])->name('pages-shift-kerja');
-  Route::get('/pages/shift-kerja/create', [ShiftKerjaController::class, 'create'])->middleware(['role:hr,supervisor'])->name('pages-shift-kerja.create');
-  Route::post('/pages/shift-kerja/store', [ShiftKerjaController::class, 'store'])->middleware(['role:hr,supervisor'])->name('pages-shift-kerja.store');
-  Route::get('/pages/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'edit'])->middleware(['role:hr,supervisor'])->name('pages-shift-kerja.edit');
-  Route::put('/pages/shift-kerja/{id}', [ShiftKerjaController::class, 'update'])->middleware(['role:hr,supervisor'])->name('pages-shift-kerja.update');
-  Route::delete('/pages/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'destroy'])->middleware(['role:hr,supervisor'])->name('pages-shift-kerja.delete');
-  Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->middleware(['role:hr'])->name('config-shift-kerja');
-  Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'storeParameter'])->middleware(['role:hr'])->name('config-shift-kerja.store');
-  Route::get('/config/shift-kerja/create', [ShiftKerjaController::class, 'createParameter'])->middleware(['role:hr'])->name('config-shift-kerja.create');
-  Route::get('/config/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'editParameter'])->middleware(['role:hr'])->middleware(['role:hr'])->name('config-shift-kerja.edit');
-  Route::put('/config/shift-kerja/{id}', [ShiftKerjaController::class, 'updateParameter'])->middleware(['role:hr'])->name('config-shift-kerja.update');
-  Route::delete('/config/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'deleteParameter'])->middleware(['role:hr'])->name('config-shift-kerja.delete');
+  Route::get('/pages/shift-kerja', [ShiftKerjaController::class, 'index'])->middleware(['role:hr,hotel manager,supervisor,dept head b,staff'])->name('pages-shift-kerja');
+  Route::get('/pages/shift-kerja/create', [ShiftKerjaController::class, 'create'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pages-shift-kerja.create');
+  Route::post('/pages/shift-kerja/store', [ShiftKerjaController::class, 'store'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pages-shift-kerja.store');
+  Route::get('/pages/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'edit'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pages-shift-kerja.edit');
+  Route::put('/pages/shift-kerja/{id}', [ShiftKerjaController::class, 'update'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pages-shift-kerja.update');
+  Route::delete('/pages/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'destroy'])->middleware(['role:hr,hotel manager,supervisor,dept head b'])->name('pages-shift-kerja.delete');
+  Route::get('/config/shift-kerja', [ShiftKerjaController::class, 'viewConfig'])->middleware(['role:hr,hotel manager'])->name('config-shift-kerja');
+  Route::post('/config/shift-kerja/store', [ShiftKerjaController::class, 'storeParameter'])->middleware(['role:hr,hotel manager'])->name('config-shift-kerja.store');
+  Route::get('/config/shift-kerja/create', [ShiftKerjaController::class, 'createParameter'])->middleware(['role:hr,hotel manager'])->name('config-shift-kerja.create');
+  Route::get('/config/shift-kerja/{id}/edit', [ShiftKerjaController::class, 'editParameter'])->middleware(['role:hr,hotel manager'])->middleware(['role:hr,hotel manager'])->name('config-shift-kerja.edit');
+  Route::put('/config/shift-kerja/{id}', [ShiftKerjaController::class, 'updateParameter'])->middleware(['role:hr,hotel manager'])->name('config-shift-kerja.update');
+  Route::delete('/config/shift-kerja/delete/{id}', [ShiftKerjaController::class, 'deleteParameter'])->middleware(['role:hr,hotel manager'])->name('config-shift-kerja.delete');
   Route::get('/param/shift-kerja/view/{rout}', [ShiftKerjaController::class, 'viewParameter'])->name('param-shift-kerja.view');
   Route::get('/param/shift-kerja/show/{shift}', [ShiftKerjaController::class, 'showParameterByShift'])->name('param-shift-kerja.showByShift');
   // Payroll
   Route::get('/pages/payroll', [PayrollController::class, 'index'])->name('pages-payroll');
 
   // Lokasi
-  Route::get('config/lokasi', [MapController::class, 'index'])->middleware(['role:hr'])->name('config-lokasi');
-  Route::get('config/lokasi/{id}', [MapController::class, 'show'])->middleware(['role:hr,staff,supervisor'])->name('config-lokasi.show');
-  Route::put('config/lokasi/updated/{id}', [MapController::class, 'update'])->middleware(['role:hr'])->name('config-lokasi.update');
+  Route::get('config/lokasi', [MapController::class, 'index'])->middleware(['role:hr,hotel manager'])->name('config-lokasi');
+  Route::get('config/lokasi/{id}', [MapController::class, 'show'])->middleware(['role:hr,hotel manager,staff,supervisor,dept head b'])->name('config-lokasi.show');
+  Route::put('config/lokasi/updated/{id}', [MapController::class, 'update'])->middleware(['role:hr,hotel manager'])->name('config-lokasi.update');
 
   // user
   Route::get("config/user", [UserController::class, 'index'])->name('config-user');

@@ -27,7 +27,7 @@
                                 <h5 class="m-0 me-2"><i class="bx bx-lg bx-history"></i> History</h5>
                             </div>
                         </div>
-                        @if (strtolower(Auth::user()->pegawai->jabatan) == 'hr')
+                        @if ((strtolower(Auth::user()->pegawai->jabatan) == 'hr') || (strtolower(Auth::user()->pegawai->jabatan) == 'hotel manager'))
                             {{-- Button Export Excel --}}
                             <div class="card-body px-4">
                                 <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
@@ -50,6 +50,7 @@
                                             <option value="">Semua Departemen</option>
                                             <option value="A&G">A&G</option>
                                             <option value="ACCOUNTING">ACCOUNTING</option>
+                                            <option value="ENGINEERING">ENGINEERING</option>
                                             <option value="FB PRODUCT">FB PRODUCT</option>
                                             <option value="FB SERVICE">FB SERVICE</option>
                                             <option value="FRONT OFFICE">FRONT OFFICE</option>

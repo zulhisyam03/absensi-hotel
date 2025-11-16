@@ -226,6 +226,10 @@
                                     <label for="jabatan" class="form-label fs-5">Jabatan</label>
                                     <select id="jabatan" class="form-select" name="jabatan">
                                         <option hidden value="">-- Jabatan --</option>
+                                        <option @selected(old('jabatan', $data->jabatan ?? '') == 'Dept Head B') value="Dept Head B">Dept Head B
+                                        </option>
+                                        <option @selected(old('jabatan', $data->jabatan ?? '') == 'Hotel Manager') value="Hotel Manager">Hotel Manager
+                                        </option>
                                         <option @selected(old('jabatan', $data->jabatan ?? '') == 'HR') value="HR">HR
                                         </option>
                                         <option @selected(old('jabatan', $data->jabatan ?? '') == 'Staff') value="Staff">
@@ -249,6 +253,8 @@
                                             A&G</option>
                                         <option @selected(old('departemen', $data->departemen ?? '') == 'ACCOUNTING') value="ACCOUNTING">
                                             ACCOUNTING</option>
+                                        <option @selected(old('departemen', $data->departemen ?? '') == 'ENGINEERING') value="ENGINEERING">
+                                            ENGINEERING</option>
                                         <option @selected(old('departemen', $data->departemen ?? '') == 'FB PRODUCT') value="FB PRODUCT">
                                             FB PRODUCT</option>
                                         <option @selected(old('departemen', $data->departemen ?? '') == 'FB SERVICE') value="FB SERVICE">
