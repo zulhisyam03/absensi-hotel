@@ -27,7 +27,7 @@
                                 <h5 class="m-0 me-2"><i class="bx bx-lg bx-history"></i> History</h5>
                             </div>
                         </div>
-                        @if ((strtolower(Auth::user()->pegawai->jabatan) == 'hr') || (strtolower(Auth::user()->pegawai->jabatan) == 'hotel manager'))
+                        @if (strtolower(Auth::user()->pegawai->jabatan) == 'hr' || strtolower(Auth::user()->pegawai->jabatan) == 'hotel manager')
                             {{-- Button Export Excel --}}
                             <div class="card-body px-4">
                                 <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
@@ -670,43 +670,64 @@
                         name: 'DT_RowIndex',
                         title: 'No.', // Ubah header ID menjadi NO.
                         orderable: false, // Nomor urut tidak perlu diurutkan
-                        searchable: false // Nomor urut tidak perlu dicari
+                        searchable: false, // Nomor urut tidak perlu dicari
+                        className: 'no-column' // Tambahkan class untuk styling
                     },
                     {
                         data: 'nama_pegawai',
-                        name: 'nama_pegawai'
+                        name: 'nama_pegawai',
+                        className: 'nama-column' // Tambahkan class untuk styling
+                    },
+                    {
+                        data: null, // Kolom baru untuk "More"
+                        name: 'more',
+                        title: 'More',
+                        orderable: false,
+                        searchable: false,
+                        className: 'more-column', // Tambahkan class untuk styling
+                        render: function(data, type, row) {
+                            return '<button class="btn btn-sm btn-primary more-btn">More</button>';
+                        }
                     },
                     {
                         data: 'departemen',
-                        name: 'departemen'
+                        name: 'departemen',
+                        className: 'hidden-mobile' // Class untuk hide di mobile
                     },
                     {
                         data: 'shift',
-                        name: 'shift'
+                        name: 'shift',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'shift_masuk',
-                        name: 'shift_masuk'
+                        name: 'shift_masuk',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'shift_pulang',
-                        name: 'shift_pulang'
+                        name: 'shift_pulang',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'check_in',
-                        name: 'check_in'
+                        name: 'check_in',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'check_out',
-                        name: 'check_out'
+                        name: 'check_out',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'status',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'keterangan',
-                        name: 'keterangan'
+                        name: 'keterangan',
+                        className: 'hidden-mobile'
                     }
                     // {
                     //     data: 'action',
@@ -721,7 +742,7 @@
                     searchPlaceholder: "Cari...",
                     search: ""
                 },
-                responsive: true,
+                responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
                 pageLength: 10,
                 lengthMenu: [
                     [10, 25, 50, 100],
@@ -735,6 +756,69 @@
                     }
                 }
             });
+
+            // Fungsi untuk format child row (data tambahan yang muncul saat "More" diklik)
+            // Perbaikan: Kembalikan HTML yang sesuai untuk child row DataTables (akan dibungkus dalam <td colspan="...">)
+            function format(d) {
+                return '<div class="child-row" style="padding-left: 20px;">' +
+                    // Hapus display: none, biarkan slide handle
+                    '<table cellpadding="5" cellspacing="0" border="0">' +
+                    '<tr>' +
+                    '<td><strong>Departemen:</strong></td>' +
+                    '<td>' + d.departemen + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Shift:</strong></td>' +
+                    '<td>' + d.shift + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Shift Masuk:</strong></td>' +
+                    '<td>' + d.shift_masuk + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Shift Pulang:</strong></td>' +
+                    '<td>' + d.shift_pulang + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Check In:</strong></td>' +
+                    '<td>' + d.check_in + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Check Out:</strong></td>' +
+                    '<td>' + d.check_out + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Status:</strong></td>' +
+                    '<td>' + d.status + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Keterangan:</strong></td>' +
+                    '<td>' + d.keterangan + '</td>' +
+                    '</tr>' +
+                    '</table>' +
+                    '</div>';
+            }
+
+            // Event listener untuk tombol "More" (setelah DataTable diinisialisasi)
+            $('#usersTable').on('click', '.more-btn', function() {
+                var tr = $(this).closest('tr');
+                var row = $('#usersTable').DataTable().row(tr);
+                var childRow = $(row.node()).next(
+                    'tr.child'); // Dapatkan child row yang benar (tr dengan class 'child')
+
+                if (row.child.isShown()) {
+                    // Jika child row sudah ditampilkan, sembunyikan dengan slide up
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // Jika belum, tampilkan dengan slide down
+                    row.child(format(row.data())).show();
+                    tr.addClass('shown');
+                    // Tambahkan animasi slide down manual pada child row
+                    childRow.find('.child-row').hide().slideDown(400); // 400ms animasi
+                }
+            });
+
 
             // Toggle filter export
             // Sembunyikan filter di awal (opsional)
@@ -754,8 +838,26 @@
             text-transform: capitalize;
         }
 
+        /* Styling untuk child row */
+        .child-row {
+            background-color: #f9f9f9;
+            border-left: 3px solid #007bff;
+            margin-top: 10px;
+        }
+
         /* Fullscreen modal di mobile - Hilangkan scrollbar dan scroll ke atas */
         @media (max-width: 575.98px) {
+            .hidden-mobile {
+                display: none !important;
+            }
+
+            .no-column,
+            .nama-column,
+            .more-column {
+                display: table-cell !important;
+                /* Pastikan selalu tampil */
+            }
+
             .modal-fullscreen .modal-content {
                 height: 100vh;
                 border-radius: 0;
