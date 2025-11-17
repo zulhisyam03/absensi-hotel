@@ -22,6 +22,26 @@
             font-style: italic;
             font-weight: bold;
         }
+
+        /* Styling untuk child row */
+        .child-row {
+            background-color: #f9f9f9;
+            border-left: 3px solid #007bff;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 575.98px) {
+            .hidden-mobile {
+                display: none !important;
+            }
+
+            .no-column,
+            .nama-column,
+            .more-column {
+                display: table-cell !important;
+                /* Pastikan selalu tampil */
+            }
+        }
     </style>
 @endsection
 
@@ -49,7 +69,7 @@
                             </div>
                         @endif
 
-                        @if ((strtolower(Auth::user()->pegawai->jabatan) == 'hr') || (strtolower(Auth::user()->pegawai->jabatan) == 'hotel manager'))
+                        @if (strtolower(Auth::user()->pegawai->jabatan) == 'hr' || strtolower(Auth::user()->pegawai->jabatan) == 'hotel manager')
                             {{-- Button Export Excel --}}
                             <div class="card-body px-4">
                                 <button class="btn btn-success w-100" id="btnExport"><i class="bx bxs-file-export"></i>
@@ -216,7 +236,8 @@
                                 <span class="col-md-1">:</span>
                                 <span id="status-pegawai"></span>
                             </div>
-                            <div class="mb-4 {{ in_array(strtolower(Auth::user()->pegawai->jabatan), ['hr', 'hotel manager']) ? '' : 'd-none' }}">
+                            <div
+                                class="mb-4 {{ in_array(strtolower(Auth::user()->pegawai->jabatan), ['hr', 'hotel manager']) ? '' : 'd-none' }}">
                                 <label for="last-salary" class="form-label fs-6 col-md-4">BASIC SALARY</label>
                                 <span class="col-md-1">:</span>
                                 <span id="last-salary"></span>
@@ -302,33 +323,51 @@
                         name: 'DT_RowIndex',
                         title: 'No.', // Ubah header ID menjadi NO.
                         orderable: false, // Nomor urut tidak perlu diurutkan
-                        searchable: false // Nomor urut tidak perlu dicari
+                        searchable: false, // Nomor urut tidak perlu dicari
+                        className: 'nama-column' // Hide di mobile, karena hanya tampil Nama, No Pegawai, More
                     },
                     {
                         data: 'nama_pegawai',
-                        name: 'nama_pegawai'
+                        name: 'nama_pegawai',
+                        className: 'nama-column' // Tambahkan class untuk styling
                     },
                     {
                         data: 'no_pegawai',
-                        name: 'no_pegawai'
+                        name: 'no_pegawai',
+                        className: 'hidden-mobile' // Tambahkan class untuk styling
+                    },
+                    {
+                        data: null, // Kolom baru untuk "More"
+                        name: 'more',
+                        title: 'More',
+                        orderable: false,
+                        searchable: false,
+                        className: 'more-column', // Tambahkan class untuk styling
+                        render: function(data, type, row) {
+                            return '<button class="btn btn-sm btn-primary more-btn">More</button>';
+                        }
                     },
                     {
                         data: 'departemen',
-                        name: 'departemen'
+                        name: 'departemen',
+                        className: 'hidden-mobile' // Class untuk hide di mobile
                     },
                     {
                         data: 'no_hp',
-                        name: 'no_hp'
+                        name: 'no_hp',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'tgl_join',
-                        name: 'tgl_join'
+                        name: 'tgl_join',
+                        className: 'hidden-mobile'
                     },
                     {
                         data: 'action',
                         name: 'action',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        className: 'hidden-mobile' // Hide di mobile
                     }
                 ],
                 // dom: 'Bfrtip', // tombol di atas table
@@ -337,7 +376,9 @@
                         text: 'Excel',
                         className: 'btn btn-success btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
+                            columns: [0, 1, 2, 3,
+                                4
+                            ] // Sesuaikan jika perlu, tapi kolom More tidak diekspor
                         }
                     },
                     {
@@ -371,12 +412,61 @@
                     searchPlaceholder: "Cari...",
                     search: ""
                 },
-                responsive: true,
+                responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
                 pageLength: 10,
                 lengthMenu: [
                     [10, 25, 50, 100],
                     [10, 25, 50, 100]
                 ]
+            });
+
+            // Fungsi untuk format child row (data tambahan yang muncul saat "More" diklik)
+            function formatPegawai(d) {
+                return '<div class="child-row" style="padding-left: 20px;">' +
+                    // Hapus display: none, biarkan slide handle
+                    '<table cellpadding="5" cellspacing="0" border="0">' +
+                    '<tr>' +
+                    '<td><strong>Nomor Pegawai:</strong></td>' +
+                    '<td>' + d.no_pegawai + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Departemen:</strong></td>' +
+                    '<td>' + d.departemen + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>No HP:</strong></td>' +
+                    '<td>' + d.no_hp + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Tgl Join:</strong></td>' +
+                    '<td>' + d.tgl_join + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '<td><strong>Action:</strong></td>' +
+                    '<td>' + d.action + '</td>' +
+                    '</tr>' +
+                    '</table>' +
+                    '</div>';
+            }
+
+            // Event listener untuk tombol "More" (setelah DataTable diinisialisasi)
+            $('#pegawaiTable').on('click', '.more-btn', function() {
+                var tr = $(this).closest('tr');
+                var row = $('#pegawaiTable').DataTable().row(tr);
+                var childRow = $(row.node()).next(
+                    'tr.child'); // Dapatkan child row yang benar (tr dengan class 'child')
+
+                if (row.child.isShown()) {
+                    // Jika child row sudah ditampilkan, sembunyikan dengan slide up
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // Jika belum, tampilkan dengan slide down
+                    row.child(formatPegawai(row.data())).show();
+                    tr.addClass('shown');
+                    // Tambahkan animasi slide down manual pada child row
+                    childRow.find('.child-row').hide().slideDown(400); // 400ms animasi
+                }
             });
 
             // Toggle filter export
