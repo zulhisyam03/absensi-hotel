@@ -30,6 +30,10 @@
             margin-top: 10px;
         }
 
+        .hidden-desktop {
+            display: none !important;
+        }
+
         @media (max-width: 575.98px) {
             .hidden-mobile {
                 display: none !important;
@@ -311,114 +315,235 @@
                 $('.dt-layout-table').addClass('table-responsive');
             });
 
-            $('#pegawaiTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: window.location.origin + '/datatable/pegawai',
-                    type: 'GET'
-                },
-                columns: [{
-                        data: 'DT_RowIndex', // Kunci dari addIndexColumn()
-                        name: 'DT_RowIndex',
-                        title: 'No.', // Ubah header ID menjadi NO.
-                        orderable: false, // Nomor urut tidak perlu diurutkan
-                        searchable: false, // Nomor urut tidak perlu dicari
-                        className: 'nama-column' // Hide di mobile, karena hanya tampil Nama, No Pegawai, More
-                    },
-                    {
-                        data: 'nama_pegawai',
-                        name: 'nama_pegawai',
-                        className: 'nama-column' // Tambahkan class untuk styling
-                    },
-                    {
-                        data: 'no_pegawai',
-                        name: 'no_pegawai',
-                        className: 'hidden-mobile' // Tambahkan class untuk styling
-                    },
-                    {
-                        data: null, // Kolom baru untuk "More"
-                        name: 'more',
-                        title: 'More',
-                        orderable: false,
-                        searchable: false,
-                        className: 'more-column', // Tambahkan class untuk styling
-                        render: function(data, type, row) {
-                            return '<button class="btn btn-sm btn-primary more-btn">More</button>';
-                        }
-                    },
-                    {
-                        data: 'departemen',
-                        name: 'departemen',
-                        className: 'hidden-mobile' // Class untuk hide di mobile
-                    },
-                    {
-                        data: 'no_hp',
-                        name: 'no_hp',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'tgl_join',
-                        name: 'tgl_join',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false,
-                        className: 'hidden-mobile' // Hide di mobile
-                    }
-                ],
-                // dom: 'Bfrtip', // tombol di atas table
-                buttons: [{
-                        extend: 'excelHtml5',
-                        text: 'Excel',
-                        className: 'btn btn-success btn-sm',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3,
-                                4
-                            ] // Sesuaikan jika perlu, tapi kolom More tidak diekspor
-                        }
-                    },
-                    {
-                        extend: 'csvHtml5',
-                        text: 'CSV',
-                        className: 'btn btn-info btn-sm',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
-                        }
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        text: 'PDF',
-                        className: 'btn btn-danger btn-sm',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'Print',
-                        className: 'btn btn-secondary btn-sm',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
-                        }
-                    }
-                ],
-                language: {
-                    // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
-                    lengthMenu: "_MENU_",
-                    searchPlaceholder: "Cari...",
-                    search: ""
-                },
-                responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
-                pageLength: 10,
-                lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
-                ]
+            let lastIsMobile = window.innerWidth < 578;
+
+            $(window).on('resize', function() {
+                let isMobile = window.innerWidth < 578;
+
+                if (isMobile !== lastIsMobile) {
+                    location.reload();
+                }
+
+                lastIsMobile = isMobile;
             });
+
+            // Deteksi apakah mobile (resolusi < 578px)
+            var isMobile = window.innerWidth < 578;
+
+            if (isMobile) {
+                // Hancurkan tabel lama
+                $('#pegawaiTable').DataTable().destroy();
+
+                $('#pegawaiTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: window.location.origin + '/datatable/pegawai',
+                        type: 'GET'
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex', // Kunci dari addIndexColumn()
+                            name: 'DT_RowIndex',
+                            title: 'No.', // Ubah header ID menjadi NO.
+                            orderable: false, // Nomor urut tidak perlu diurutkan
+                            searchable: false, // Nomor urut tidak perlu dicari
+                            className: 'nama-column' // Hide di mobile, karena hanya tampil Nama, No Pegawai, More
+                        },
+                        {
+                            data: 'nama_pegawai',
+                            name: 'nama_pegawai',
+                            className: 'nama-column' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: 'no_pegawai',
+                            name: 'no_pegawai',
+                            className: 'hidden-mobile' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: null, // Kolom baru untuk "More"
+                            name: 'more',
+                            title: 'More',
+                            orderable: false,
+                            searchable: false,
+                            className: 'hidden-desktop more-column', // Tambahkan class untuk styling
+                            render: function(data, type, row) {
+                                return '<button class="btn btn-sm btn-primary more-btn">More</button>';
+                            }
+                        },
+                        {
+                            data: 'departemen',
+                            name: 'departemen',
+                            className: 'hidden-mobile' // Class untuk hide di mobile
+                        },
+                        {
+                            data: 'no_hp',
+                            name: 'no_hp',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'tgl_join',
+                            name: 'tgl_join',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            className: 'hidden-mobile' // Hide di mobile
+                        }
+                    ],
+                    // dom: 'Bfrtip', // tombol di atas table
+                    buttons: [{
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            className: 'btn btn-success btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3,
+                                    4
+                                ] // Sesuaikan jika perlu, tapi kolom More tidak diekspor
+                            }
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            className: 'btn btn-info btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4]
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            className: 'btn btn-danger btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4]
+                            }
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print',
+                            className: 'btn btn-secondary btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4]
+                            }
+                        }
+                    ],
+                    language: {
+                        // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
+                        lengthMenu: "_MENU_",
+                        searchPlaceholder: "Cari...",
+                        search: ""
+                    },
+                    responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
+                    pageLength: 10,
+                    lengthMenu: [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ]
+                });
+            } else {
+                // Hancurkan tabel lama
+                $('#pegawaiTable').DataTable().destroy();
+
+                $('#pegawaiTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: window.location.origin + '/datatable/pegawai',
+                        type: 'GET'
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex', // Kunci dari addIndexColumn()
+                            name: 'DT_RowIndex',
+                            title: 'No.', // Ubah header ID menjadi NO.
+                            orderable: false, // Nomor urut tidak perlu diurutkan
+                            searchable: false, // Nomor urut tidak perlu dicari
+                            className: 'nama-column' // Hide di mobile, karena hanya tampil Nama, No Pegawai, More
+                        },
+                        {
+                            data: 'nama_pegawai',
+                            name: 'nama_pegawai',
+                            className: 'nama-column' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: 'no_pegawai',
+                            name: 'no_pegawai',
+                            className: 'hidden-mobile' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: 'departemen',
+                            name: 'departemen',
+                            className: 'hidden-mobile' // Class untuk hide di mobile
+                        },
+                        {
+                            data: 'no_hp',
+                            name: 'no_hp',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'tgl_join',
+                            name: 'tgl_join',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            className: 'hidden-mobile' // Hide di mobile
+                        }
+                    ],
+                    // dom: 'Bfrtip', // tombol di atas table
+                    buttons: [{
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            className: 'btn btn-success btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3,
+                                    4
+                                ] // Sesuaikan jika perlu, tapi kolom More tidak diekspor
+                            }
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            className: 'btn btn-info btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4]
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            className: 'btn btn-danger btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4]
+                            }
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print',
+                            className: 'btn btn-secondary btn-sm',
+                            exportOptions: {
+                                columns: [0, 1, 2, 3, 4]
+                            }
+                        }
+                    ],
+                    language: {
+                        // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
+                        lengthMenu: "_MENU_",
+                        searchPlaceholder: "Cari...",
+                        search: ""
+                    },
+                    responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
+                    pageLength: 10,
+                    lengthMenu: [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ]
+                });
+            }
 
             // Fungsi untuk format child row (data tambahan yang muncul saat "More" diklik)
             function formatPegawai(d) {
