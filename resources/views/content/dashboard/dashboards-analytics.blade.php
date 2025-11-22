@@ -658,104 +658,215 @@
                 $('.dt-layout-table').addClass('table-responsive');
             });
 
-            $('#usersTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: window.location.origin + '/datatable/history-absen',
-                    type: 'GET'
-                },
-                columns: [{
-                        data: 'DT_RowIndex', // Kunci dari addIndexColumn()
-                        name: 'DT_RowIndex',
-                        title: 'No.', // Ubah header ID menjadi NO.
-                        orderable: false, // Nomor urut tidak perlu diurutkan
-                        searchable: false, // Nomor urut tidak perlu dicari
-                        className: 'no-column' // Tambahkan class untuk styling
-                    },
-                    {
-                        data: 'nama_pegawai',
-                        name: 'nama_pegawai',
-                        className: 'nama-column' // Tambahkan class untuk styling
-                    },
-                    {
-                        data: null, // Kolom baru untuk "More"
-                        name: 'more',
-                        title: 'More',
-                        orderable: false,
-                        searchable: false,
-                        className: 'more-column', // Tambahkan class untuk styling
-                        render: function(data, type, row) {
-                            return '<button class="btn btn-sm btn-primary more-btn">More</button>';
-                        }
-                    },
-                    {
-                        data: 'departemen',
-                        name: 'departemen',
-                        className: 'hidden-mobile' // Class untuk hide di mobile
-                    },
-                    {
-                        data: 'shift',
-                        name: 'shift',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'shift_masuk',
-                        name: 'shift_masuk',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'shift_pulang',
-                        name: 'shift_pulang',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'check_in',
-                        name: 'check_in',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'check_out',
-                        name: 'check_out',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        className: 'hidden-mobile'
-                    },
-                    {
-                        data: 'keterangan',
-                        name: 'keterangan',
-                        className: 'hidden-mobile'
-                    }
-                    // {
-                    //     data: 'action',
-                    //     name: 'action',
-                    //     orderable: false,
-                    //     searchable: false
-                    // }
-                ],
-                language: {
-                    // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
-                    lengthMenu: "_MENU_",
-                    searchPlaceholder: "Cari...",
-                    search: ""
-                },
-                responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
-                pageLength: 10,
-                lengthMenu: [
-                    [10, 25, 50, 100],
-                    [10, 25, 50, 100]
-                ],
-                // 🔥 Tambahkan createdRow untuk pewarnaan baris berdasarkan is_late
-                createdRow: function(row, data, dataIndex) {
-                    if (data.is_late || data.is_fast || data.keterangan == 'Tidak Check Out' || data
-                        .keterangan == 'telat' || data.keterangan == 'cepat pulang') {
-                        $(row).addClass('table-danger'); // Bootstrap class untuk warna kuning
-                    }
+            let lastIsMobile = window.innerWidth < 578;
+
+            $(window).on('resize', function() {
+                let isMobile = window.innerWidth < 578;
+
+                if (isMobile !== lastIsMobile) {
+                    location.reload();
                 }
+
+                lastIsMobile = isMobile;
             });
+
+            // Deteksi apakah mobile (resolusi < 578px)
+            var isMobile = window.innerWidth < 578;
+
+            if (isMobile) {
+                // Hancurkan tabel lama
+                $('#usersTable').DataTable().destroy();
+
+                $('#usersTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: window.location.origin + '/datatable/history-absen',
+                        type: 'GET'
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex', // Kunci dari addIndexColumn()
+                            name: 'DT_RowIndex',
+                            title: 'No.', // Ubah header ID menjadi NO.
+                            orderable: false, // Nomor urut tidak perlu diurutkan
+                            searchable: false, // Nomor urut tidak perlu dicari
+                            className: 'no-column' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: 'nama_pegawai',
+                            name: 'nama_pegawai',
+                            className: 'nama-column' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: null, // Kolom baru untuk "More"
+                            name: 'more',
+                            title: 'More',
+                            orderable: false,
+                            searchable: false,
+                            className: 'more-column', // Tambahkan class untuk styling
+                            render: function(data, type, row) {
+                                return '<button class="btn btn-sm btn-primary more-btn">More</button>';
+                            }
+                        },
+                        {
+                            data: 'departemen',
+                            name: 'departemen',
+                            className: 'hidden-mobile' // Class untuk hide di mobile
+                        },
+                        {
+                            data: 'shift',
+                            name: 'shift',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'shift_masuk',
+                            name: 'shift_masuk',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'shift_pulang',
+                            name: 'shift_pulang',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'check_in',
+                            name: 'check_in',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'check_out',
+                            name: 'check_out',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'keterangan',
+                            name: 'keterangan',
+                            className: 'hidden-mobile'
+                        }
+                        // {
+                        //     data: 'action',
+                        //     name: 'action',
+                        //     orderable: false,
+                        //     searchable: false
+                        // }
+                    ],
+                    language: {
+                        // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
+                        lengthMenu: "_MENU_",
+                        searchPlaceholder: "Cari...",
+                        search: ""
+                    },
+                    responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
+                    pageLength: 10,
+                    lengthMenu: [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ],
+                    // 🔥 Tambahkan createdRow untuk pewarnaan baris berdasarkan is_late
+                    createdRow: function(row, data, dataIndex) {
+                        if (data.is_late || data.is_fast || data.keterangan == 'Tidak Check Out' || data
+                            .keterangan == 'telat' || data.keterangan == 'cepat pulang') {
+                            $(row).addClass('table-danger'); // Bootstrap class untuk warna kuning
+                        }
+                    }
+                });
+            } else {
+                // Hancurkan tabel lama
+                $('#usersTable').DataTable().destroy();
+
+                $('#usersTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: window.location.origin + '/datatable/history-absen',
+                        type: 'GET'
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex', // Kunci dari addIndexColumn()
+                            name: 'DT_RowIndex',
+                            title: 'No.', // Ubah header ID menjadi NO.
+                            orderable: false, // Nomor urut tidak perlu diurutkan
+                            searchable: false, // Nomor urut tidak perlu dicari
+                            className: 'no-column' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: 'nama_pegawai',
+                            name: 'nama_pegawai',
+                            className: 'nama-column' // Tambahkan class untuk styling
+                        },
+                        {
+                            data: 'departemen',
+                            name: 'departemen',
+                            className: 'hidden-mobile' // Class untuk hide di mobile
+                        },
+                        {
+                            data: 'shift',
+                            name: 'shift',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'shift_masuk',
+                            name: 'shift_masuk',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'shift_pulang',
+                            name: 'shift_pulang',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'check_in',
+                            name: 'check_in',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'check_out',
+                            name: 'check_out',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status',
+                            className: 'hidden-mobile'
+                        },
+                        {
+                            data: 'keterangan',
+                            name: 'keterangan',
+                            className: 'hidden-mobile'
+                        }
+                        // {
+                        //     data: 'action',
+                        //     name: 'action',
+                        //     orderable: false,
+                        //     searchable: false
+                        // }
+                    ],
+                    language: {
+                        // Mengganti string "Show _MENU_ entries" menjadi hanya "_MENU_" (dropdown)
+                        lengthMenu: "_MENU_",
+                        searchPlaceholder: "Cari...",
+                        search: ""
+                    },
+                    responsive: false, // Nonaktifkan responsive otomatis DataTables agar kita kontrol penuh
+                    pageLength: 10,
+                    lengthMenu: [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ],
+                    // 🔥 Tambahkan createdRow untuk pewarnaan baris berdasarkan is_late
+                    createdRow: function(row, data, dataIndex) {
+                        if (data.is_late || data.is_fast || data.keterangan == 'Tidak Check Out' || data
+                            .keterangan == 'telat' || data.keterangan == 'cepat pulang') {
+                            $(row).addClass('table-danger'); // Bootstrap class untuk warna kuning
+                        }
+                    }
+                });
+            }
 
             // Fungsi untuk format child row (data tambahan yang muncul saat "More" diklik)
             // Perbaikan: Kembalikan HTML yang sesuai untuk child row DataTables (akan dibungkus dalam <td colspan="...">)
