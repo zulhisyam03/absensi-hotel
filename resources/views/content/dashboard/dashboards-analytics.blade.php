@@ -166,12 +166,12 @@
                 <!-- Panel Informasi (Putih di bawah video) -->
                 <div class="position-absolute bottom-0 w-100 bg-white text-center py-3 shadow-lg" style="opacity: 0.95;">
                     <input type="hidden" name="Baselatitude" id="Baselatitude">
-                    <input type="hidden" name="Baselongitude" id="Baselongitude"><br>
-                    <input type="hidden" name="Baseradius" id="Baseradius"><br>
+                    <input type="hidden" name="Baselongitude" id="Baselongitude">
+                    <input type="hidden" name="Baseradius" id="Baseradius">
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
                     <span id="lblRadius"></span>
-                    <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama) }}</h6>
+                    <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h6>
                     <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
                     <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
                     <button type="button" class="btn btn-outline-secondary btn-sm"
@@ -362,6 +362,12 @@
                     alert('Browser tidak mendukung geolocation.');
                     return;
                 }
+
+                // Set caption awal saat mulai mengambil lokasi
+                document.getElementById('lblRadius').innerHTML = '⏳ sedang mengambil lokasi ....';
+                $('#lblRadius').removeClass('text-success text-danger').addClass(
+                    'text-info'); // Opsional: tambahkan class untuk indikasi loading
+                btnSaveAbsensi.disabled = true; // Pastikan tombol disabled saat loading
 
                 navigator.geolocation.getCurrentPosition(function(posisi) {
                     const currentLat = posisi.coords.latitude;
