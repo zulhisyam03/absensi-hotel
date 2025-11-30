@@ -48,36 +48,32 @@ class Analytics extends Controller
         // Ambil semua shift milik pegawai (urut berdasarkan waktu_masuk)
         $shifts = $pegawai->shift->sortBy('waktu_masuk');
 
-        // Cek apakah sekarang ada shift aktif (jika lintas hari misal 22:00–05:00), TAPI pastikan belum check_out hari ini
-        $shiftAktif = $shifts->first(function ($shift) use ($now, $pegawai) {
-          // 🔹 Cek apakah shift ini sudah di-check_out hari ini
-          $hasCheckedOut = Absen::where('no_pegawai', $pegawai->no_pegawai)
-            ->where('shift', $shift->shift)
-            ->whereNotNull('check_out')
-            ->whereDate('check_in', today())
-            ->exists();
+        // mapping shift into Carbon
+        $shiftData = $shifts->map(function($shift) use ($now) {
+            $start = Carbon::parse($shift->waktu_masuk);
+            $end   = Carbon::parse($shift->waktu_pulang);
 
-          if ($hasCheckedOut) {
-            return false;
-          }
-
-          // Parse waktu shift ke Carbon dengan tanggal yang tepat
-          $tanggalSekarang = $now->copy()->startOfDay();
-          $startCarbon = $tanggalSekarang->copy()->setTimeFromTimeString($shift->waktu_masuk);
-          $endCarbon = $tanggalSekarang->copy()->setTimeFromTimeString($shift->waktu_pulang);
-
-          // Jika shift lintas hari, sesuaikan tanggal
-          if ($shift->waktu_masuk > $shift->waktu_pulang) {
-            $endCarbon = $endCarbon->copy()->addDay();
-            // Jika sekarang dalam rentang hari berikutnya, start di hari kemarin
-            if ($now->format('H:i:s') <= $shift->waktu_pulang) {
-              $startCarbon = $startCarbon->copy()->subDay();
+            // shift lintas hari (contoh 23:00–07:00)
+            if ($start->gt($end)) {
+                $end->addDay();
             }
-          }
 
-          // Cek apakah $now dalam rentang shift
-          return $now->greaterThanOrEqualTo($startCarbon) && $now->lessThanOrEqualTo($endCarbon);
+            return (object)[
+                'model' => $shift,
+                'start' => $start,
+                'end'   => $end,
+            ];
         });
+
+        // tentukan shift yang waktu_masuk-nya TERDEKAT tetapi tidak melebihi NOW
+        $shiftAktifData = $shiftData
+          ->filter(fn($s) => now()->gte($s->start))
+          ->sortByDesc('start')
+          ->first();
+
+      // kembalikan model asli (SHIFT)
+      $shiftAktif = $shiftAktifData->model;
+      Log::channel('shift')->info('Shift Aktif Baru : '.$shiftAktif);
         // Jika tidak ada shift aktif (atau sudah check_out), cari shift berikutnya
         if (!$shiftAktif) {
           $shiftBerikutnya = $shifts->first(function ($shift) use ($now) {
@@ -205,6 +201,8 @@ class Analytics extends Controller
       // Bisa tambahkan log jika dibutuhkan
       // Log::error($e->getMessage());
     }
+
+    Log::channel('shift')->info('========================================================================================'); // Untuk melihat semua atribut
 
     // Cek Pengaturan Shift Pegawai
     $shiftPegawai = ShiftKerja::where('no_pegawai', $user->pegawai->no_pegawai)->first();
