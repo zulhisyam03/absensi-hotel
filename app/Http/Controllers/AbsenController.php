@@ -109,6 +109,9 @@ class AbsenController extends Controller
           $path = $file->storeAs('check-out', $filename, 'public');
         }
 
+        // Ambil waktu shift pulang dari record absen
+        $shiftEnd = Carbon::parse($cekAbsen->shift_pulang);
+
         $cepatPulang = $this->isCepatPulang($checkOut, $shiftStart, $shiftEnd);
         if ($cepatPulang) {
           $keterangan = 'cepat pulang';

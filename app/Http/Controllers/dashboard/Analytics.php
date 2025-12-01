@@ -47,37 +47,80 @@ class Analytics extends Controller
 
         // Ambil semua shift milik pegawai (urut berdasarkan waktu_masuk)
         $shifts = $pegawai->shift->sortBy('waktu_masuk');
+        Log::channel('shift')->info('Shifts raw : ' . $shifts->pluck('waktu_masuk')->join(', '));
 
-        // Cek apakah sekarang ada shift aktif (jika lintas hari misal 22:00–05:00), TAPI pastikan belum check_out hari ini
-        $shiftAktif = $shifts->first(function ($shift) use ($now, $pegawai) {
-          // 🔹 Cek apakah shift ini sudah di-check_out hari ini
-          $hasCheckedOut = Absen::where('no_pegawai', $pegawai->no_pegawai)
-            ->where('shift', $shift->shift)
-            ->whereNotNull('check_out')
-            ->whereDate('check_in', today())
-            ->exists();
+        $shiftData = $shifts->map(function ($shift) use ($now) {
+          // parse time -> Carbon with TODAY date
+          $start = Carbon::parse($shift->waktu_masuk);
+          $end = Carbon::parse($shift->waktu_pulang);
 
-          if ($hasCheckedOut) {
-            return false;
+          // jika shift lintas hari (start > end) => end harus ke besok
+          if ($start->gt($end)) {
+            $end->addDay();
           }
 
-          // Parse waktu shift ke Carbon dengan tanggal yang tepat
-          $tanggalSekarang = $now->copy()->startOfDay();
-          $startCarbon = $tanggalSekarang->copy()->setTimeFromTimeString($shift->waktu_masuk);
-          $endCarbon = $tanggalSekarang->copy()->setTimeFromTimeString($shift->waktu_pulang);
+          // KHUSUS: jika shift lintas hari dan sekarang berada setelah tengah malam
+          // tapi sebelum 'end' (mis. sekarang 01:00, end = besok 07:00),
+          // maka start sebenarnya adalah KEMARIN pada waktu start.
+          if ($start->gt($end) === false) {
+            // nothing here: kept for clarity
+          }
 
-          // Jika shift lintas hari, sesuaikan tanggal
-          if ($shift->waktu_masuk > $shift->waktu_pulang) {
-            $endCarbon = $endCarbon->copy()->addDay();
-            // Jika sekarang dalam rentang hari berikutnya, start di hari kemarin
-            if ($now->format('H:i:s') <= $shift->waktu_pulang) {
-              $startCarbon = $startCarbon->copy()->subDay();
+          // Deteksi overnight nyata: original start time (clock) lebih besar dari end clock
+          // (contoh 23:00 > 07:00)
+          $isOvernight = Carbon::parse($shift->waktu_masuk)->gt(Carbon::parse($shift->waktu_pulang));
+
+          if ($isOvernight) {
+            // setelah kita menambahkan day ke $end di atas, jika now < end => kita sedang di bagian dinihari
+            if ($now->lt($end)) {
+              // pindahkan start ke hari sebelumnya supaya start <= now (shift dimulai kemarin)
+              $start->subDay();
+            } else {
+              // jika now >= end, berarti kita sudah melewati periode overnight (start hari ini berlaku)
+              // tidak ubah start (tetap hari ini)
             }
           }
 
-          // Cek apakah $now dalam rentang shift
-          return $now->greaterThanOrEqualTo($startCarbon) && $now->lessThanOrEqualTo($endCarbon);
+          return (object) [
+            'model' => $shift,
+            'start' => $start,
+            'end' => $end,
+            'isOvernight' => $isOvernight,
+          ];
         });
+
+        // Log hasil mapping utk debugging
+        Log::channel('shift')->info('Mapped shifts: ' . $shiftData->map(fn($s) => [
+          'shift' => $s->model->shift,
+          'start' => $s->start->toDateTimeString(),
+          'end' => $s->end->toDateTimeString(),
+          'overnight' => $s->isOvernight,
+        ])->toJson(JSON_PRETTY_PRINT));
+
+        // tentukan shift yang waktu_masuk-nya TERDEKAT tetapi tidak melebihi NOW
+        $shiftAktifData = $shiftData
+          ->filter(fn($s) => $now->gte($s->start))
+          ->sortByDesc('start')
+          ->first();
+
+        // AMBIL SHIFT YANG PALING DEKAT DENGAN SEKARANG (upcoming or ongoing)
+        if (!$shiftAktifData) {
+          $shiftAktifData = $shiftData
+            ->sortBy(fn($s) => $now->diffInMinutes($s->start))
+            ->first();
+        }
+
+        Log::channel('shift')->info('Active shift candidate: ' . ($shiftAktifData ? json_encode([
+          'shift' => $shiftAktifData->model->shift,
+          'start' => $shiftAktifData->start->toDateTimeString(),
+          'end' => $shiftAktifData->end->toDateTimeString()
+        ]) : 'NULL'));
+
+        // kembalikan model asli (SHIFT)
+        Log::channel('shift')->info(json_encode($shiftAktifData));
+
+        $shiftAktif = $shiftAktifData->model;
+        Log::channel('shift')->info('Shift Aktif Baru : ' . $shiftAktif);
         // Jika tidak ada shift aktif (atau sudah check_out), cari shift berikutnya
         if (!$shiftAktif) {
           $shiftBerikutnya = $shifts->first(function ($shift) use ($now) {
@@ -205,6 +248,8 @@ class Analytics extends Controller
       // Bisa tambahkan log jika dibutuhkan
       // Log::error($e->getMessage());
     }
+
+    Log::channel('shift')->info('========================================================================================'); // Untuk melihat semua atribut
 
     // Cek Pengaturan Shift Pegawai
     $shiftPegawai = ShiftKerja::where('no_pegawai', $user->pegawai->no_pegawai)->first();
