@@ -103,6 +103,13 @@ class Analytics extends Controller
           ->sortByDesc('start')
           ->first();
 
+        // AMBIL SHIFT YANG PALING DEKAT DENGAN SEKARANG (upcoming or ongoing)
+        if (!$shiftAktifData) {
+          $shiftAktifData = $shiftData
+            ->sortBy(fn($s) => $now->diffInMinutes($s->start))
+            ->first();
+        }
+
         Log::channel('shift')->info('Active shift candidate: ' . ($shiftAktifData ? json_encode([
           'shift' => $shiftAktifData->model->shift,
           'start' => $shiftAktifData->start->toDateTimeString(),
