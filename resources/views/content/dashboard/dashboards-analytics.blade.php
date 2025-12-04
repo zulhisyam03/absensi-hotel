@@ -103,15 +103,21 @@
                                 <h4 class="mb-1" id="nama-pegawai">
                                     {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}
                                 </h4>
-                                <span class="badge bg-label-info fs-5" id="shift-pegawai">
-                                    Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) . ' ' . $waktuShiftAktif : '' }}
-                                </span>
+                                @if ($shiftAktif != '')
+                                    <span class="badge bg-label-info fs-5" id="shift-pegawai">
+                                        Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) . ' ' . $waktuShiftAktif : '' }}
+                                    </span>
+                                @else
+                                    <span class="badge bg-label-warning fs-5" id="shift-pegawai">
+                                        Silahkan Check In dan Pilih Shift
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Bagian bawah: Tombol di tengah -->
                             <div class="d-flex justify-content-center w-100">
                                 <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"
-                                    data-bs-toggle="modal" data-bs-target="#backDropModal">
+                                    data-bs-toggle="modal" data-bs-target="#modalShift">
                                     {{ $statusAbsen }}
                                 </button>
                             </div>
@@ -170,10 +176,11 @@
                     <input type="hidden" name="Baseradius" id="Baseradius">
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
-                    <span id="lblRadius"></span>
-                    <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">{{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h6>
-                    <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
-                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
+                    {{-- <span id="lblRadius"></span> --}}
+                    {{-- <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">
+                        {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h6> --}}
+                    {{-- <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
+                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p> --}}
                     <button type="button" class="btn btn-outline-secondary btn-sm"
                         data-bs-dismiss="modal">Close</button>
                     &nbsp;
@@ -184,6 +191,45 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Pilih Shift-->
+    <div class="modal fade" id="modalShift" tabindex="-1" aria-labelledby="modalShiftLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalShiftLabel">Daftar Shift Pegawai</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h5 id="namaPegawai" class="mb-1 fw-bold text-dark">
+                        {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h5>
+                    <span id="lblRadius"></span>
+                    <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
+                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
+
+                    <h6 class="fw-bold">Silahkan Pilih Shift Kerja Anda</h6>
+                    <div class="d-inline-block text-start mx-auto">
+                        @foreach ($listShift as $shift)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input shift-radio" type="radio" name="shift_id"
+                                    id="shift_{{ $shift['id'] }}" value="{{ $shift['id'] }}">
+
+                                <label class="form-check-label" for="shift_{{ $shift['id'] }}">
+                                    {{ strtoupper($shift['shift']) }}
+                                    ({{ substr($shift['waktu_masuk'], 0, 5) }} -
+                                    {{ substr($shift['waktu_pulang'], 0, 5) }})
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <button type="button" id="btnSaveShift" class="btn btn-primary btn-md" disabled>
+                    Check In
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal Pilih Shift-->
 
     {{-- Modal Foto Absen --}}
     <div class="modal fade" id="modalFoto" tabindex="-1" aria-labelledby="modalFotoLabel" aria-hidden="true">
@@ -210,12 +256,12 @@
         </div>
     </div>
     {{-- END Modal Foto Absen --}}
-
 @endsection
 
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+
             // Script Modal Foto
             $(document).on('click', '.btn-show-foto', function(e) {
                 e.preventDefault();
@@ -318,6 +364,73 @@
             }
             // End Export Function
 
+            // event saat modal daftar shift pegawai
+            document.getElementById('modalShift').addEventListener('shown.bs.modal', async function() {
+                // Scroll halaman utama ke atas secara otomatis
+                window.scrollTo(0, 0);
+
+                var radios = document.querySelectorAll(".shift-radio");
+                var btn = document.getElementById("btnSaveShift");
+
+                // Cek Lokasi
+                // --- Ambil parameter lokasi dari server
+                const lokasiData = await fetchConfigLokasi();
+                if (!lokasiData) {
+                    alert('Gagal memuat konfigurasi lokasi.');
+                    return;
+                }
+
+                // --- Ambil posisi sekarang
+                if (!navigator.geolocation) {
+                    alert('Browser tidak mendukung geolocation.');
+                    return;
+                }
+
+                // Set caption awal saat mulai mengambil lokasi
+                document.getElementById('lblRadius').innerHTML = '⏳ sedang mengambil lokasi ....';
+                $('#lblRadius').removeClass('text-success text-danger').addClass(
+                    'text-info'); // Opsional: tambahkan class untuk indikasi loading
+
+                navigator.geolocation.getCurrentPosition(function(posisi) {
+                    const currentLat = posisi.coords.latitude;
+                    const currentLng = posisi.coords.longitude;
+
+                    // document.getElementById('latitude').value = currentLat;
+                    // document.getElementById('longitude').value = currentLng;
+
+                    const paramLat = lokasiData.latitude;
+                    const paramLng = lokasiData.longitude;
+                    const radius = lokasiData.radius;
+
+                    const dalamRadius = isInsideRadius(paramLat, paramLng, radius, currentLat,
+                        currentLng);
+
+                    if (dalamRadius) {
+                        btnSaveAbsensi.disabled = false;
+                        document.getElementById('lblRadius').innerHTML =
+                            '✅' + @json($statusAbsen) + ' Ready !';
+                        $('#lblRadius').addClass('text-success');
+                        console.log('✅ Anda berada dalam radius lokasi yang diizinkan');
+
+                        radios.forEach(radio => {
+                            radio.addEventListener("change", function() {
+                                btn.disabled = false;
+                            });
+                        });
+                    } else {
+                        btnSaveAbsensi.disabled = true;
+                        document.getElementById('lblRadius').innerHTML =
+                            '❌ Anda Diluar Radius Absen !';
+                        $('#lblRadius').addClass('text-danger');
+                        console.log('❌ Anda berada di luar radius lokasi');
+                    }
+                }, function(error) {
+                    console.error('Gagal mendapatkan lokasi:', error);
+                });
+                // END Cek Lokasi
+            });
+            // END event saat modal daftar shift pegawai
+
             // Event saat modal dibuka: Scroll ke atas + akses kamera
             document.getElementById('backDropModal').addEventListener('shown.bs.modal', async function() {
                 // Scroll halaman utama ke atas secara otomatis
@@ -348,58 +461,6 @@
                         // Optional: Tutup modal jika gagal
                         // bootstrap.Modal.getInstance(document.getElementById('backDropModal')).hide();
                     });
-
-                // Cek Lokasi
-                // --- Ambil parameter lokasi dari server
-                const lokasiData = await fetchConfigLokasi();
-                if (!lokasiData) {
-                    alert('Gagal memuat konfigurasi lokasi.');
-                    return;
-                }
-
-                // --- Ambil posisi sekarang
-                if (!navigator.geolocation) {
-                    alert('Browser tidak mendukung geolocation.');
-                    return;
-                }
-
-                // Set caption awal saat mulai mengambil lokasi
-                document.getElementById('lblRadius').innerHTML = '⏳ sedang mengambil lokasi ....';
-                $('#lblRadius').removeClass('text-success text-danger').addClass(
-                    'text-info'); // Opsional: tambahkan class untuk indikasi loading
-                btnSaveAbsensi.disabled = true; // Pastikan tombol disabled saat loading
-
-                navigator.geolocation.getCurrentPosition(function(posisi) {
-                    const currentLat = posisi.coords.latitude;
-                    const currentLng = posisi.coords.longitude;
-
-                    document.getElementById('latitude').value = currentLat;
-                    document.getElementById('longitude').value = currentLng;
-
-                    const paramLat = lokasiData.latitude;
-                    const paramLng = lokasiData.longitude;
-                    const radius = lokasiData.radius;
-
-                    const dalamRadius = isInsideRadius(paramLat, paramLng, radius, currentLat,
-                        currentLng);
-
-                    if (dalamRadius) {
-                        btnSaveAbsensi.disabled = false;
-                        document.getElementById('lblRadius').innerHTML =
-                            '✅' + @json($statusAbsen) + ' Ready !';
-                        $('#lblRadius').addClass('text-success');
-                        console.log('✅ Anda berada dalam radius lokasi yang diizinkan');
-                    } else {
-                        btnSaveAbsensi.disabled = true;
-                        document.getElementById('lblRadius').innerHTML =
-                            '❌ Anda Diluar Radius Absen !';
-                        $('#lblRadius').addClass('text-danger');
-                        console.log('❌ Anda berada di luar radius lokasi');
-                    }
-                }, function(error) {
-                    console.error('Gagal mendapatkan lokasi:', error);
-                });
-                // END Cek Lokasi
             });
 
             async function fetchConfigLokasi() {
@@ -711,7 +772,7 @@
                             searchable: false,
                             className: 'more-column', // Tambahkan class untuk styling
                             render: function(data, type, row) {
-                                return '<button class="btn btn-sm btn-primary more-btn">More</button>';
+                                return '<button class="btn btn-sm btn-primary more-btn text-white">More</button>';
                             }
                         },
                         {
