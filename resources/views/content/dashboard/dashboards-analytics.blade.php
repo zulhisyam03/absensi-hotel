@@ -117,7 +117,8 @@
                             <!-- Bagian bawah: Tombol di tengah -->
                             <div class="d-flex justify-content-center w-100">
                                 <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"
-                                    data-bs-toggle="modal" data-bs-target="#modalShift">
+                                    data-bs-toggle="modal"
+                                    data-bs-target="{{ $statusAbsen == 'Check In' ? '#modalShift' : '#backDropModal' }}">
                                     {{ $statusAbsen }}
                                 </button>
                             </div>
@@ -178,8 +179,13 @@
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
                     <span id="lblRadius"></span>
-                    <h6 id="lblSelectedShift" class="mb-1 fw-bold text-dark"></h6>
-                    <input type="hidden" name="selectedShift" id="selectedShift">
+                    <h6 id="lblSelectedShift" class="mb-1 fw-bold text-dark">
+                        @if ($statusAbsen == 'Check Out')
+                            {{ strtoupper($shiftAktif) }} {{ strtoupper($waktuShiftAktif) }}
+                        @endif
+                    </h6>
+                    <input type="hidden" name="selectedShift" id="selectedShift"
+                        value="{{ $statusAbsen == 'Check Out' ? $shiftAktif : '' }}">
                     <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
                     <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
                     <button type="button" class="btn btn-outline-secondary btn-sm"
@@ -209,18 +215,20 @@
 
                     <h6 class="fw-bold">Silahkan Pilih Shift Kerja Anda</h6>
                     <div class="d-inline-block text-start mx-auto">
-                        @foreach ($listShift as $shift)
-                            <div class="form-check mb-2">
-                                <input class="form-check-input shift-radio" type="radio" name="shift_id"
-                                    id="shift_{{ $shift['id'] }}" value="{{ $shift['id'] }}">
+                        @if (!empty($listShift))
+                            @foreach ($listShift as $shift)
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input shift-radio" type="radio" name="shift_id"
+                                        id="shift_{{ $shift['id'] }}" value="{{ $shift['shift'] }}">
 
-                                <label class="form-check-label" for="shift_{{ $shift['id'] }}">
-                                    {{ strtoupper($shift['shift']) }}
-                                    ({{ substr($shift['waktu_masuk'], 0, 5) }} -
-                                    {{ substr($shift['waktu_pulang'], 0, 5) }})
-                                </label>
-                            </div>
-                        @endforeach
+                                    <label class="form-check-label" for="shift_{{ $shift['id'] }}">
+                                        {{ strtoupper($shift['shift']) }}
+                                        ({{ substr($shift['waktu_masuk'], 0, 5) }} -
+                                        {{ substr($shift['waktu_pulang'], 0, 5) }})
+                                    </label>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
                 <button type="button" id="btnSaveShift" class="btn btn-primary btn-md" disabled>
@@ -261,6 +269,8 @@
 @push('scripts')
     <script>
         window.addEventListener('load', function() {
+            var selectedShifWaktu = ''; // Inisialisasi dengan string kosong
+            var selectedShiftValue = ''; // Inisialisasi dengan string kosong
 
             // Script Modal Foto
             $(document).on('click', '.btn-show-foto', function(e) {
@@ -399,9 +409,14 @@
                 // Ambil shift yang dipilih
                 var selectedRadio = document.querySelector('input[name="shift_id"]:checked');
                 if (selectedRadio) {
-                    var selectedShiftText = selectedRadio.nextElementSibling.textContent
+                    selectedShiftText = selectedRadio.nextElementSibling.textContent
                         .trim(); // Ambil teks label shift
-                    var selectedShiftValue = selectedRadio.value; // Ambil value shift ID
+                    selectedShiftValue = selectedRadio.value; // Ambil value shift ID
+
+                    // mengambil waktu dari selectedShiftText
+                    let match = selectedShiftText.match(/\(\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\s*\)/);
+                    selectedShiftWaktu = match ? match[0] : null;
+
                     // Set ke elemen di backDropModal
                     document.getElementById('lblSelectedShift').textContent = selectedShiftText;
                     document.getElementById('selectedShift').value = selectedShiftValue;
@@ -416,6 +431,7 @@
                     radio.checked = false;
                 });
                 btnSaveShift.disabled = true;
+
                 // Buka modal baru #backDropModal
                 var backDropModal = new bootstrap.Modal(document.getElementById('backDropModal'));
                 backDropModal.show();
@@ -423,6 +439,7 @@
             // END event saat modal daftar shift pegawai
 
             // Event saat modal dibuka: Scroll ke atas + akses kamera
+            var cameraStream = null;
             document.getElementById('backDropModal').addEventListener('shown.bs.modal', async function() {
                 // Scroll halaman utama ke atas secara otomatis
                 window.scrollTo(0, 0);
@@ -443,15 +460,19 @@
 
                 // Set caption awal saat mulai mengambil lokasi
                 document.getElementById('lblRadius').innerHTML = '⏳ sedang mengambil lokasi ....';
-                $('#lblRadius').removeClass('text-success text-danger').addClass(
-                    'text-info'); // Opsional: tambahkan class untuk indikasi loading
+                $('#lblRadius').removeClass('text-success text-danger').addClass('text-info');
+
+                // Opsi untuk getCurrentPosition: timeout 10 detik, high accuracy
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000, // 10 detik
+                    maximumAge: 0
+                };
 
                 navigator.geolocation.getCurrentPosition(function(posisi) {
+                    console.log('Lokasi berhasil didapat:', posisi.coords); // Debug log
                     const currentLat = posisi.coords.latitude;
                     const currentLng = posisi.coords.longitude;
-
-                    // document.getElementById('latitude').value = currentLat;
-                    // document.getElementById('longitude').value = currentLng;
 
                     const paramLat = lokasiData.latitude;
                     const paramLng = lokasiData.longitude;
@@ -462,8 +483,8 @@
 
                     if (dalamRadius) {
                         btnSaveAbsensi.disabled = false;
-                        document.getElementById('lblRadius').innerHTML =
-                            '✅' + @json($statusAbsen) + ' Ready !';
+                        document.getElementById('lblRadius').innerHTML = '✅' +
+                            @json($statusAbsen) + ' Ready !';
                         $('#lblRadius').addClass('text-success');
                         console.log('✅ Anda berada dalam radius lokasi yang diizinkan');
                     } else {
@@ -474,35 +495,55 @@
                         console.log('❌ Anda berada di luar radius lokasi');
                     }
                 }, function(error) {
-                    console.error('Gagal mendapatkan lokasi:', error);
-                });
+                    console.error('Gagal mendapatkan lokasi:', error); // Debug log
+                    btnSaveAbsensi.disabled = true;
+                    let errorMsg = '❌ Gagal mendapatkan lokasi: ';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg += 'Izin lokasi ditolak. Izinkan akses lokasi di browser.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg += 'Lokasi tidak tersedia.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg += 'Timeout mendapatkan lokasi.';
+                            break;
+                        default:
+                            errorMsg += 'Error tidak diketahui.';
+                            break;
+                    }
+                    document.getElementById('lblRadius').innerHTML = errorMsg;
+                    $('#lblRadius').addClass('text-danger');
+                }, options); // Tambahkan options di sini
                 // END Cek Lokasi
 
                 // Akses kamera (kamera depan untuk selfie/absensi)
-                navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: 'user', // Kamera depan
-                            width: {
-                                ideal: 1280
-                            },
-                            height: {
-                                ideal: 720
+                // ==== CEGAH KAMERA DUA KALI ====
+                if (!cameraStream) {
+                    try {
+                        cameraStream = await navigator.mediaDevices.getUserMedia({
+                            video: {
+                                facingMode: 'user',
+                                width: {
+                                    ideal: 1280
+                                },
+                                height: {
+                                    ideal: 720
+                                },
                             }
-                        }
-                    })
-                    .then(function(stream) {
-                        var video = document.getElementById('videoKamera');
-                        video.srcObject = stream;
-                        video.play(); // Pastikan play di mobile
-                    })
-                    .catch(function(err) {
-                        console.error('Error accessing camera: ', err);
-                        alert(
-                            'Gagal mengakses kamera. Izinkan permission di browser dan coba lagi.'
-                        );
-                        // Optional: Tutup modal jika gagal
-                        // bootstrap.Modal.getInstance(document.getElementById('backDropModal')).hide();
-                    });
+                        });
+
+                        const video = document.getElementById('videoKamera');
+                        video.srcObject = cameraStream;
+
+                        await video.play(); // pakai await untuk handle promise
+
+                    } catch (err) {
+                        alert("Gagal mengakses kamera");
+                        console.error(err);
+                        return;
+                    }
+                }
             });
 
             async function fetchConfigLokasi() {
@@ -693,8 +734,14 @@
                         const Baseradius = document.getElementById('Baseradius').value;
                         const Baselatitude = document.getElementById('Baselatitude').value;
                         const Baselongitude = document.getElementById('Baselongitude').value;
-                        const shiftAktif = @json(isset($shiftAktif) ? strtolower($shiftAktif) : '');
-                        const waktuShiftAktif = @json(isset($waktuShiftAktif) ? strtolower($waktuShiftAktif) : '');
+                        var shiftAktif = @json(isset($shiftAktif) ? strtolower($shiftAktif) : null);
+                        if (!shiftAktif) {
+                            shiftAktif = selectedShiftValue
+                        }
+                        var waktuShiftAktif = @json(isset($waktuShiftAktif) ? strtolower($waktuShiftAktif) : null);
+                        if (!waktuShiftAktif) {
+                            waktuShiftAktif = selectedShiftWaktu;
+                        }
 
                         // 4️⃣ Siapkan data form
                         const formData = new FormData();

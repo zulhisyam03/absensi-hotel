@@ -16,7 +16,7 @@ class Analytics extends Controller
   public function index()
   {
     // ✅ Jalankan command sebelum load dashboard
-    Artisan::call('shift:cek');
+    // Artisan::call('shift:cek');
 
     // Ambil user login
     $user = Auth::user();
@@ -46,7 +46,7 @@ class Analytics extends Controller
         Log::channel('shift')->info('Status Absen : Ready Check Out'); // Untuk melihat semua atribut
       } else {
         $listShift = ShiftKerja::where('no_pegawai', $pegawai->no_pegawai)
-          ->where('flag','!=', 'f')
+          ->where('flag', '!=', 'f')
           ->get();
       }
 
@@ -57,6 +57,6 @@ class Analytics extends Controller
 
     Log::channel('shift')->info('========================================================================================'); // Untuk melihat semua atribut
 
-    return view('content.dashboard.dashboards-analytics', compact('user', 'pegawai','listShift', 'shiftAktif', 'waktuShiftAktif', 'statusAbsen'));
+    return view('content.dashboard.dashboards-analytics', compact('user', 'pegawai', 'listShift', 'shiftAktif', 'waktuShiftAktif', 'statusAbsen'));
   }
 }
