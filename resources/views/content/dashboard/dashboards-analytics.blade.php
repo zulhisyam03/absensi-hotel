@@ -105,7 +105,7 @@
                                 </h4>
                                 @if ($shiftAktif != '')
                                     <span class="badge bg-label-info fs-5" id="shift-pegawai">
-                                        Shift {{ isset($shiftAktif) ? ucfirst($shiftAktif) . ' ' . $waktuShiftAktif : '' }}
+                                        {{ isset($shiftAktif) ? ucfirst($shiftAktif) . ' ' . $waktuShiftAktif : '' }}
                                     </span>
                                 @else
                                     <span class="badge bg-label-warning fs-5" id="shift-pegawai">
