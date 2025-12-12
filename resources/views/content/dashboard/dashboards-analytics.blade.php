@@ -218,7 +218,7 @@
                     <div class="d-inline-block text-start mx-auto">
                         @if (!empty($listShift))
                             @foreach ($listShift as $shift)
-                                <div class="form-check mb-2">
+                                <div class="form-check mb-2 pb-2 border-bottom">
                                     <input class="form-check-input shift-radio" type="radio" name="shift_id"
                                         id="shift_{{ $shift['id'] }}" value="{{ $shift['shift'] }}">
 
