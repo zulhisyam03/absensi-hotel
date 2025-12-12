@@ -152,7 +152,8 @@
                 enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="backDropModalTitle" class="text-light">Absensi Wajah</h5>
+                    <h5 class="modal-title" id="backDropModalTitle" class="text-light">
+                        {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h5>
                     {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
                 </div>
                 <div class="modal-body p-0">
@@ -176,11 +177,11 @@
                     <input type="hidden" name="Baseradius" id="Baseradius">
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
-                    {{-- <span id="lblRadius"></span> --}}
-                    {{-- <h6 id="namaPegawai" class="mb-1 fw-bold text-dark">
-                        {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h6> --}}
-                    {{-- <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
-                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p> --}}
+                    <span id="lblRadius"></span>
+                    <h6 id="lblSelectedShift" class="mb-1 fw-bold text-dark"></h6>
+                    <input type="hidden" name="selectedShift" id="selectedShift">
+                    <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
+                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
                     <button type="button" class="btn btn-outline-secondary btn-sm"
                         data-bs-dismiss="modal">Close</button>
                     &nbsp;
@@ -203,9 +204,8 @@
                 <div class="modal-body text-center">
                     <h5 id="namaPegawai" class="mb-1 fw-bold text-dark">
                         {{ strtoupper(Auth::user()->pegawai->nama_pegawai) }}</h5>
-                    <span id="lblRadius"></span>
-                    <p id="tanggalSekarang" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
-                    <p id="jamSekarang" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
+                    <p id="tanggalSekarangShift" class="mb-0 text-muted" style="font-size: 0.9rem;"></p>
+                    <p id="jamSekarangShift" class="mb-2 text-primary fw-semibold" style="font-size: 1.1rem;"></p>
 
                     <h6 class="fw-bold">Silahkan Pilih Shift Kerja Anda</h6>
                     <div class="d-inline-block text-start mx-auto">
@@ -299,6 +299,8 @@
 
                 document.getElementById('tanggalSekarang').textContent = tanggal;
                 document.getElementById('jamSekarang').textContent = jam;
+                document.getElementById('tanggalSekarangShift').textContent = tanggal;
+                document.getElementById('jamSekarangShift').textContent = jam;
             }
 
             // Jalankan setiap detik
@@ -370,7 +372,60 @@
                 window.scrollTo(0, 0);
 
                 var radios = document.querySelectorAll(".shift-radio");
-                var btn = document.getElementById("btnSaveShift");
+                var btnSaveShift = document.getElementById("btnSaveShift");
+
+                radios.forEach(radio => {
+                    radio.addEventListener("change", function() {
+                        btnSaveShift.disabled = false;
+                    });
+                });
+            });
+            // END event saat modal daftar shift pegawai
+
+            // Event saat modal ditutup (untuk reset)
+            document.getElementById('modalShift').addEventListener('hidden.bs.modal', function() {
+                var radios = document.querySelectorAll(".shift-radio");
+                var btnSaveShift = document.getElementById("btnSaveShift");
+                // Reset radio buttons (tidak ada yang dipilih)
+                radios.forEach(radio => {
+                    radio.checked = false;
+                });
+                // Disable tombol Check In
+                btnSaveShift.disabled = true;
+            });
+
+            // Event saat tombol Check In diklik
+            document.getElementById('btnSaveShift').addEventListener('click', function() {
+                // Ambil shift yang dipilih
+                var selectedRadio = document.querySelector('input[name="shift_id"]:checked');
+                if (selectedRadio) {
+                    var selectedShiftText = selectedRadio.nextElementSibling.textContent
+                        .trim(); // Ambil teks label shift
+                    var selectedShiftValue = selectedRadio.value; // Ambil value shift ID
+                    // Set ke elemen di backDropModal
+                    document.getElementById('lblSelectedShift').textContent = selectedShiftText;
+                    document.getElementById('selectedShift').value = selectedShiftValue;
+                }
+                // Tutup modal pertama
+                var modalShift = bootstrap.Modal.getInstance(document.getElementById('modalShift'));
+                modalShift.hide();
+                // Reset modal pertama (meskipun sudah ada di hidden event, ini memastikan)
+                var radios = document.querySelectorAll(".shift-radio");
+                var btnSaveShift = document.getElementById("btnSaveShift");
+                radios.forEach(radio => {
+                    radio.checked = false;
+                });
+                btnSaveShift.disabled = true;
+                // Buka modal baru #backDropModal
+                var backDropModal = new bootstrap.Modal(document.getElementById('backDropModal'));
+                backDropModal.show();
+            });
+            // END event saat modal daftar shift pegawai
+
+            // Event saat modal dibuka: Scroll ke atas + akses kamera
+            document.getElementById('backDropModal').addEventListener('shown.bs.modal', async function() {
+                // Scroll halaman utama ke atas secara otomatis
+                window.scrollTo(0, 0);
 
                 // Cek Lokasi
                 // --- Ambil parameter lokasi dari server
@@ -411,12 +466,6 @@
                             '✅' + @json($statusAbsen) + ' Ready !';
                         $('#lblRadius').addClass('text-success');
                         console.log('✅ Anda berada dalam radius lokasi yang diizinkan');
-
-                        radios.forEach(radio => {
-                            radio.addEventListener("change", function() {
-                                btn.disabled = false;
-                            });
-                        });
                     } else {
                         btnSaveAbsensi.disabled = true;
                         document.getElementById('lblRadius').innerHTML =
@@ -428,13 +477,6 @@
                     console.error('Gagal mendapatkan lokasi:', error);
                 });
                 // END Cek Lokasi
-            });
-            // END event saat modal daftar shift pegawai
-
-            // Event saat modal dibuka: Scroll ke atas + akses kamera
-            document.getElementById('backDropModal').addEventListener('shown.bs.modal', async function() {
-                // Scroll halaman utama ke atas secara otomatis
-                window.scrollTo(0, 0);
 
                 // Akses kamera (kamera depan untuk selfie/absensi)
                 navigator.mediaDevices.getUserMedia({
