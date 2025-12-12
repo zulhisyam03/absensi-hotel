@@ -116,8 +116,9 @@
 
                             <!-- Bagian bawah: Tombol di tengah -->
                             <div class="d-flex justify-content-center w-100">
-                                <button class="btn btn-primary rounded-circle fs-2" style="width:175px;height:175px;"
-                                    data-bs-toggle="modal"
+                                <button
+                                    class="btn {{ $statusAbsen == 'Check In' ? 'btn-primary' : 'btn-danger' }}  rounded-circle fs-2"
+                                    style="width:175px;height:175px;" data-bs-toggle="modal"
                                     data-bs-target="{{ $statusAbsen == 'Check In' ? '#modalShift' : '#backDropModal' }}">
                                     {{ $statusAbsen }}
                                 </button>
