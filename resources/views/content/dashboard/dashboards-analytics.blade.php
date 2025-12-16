@@ -116,35 +116,36 @@
 
                             <!-- Bagian bawah: Tombol di tengah -->
                             <div class="d-flex justify-content-center w-100">
-                                <button
-                                    class="btn {{ $statusAbsen == 'Check In' ? 'btn-primary' : 'btn-danger' }}  rounded-circle fs-2"
-                                    style="width:175px;height:175px;" data-bs-toggle="modal"
-                                    data-bs-target="{{ $statusAbsen == 'Check In' ? '#modalShift' : '#backDropModal' }}">
-                                    {{ $statusAbsen }}
-                                </button>
-                            </div>
-                        </div>
+                                @if ($statusAbsen == 'Check In')
+                                    <button
+                                        class="btn btn-primary btn-checkin rounded-circle fs-2
+               d-flex flex-column justify-content-center align-items-center"
+                                        style="width:175px;height:175px;" data-bs-toggle="modal"
+                                        data-bs-target="#modalShift">
 
-                    </div>
-                </div>
-                {{-- <div class="col-6 mb-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <p class="badge bg-label-warning fs-5 mb-1">Kehadiran</p>
-                            <h4 class="card-title fs-1 text-center">2</h4>
+                                        <i class="bx bx-log-in fs-1 mb-2"></i>
+                                        <span class="fs-3">{{ $statusAbsen }}</span>
+                                    </button>
+                                @else
+                                    <button
+                                        class="btn btn-danger btn-checkout rounded-circle fs-2
+               d-flex flex-column justify-content-center align-items-center"
+                                        style="width:175px;height:175px;" data-bs-toggle="modal"
+                                        data-bs-target="#backDropModal">
+
+                                        <i class="bx bx-log-out fs-1 mb-2"></i>
+                                        <span class="fs-4">{{ $statusAbsen }}</span>
+                                    </button>
+                            </div>
+                            @endif
+
                         </div>
                     </div>
+
                 </div>
-                <div class="col-6 mb-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <p class="badge bg-label-primary fs-5 mb-1">Cuti</p>
-                            <h4 class="card-title fs-1 text-center">12</h4>
-                        </div>
-                    </div>
-                </div> --}}
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Modal -->
@@ -1221,6 +1222,54 @@
         body.modal-open {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        .btn-checkin {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: #fff;
+            font-size: 26px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .btn-checkin i {
+            font-size: 38px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .btn-checkout {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff;
+            font-size: 26px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 25px rgba(79, 172, 254, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(79, 172, 254, 0);
+            }
         }
     </style>
 @endpush
