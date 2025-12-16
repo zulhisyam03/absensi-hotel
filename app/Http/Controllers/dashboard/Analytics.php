@@ -16,7 +16,7 @@ class Analytics extends Controller
   public function index()
   {
     // ✅ Jalankan command sebelum load dashboard
-    // Artisan::call('shift:cek');
+    Artisan::call('shift:cek');
 
     // Ambil user login
     $user = Auth::user();

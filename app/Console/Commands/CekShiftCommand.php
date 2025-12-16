@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class CekShiftCommand extends Command
 {
   protected $signature = 'shift:cek';
-  protected $description = 'Cek absen yang sudah melewati waktu shift_pulang + 5 jam tanpa check out dan ubah ke tco';
+  protected $description = 'Cek absen yang sudah melewati waktu shift_pulang + 8 jam tanpa check out dan ubah ke tco';
 
   public function handle()
   {
@@ -28,13 +28,13 @@ class CekShiftCommand extends Command
         // Parse shift_pulang (sudah datetime penuh di DB)
         $shiftPulang = Carbon::parse($absen->shift_pulang);
 
-        // Hitung batas waktu (shift_pulang + 5 jam)
-        $batasWaktu = $shiftPulang->copy()->addHours(5);
+        // Hitung batas waktu (shift_pulang + 8 jam)
+        $batasWaktu = $shiftPulang->copy()->addHours(8);
 
         Log::channel('shift')->info("CekShift - ID: {$absen->id}, Pegawai: {$absen->no_pegawai}");
         Log::channel('shift')->info("Shift Pulang: {$shiftPulang}, Batas Waktu: {$batasWaktu}, Sekarang: {$now}");
 
-        // Jika waktu sekarang sudah lewat 5 jam dari shift_pulang
+        // Jika waktu sekarang sudah lewat 8 jam dari shift_pulang
         if ($now->greaterThan($batasWaktu)) {
           $absen->update(['keterangan' => 'tco']);
           $updated++;
