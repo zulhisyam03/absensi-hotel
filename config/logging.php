@@ -127,6 +127,12 @@ return [
       'path' => storage_path('logs/laravel.log'),
     ],
 
+    'shift' => [
+      'driver' => 'single',
+      'path' => storage_path('logs/shift.log'),
+      'level' => 'debug',
+    ]
+
   ],
 
 ];
