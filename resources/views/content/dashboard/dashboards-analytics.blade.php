@@ -470,10 +470,10 @@
                 document.getElementById('lblRadius').innerHTML = '⏳ sedang mengambil lokasi ....';
                 $('#lblRadius').removeClass('text-success text-danger').addClass('text-info');
 
-                // Opsi untuk getCurrentPosition: timeout 10 detik, high accuracy
+                // Opsi untuk getCurrentPosition: timeout 40 detik, high accuracy
                 const options = {
                     enableHighAccuracy: true,
-                    timeout: 10000, // 10 detik
+                    timeout: 40000, // 40 detik
                     maximumAge: 0
                 };
 
