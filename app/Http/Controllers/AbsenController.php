@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver; // Atau gunakan \Logisk\Drivers\Imagick\Driver jika pakai Imagick
+
 class AbsenController extends Controller
 {
   /**
@@ -106,7 +109,17 @@ class AbsenController extends Controller
         if ($request->hasFile('foto_absensi')) {
           $file = $request->file('foto_absensi');
           $filename = 'checkout_' . $noPegawai . '_' . time() . '.' . $file->getClientOriginalExtension();
-          $path = $file->storeAs('check-out', $filename, 'public');
+
+          // 1. Buat instance ImageManager dengan driver GD
+          $manager = new ImageManager(new Driver());
+
+          // 2. Baca gambar menggunakan manager tersebut
+          $image = $manager->read($file)->scale(width: 800);
+          $encoded = $image->toJpeg(75);
+
+          // 3. Simpan ke storage
+          $path = 'check-out/' . $filename;
+          Storage::disk('public')->put($path, $encoded);
         }
 
         // Ambil waktu shift pulang dari record absen
@@ -143,7 +156,17 @@ class AbsenController extends Controller
         if ($request->hasFile('foto_absensi')) {
           $file = $request->file('foto_absensi');
           $filename = 'checkin_' . $noPegawai . '_' . time() . '.' . $file->getClientOriginalExtension();
-          $path = $file->storeAs('check-in', $filename, 'public');
+
+          // 1. Buat instance ImageManager dengan driver GD
+          $manager = new ImageManager(new Driver());
+
+          // 2. Baca gambar menggunakan manager tersebut
+          $image = $manager->read($file)->scale(width: 800);
+          $encoded = $image->toJpeg(75);
+
+          // 3. Simpan ke storage
+          $path = 'check-in/' . $filename;
+          Storage::disk('public')->put($path, $encoded);
         }
 
         $telat = $this->isTerlambat($checkIn, $shiftStart, $shiftEnd);
