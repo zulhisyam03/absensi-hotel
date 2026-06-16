@@ -256,7 +256,7 @@
                             <p><b>Check In</b></p>
                             <img id="pictIn" src="" alt="Pict In" class="img-fluid rounded shadow">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="checkoutFrame">
                             <p><b>Check Out</b></p>
                             <img id="pictOut" src="" alt="Pict Out" class="img-fluid rounded shadow">
                         </div>
@@ -284,7 +284,13 @@
 
                 $('#namaPegawaiModal').text(nama);
                 $('#pictIn').attr('src', pictIn || 'https://via.placeholder.com/300x300?text=No+Image');
-                $('#pictOut').attr('src', pictOut || 'https://via.placeholder.com/300x300?text=No+Image');
+                if (pictOut) {
+                    $('#checkoutFrame').removeClass('d-none');
+                    $('#pictOut').attr('src', pictOut ||
+                        'https://via.placeholder.com/300x300?text=No+Image');
+                } else {
+                    $('#checkoutFrame').addClass('d-none');
+                }
 
                 $('#modalFoto').modal('show');
             });
