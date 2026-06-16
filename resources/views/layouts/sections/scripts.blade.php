@@ -16,6 +16,28 @@
 <!-- END: Page JS-->
 
 <script>
+    let lastHiddenTime = null;
+
+    document.addEventListener('visibilitychange', function() {
+
+        if (document.hidden) {
+            // Saat tab disembunyikan
+            lastHiddenTime = Date.now();
+        } else {
+
+            // Saat tab dibuka kembali
+            if (lastHiddenTime) {
+
+                let elapsed = Date.now() - lastHiddenTime;
+                let thirtyMinutes = 30 * 60 * 1000;
+
+                if (elapsed > thirtyMinutes) {
+                    location.reload();
+                }
+            }
+        }
+    });
+
     function logoutUser() {
         fetch("{{ route('logout') }}", {
                 method: "POST",
