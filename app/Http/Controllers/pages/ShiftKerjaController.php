@@ -5,6 +5,7 @@ namespace App\Http\Controllers\pages;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ShiftKerja;
+use App\Models\Pegawai;
 use App\Models\Param;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -125,7 +126,7 @@ class ShiftKerjaController extends Controller
         $shiftKerja->shift = strtolower($validated['shift_kerja']);
         $shiftKerja->waktu_masuk = $validated['waktu_masuk'];
         $shiftKerja->waktu_pulang = $validated['waktu_pulang'];
-        $shiftKerja->waktu_pulang = $flag;
+        $shiftKerja->flag = $flag;
         $shiftKerja->save();
 
         return redirect()->route('pages-shift-kerja')->with('success', 'Data shift kerja pegawai ' . strtoupper($request['nama_pegawai'] . ' berhasil diupdate.'));
@@ -295,6 +296,15 @@ class ShiftKerjaController extends Controller
       // Simpan kembali ke database
       $param->svalue = json_encode($shifts);
       $param->save();
+
+      $shiftkerja = strtolower($validated['shift']);
+      $dataShiftKerja = ShiftKerja::where('shift', $shiftkerja)->get();
+      $dataShiftKerja->each(function ($item) use ($validated) {
+        $item->waktu_masuk = $validated['waktu_masuk'];
+        $item->waktu_pulang = $validated['waktu_pulang'];
+        $item->save();
+      });
+
 
       return redirect()->route('config-shift-kerja')->with('success', 'Parameter shift kerja berhasil diupdate.');
     } catch (\Exception $e) {
